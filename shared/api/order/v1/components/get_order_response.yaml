@@ -1,0 +1,4 @@
+type: object
+properties:
+  allOf:
+    $ref: "./order_dto.yaml"

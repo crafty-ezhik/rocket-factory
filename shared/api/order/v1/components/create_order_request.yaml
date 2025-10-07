@@ -1,0 +1,15 @@
+type: object
+required:
+  - user_uuid
+  - part_uuids
+properties:
+  user_uuid:
+    type: string
+    format: uuid
+    description: Уникальный идентификатор пользователя
+    example: 66e69275-c6bc-800c-90a6-2f41cb991502
+
+  part_uuids:
+    type: array
+    description: Список уникальных идентификаторов деталей
+    example: [string, string]
