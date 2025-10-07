@@ -4,8 +4,6 @@ syntax = "proto3";
 package inventory.v1;
 
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/wrappers.proto";
-import "google/protobuf/empty.proto";
 
 // Описываем, куда будет положены сгенерированные файла и как будет называться пакет в Go
 option go_package = "github.com/crafty-ezhik/rocket-factory/pkg/proto/inventory/v1;inventory_v1";
