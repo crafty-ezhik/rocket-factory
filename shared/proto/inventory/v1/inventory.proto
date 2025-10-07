@@ -101,19 +101,19 @@ message PartsFilter{
 // Category перечисление категорий деталей
 enum Category {
   // Неизвестная категория
-  CATEGORY_UNKNOW_UNSPECIFIED = 0;
+  UNKNOW_UNSPECIFIED = 0;
 
   // Двигатель
-  CATEGORY_ENGINE = 1;
+  ENGINE = 1;
 
   // Топливо
-  CATEGORY_FUEL = 2;
+  FUEL = 2;
 
   // Иллюминатор
-  CATEGORY_PORTHOLE = 3;
+  PORTHOLE = 3;
 
   // Крыло
-  CATEGORY_WING = 4;
+  WING = 4;
 }
 
 // Dimensions описание размеров и веса детали
