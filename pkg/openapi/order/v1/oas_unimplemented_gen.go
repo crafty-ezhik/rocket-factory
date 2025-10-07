@@ -48,3 +48,11 @@ func (UnimplementedHandler) OrderGet(ctx context.Context, params OrderGetParams)
 func (UnimplementedHandler) OrderPay(ctx context.Context, req *PayOrderRequest, params OrderPayParams) (r OrderPayRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
+
+// NewError creates *GenericErrorStatusCode from error returned by handler.
+//
+// Used for common default response.
+func (UnimplementedHandler) NewError(ctx context.Context, err error) (r *GenericErrorStatusCode) {
+	r = new(GenericErrorStatusCode)
+	return r
+}

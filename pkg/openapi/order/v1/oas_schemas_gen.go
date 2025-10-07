@@ -3,10 +3,16 @@
 package order_v1
 
 import (
+	"fmt"
+
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 	"github.com/google/uuid"
 )
+
+func (s *GenericErrorStatusCode) Error() string {
+	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
+}
 
 // Ref: #/components/schemas/bad_gateway_error
 type BadGatewayError struct {
@@ -193,6 +199,60 @@ func (s *ForbiddenError) SetMessage(val string) {
 func (*ForbiddenError) orderCancelRes() {}
 func (*ForbiddenError) orderGetRes()    {}
 func (*ForbiddenError) orderPayRes()    {}
+
+// Ref: #/components/schemas/generic_error
+type GenericError struct {
+	// HTTP-код ошибки.
+	Code int `json:"code"`
+	// Описание ошибки.
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *GenericError) GetCode() int {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *GenericError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *GenericError) SetCode(val int) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *GenericError) SetMessage(val string) {
+	s.Message = val
+}
+
+// GenericErrorStatusCode wraps GenericError with StatusCode.
+type GenericErrorStatusCode struct {
+	StatusCode int
+	Response   GenericError
+}
+
+// GetStatusCode returns the value of StatusCode.
+func (s *GenericErrorStatusCode) GetStatusCode() int {
+	return s.StatusCode
+}
+
+// GetResponse returns the value of Response.
+func (s *GenericErrorStatusCode) GetResponse() GenericError {
+	return s.Response
+}
+
+// SetStatusCode sets the value of StatusCode.
+func (s *GenericErrorStatusCode) SetStatusCode(val int) {
+	s.StatusCode = val
+}
+
+// SetResponse sets the value of Response.
+func (s *GenericErrorStatusCode) SetResponse(val GenericError) {
+	s.Response = val
+}
 
 // Ref: #/components/schemas/get_order_response
 type GetOrderResponse struct {
