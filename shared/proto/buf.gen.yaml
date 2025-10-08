@@ -20,3 +20,9 @@ plugins:
     opt:
       - paths=source_relative
       - lang=go
+  - local: ../../bin/protoc-gen-openapiv2
+    out: ../../shared/pkg
+    opt:
+      - allow_merge=true
+      - merge_file_name=swagger.json
+      - json_names_for_fields=false
