@@ -1,0 +1,375 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Package inventory.v1 содержит API для работы с InventoryService",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "InventoryService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/api/v1/inventory": {
+      "get": {
+        "summary": "ListParts возвращает список деталей с возможностью фильтрации.",
+        "operationId": "InventoryService_ListParts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListPartsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter.uuids",
+            "description": "uuids - Список UUID'ов. Пусто — не фильтруем по UUID",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.names",
+            "description": "names - Список имён. Пусто — не фильтруем по имени",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.categories",
+            "description": "categories - Список категорий. Пусто — не фильтруем по категории\n\n - UNKNOW_UNSPECIFIED: Неизвестная категория\n - ENGINE: Двигатель\n - FUEL: Топливо\n - PORTHOLE: Иллюминатор\n - WING: Крыло",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "UNKNOW_UNSPECIFIED",
+                "ENGINE",
+                "FUEL",
+                "PORTHOLE",
+                "WING"
+              ]
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.manufacturer_countries",
+            "description": "manufacturer_countries - Список стран производителей. Пусто — не фильтруем по стране",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "filter.tags",
+            "description": "tags - Список тегов. Пусто — не фильтруем по тегам",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "InventoryService"
+        ]
+      }
+    },
+    "/api/v1/inventory/{uuid}": {
+      "get": {
+        "summary": "GetPart возвращает информацию о детали по её UUID.",
+        "operationId": "InventoryService_GetPart",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetPartResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "uuid",
+            "description": "uuid - идентификатор детали",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InventoryService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1Category": {
+      "type": "string",
+      "enum": [
+        "UNKNOW_UNSPECIFIED",
+        "ENGINE",
+        "FUEL",
+        "PORTHOLE",
+        "WING"
+      ],
+      "default": "UNKNOW_UNSPECIFIED",
+      "description": "- UNKNOW_UNSPECIFIED: Неизвестная категория\n - ENGINE: Двигатель\n - FUEL: Топливо\n - PORTHOLE: Иллюминатор\n - WING: Крыло",
+      "title": "Category перечисление категорий деталей"
+    },
+    "v1Dimensions": {
+      "type": "object",
+      "properties": {
+        "length": {
+          "type": "number",
+          "format": "double",
+          "title": "length - длина в см"
+        },
+        "width": {
+          "type": "number",
+          "format": "double",
+          "title": "width - ширина в см"
+        },
+        "height": {
+          "type": "number",
+          "format": "double",
+          "title": "height - высота в см"
+        },
+        "weight": {
+          "type": "number",
+          "format": "double",
+          "title": "weight - вес в кг"
+        }
+      },
+      "title": "Dimensions описание размеров и веса детали"
+    },
+    "v1GetPartResponse": {
+      "type": "object",
+      "properties": {
+        "part": {
+          "$ref": "#/definitions/v1Part",
+          "title": "part - информация о детали"
+        }
+      },
+      "title": "GetPartResponse ответ на запрос получения информации о детали по её UUID"
+    },
+    "v1ListPartsResponse": {
+      "type": "object",
+      "properties": {
+        "parts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Part"
+          },
+          "title": "parts - Список деталей"
+        }
+      },
+      "title": "ListPartsResponse ответ на запрос получения списка деталей с возможностью фильтрации"
+    },
+    "v1Manufacturer": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name - Название"
+        },
+        "country": {
+          "type": "string",
+          "title": "country - Страна производителя"
+        },
+        "website": {
+          "type": "string",
+          "title": "website - Сайт производителя"
+        }
+      },
+      "title": "Manufacturer описание производителя"
+    },
+    "v1Part": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "title": "uuid - Уникальный идентификатор детали"
+        },
+        "name": {
+          "type": "string",
+          "title": "name - Название детали"
+        },
+        "description": {
+          "type": "string",
+          "title": "description - Описание детали"
+        },
+        "price": {
+          "type": "number",
+          "format": "double",
+          "title": "price - Цена за единицу"
+        },
+        "stock_quantity": {
+          "type": "string",
+          "format": "int64",
+          "title": "stock_quantity - Количество на складе"
+        },
+        "category": {
+          "$ref": "#/definitions/v1Category",
+          "title": "category - Категория"
+        },
+        "dimensions": {
+          "$ref": "#/definitions/v1Dimensions",
+          "title": "dimensions - Размеры детали"
+        },
+        "manufacturer": {
+          "$ref": "#/definitions/v1Manufacturer",
+          "title": "manufacturer - Информация о производителе"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "tags - Теги для быстрого поиска"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Value"
+          },
+          "title": "metadata - Гибкие метаданные"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "created_at - Дата создания"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "updated_at - Дата обновления"
+        }
+      },
+      "title": "Part информация о детали"
+    },
+    "v1PartsFilter": {
+      "type": "object",
+      "properties": {
+        "uuids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "uuids - Список UUID'ов. Пусто — не фильтруем по UUID"
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "names - Список имён. Пусто — не фильтруем по имени"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v1Category"
+          },
+          "title": "categories - Список категорий. Пусто — не фильтруем по категории"
+        },
+        "manufacturer_countries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "manufacturer_countries - Список стран производителей. Пусто — не фильтруем по стране"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "tags - Список тегов. Пусто — не фильтруем по тегам"
+        }
+      },
+      "title": "PartsFilter доступные поля для фильтрации деталей (опционально)"
+    },
+    "v1Value": {
+      "type": "object",
+      "properties": {
+        "string_value": {
+          "type": "string"
+        },
+        "int64_value": {
+          "type": "string",
+          "format": "int64"
+        },
+        "double_value": {
+          "type": "number",
+          "format": "double"
+        },
+        "bool_value": {
+          "type": "boolean"
+        }
+      },
+      "title": "Value значения для metadata"
+    }
+  }
+}
