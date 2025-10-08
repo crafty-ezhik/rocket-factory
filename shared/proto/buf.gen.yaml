@@ -4,14 +4,14 @@ clean: true
 
 plugins:
   - local: ../../bin/protoc-gen-go
-    out: ../../pkg/proto
+    out: ../../shared/pkg/proto
     opt:
       - paths=source_relative
   - local: ../../bin/protoc-gen-go-grpc
-    out: ../../pkg/proto
+    out: ../../shared/pkg/proto
     opt:
       - paths=source_relative
   - local: ../../bin/protoc-gen-grpc-gateway
-    out: ../../pkg/proto
+    out: ../../shared/pkg/proto
     opt:
       - paths=source_relative
