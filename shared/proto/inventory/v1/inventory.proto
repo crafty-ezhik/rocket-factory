@@ -5,6 +5,7 @@ package inventory.v1;
 
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 // Описываем, куда будет положены сгенерированные файла и как будет называться пакет в Go
 option go_package = "github.com/crafty-ezhik/rocket-factory/pkg/proto/inventory/v1;inventory_v1";
@@ -30,7 +31,7 @@ service InventoryService {
 // GetPartRequest запрос на получение информации о детали по её UUID
 message GetPartRequest {
   // uuid - идентификатор детали
-  string uuid = 1;
+  string uuid = 1 [(validate.rules).string.len = 36];
 }
 
 // GetPartResponse ответ на запрос получения информации о детали по её UUID

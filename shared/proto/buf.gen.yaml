@@ -15,3 +15,8 @@ plugins:
     out: ../../shared/pkg/proto
     opt:
       - paths=source_relative
+  - local: ../../bin/protoc-gen-validate
+    out: ../../shared/pkg/proto
+    opt:
+      - paths=source_relative
+      - lang=go

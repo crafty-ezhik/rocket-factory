@@ -3,6 +3,7 @@ syntax = "proto3";
 package payment.v1;
 
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 // Описываем, куда будет положены сгенерированные файла и как будет называться пакет в Go
 option go_package = "github.com/crafty-ezhik/rocket-factory/pkg/proto/payment/v1;payment_v1";
@@ -21,10 +22,10 @@ service PaymentService {
 // PayOrderRequest запрос на оплату
 message PayOrderRequest {
   // order_uuid - UUID заказа
-  string order_uuid = 1;
+  string order_uuid = 1 [(validate.rules).string.len = 36];
 
   // user_uuid - UUID пользователя
-  string user_uuid = 2;
+  string user_uuid = 2 [(validate.rules).string.len = 36] ;
 
   // payment_method - выбранный способ оплаты
   PaymentMethod payment_method = 3;
