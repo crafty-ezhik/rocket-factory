@@ -2,10 +2,12 @@ package interceptor
 
 import (
 	"context"
-	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 func ValidatorInterceptor() grpc.UnaryServerInterceptor {

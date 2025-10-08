@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/payment/internal/interceptor"
 	"log"
 	"net"
 	"net/http"
@@ -19,6 +18,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/crafty-ezhik/rocket-factory/payment/internal/interceptor"
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
