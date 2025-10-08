@@ -1,6 +1,5 @@
 version: v2
 # Удаляет сгенеренное ранее, то что находится в out каждого плагина.
-clean: true
 
 plugins:
   - local: ../../bin/protoc-gen-go
@@ -21,8 +20,7 @@ plugins:
       - paths=source_relative
       - lang=go
   - local: ../../bin/protoc-gen-openapiv2
-    out: ../../shared/pkg
+    out: ../../shared/pkg/swagger
     opt:
-      - allow_merge=true
       - merge_file_name=swagger.json
       - json_names_for_fields=false
