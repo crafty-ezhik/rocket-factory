@@ -138,6 +138,13 @@ tasks:
         done
         exit $ERR
 
+  check:
+    desc: "Запускает форматер + линтер для всех модулей"
+    deps: [install-formatters, install-golangci-lint]
+    cmds:
+      - task: format
+      - task: lint
+
   install-buf:
     desc: "Устанавливает Buf в каталог bin"
     cmds:
