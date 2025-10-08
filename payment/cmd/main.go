@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/crafty-ezhik/rocket-factory/payment/internal/interceptor"
 	"log"
 	"net"
 	"net/http"
@@ -35,11 +36,11 @@ type paymentService struct {
 
 // PayOrder - обрабатывает команду на оплату и возвращает transaction_uuid
 func (ps *paymentService) PayOrder(ctx context.Context, req *paymentV1.PayOrderRequest) (*paymentV1.PayOrderResponse, error) {
-	transactionUUID := uuid.New()
-	log.Printf("Оплата прошла успешно, transaction_uuid: %s\n", transactionUUID.String())
+	transactionUUID := uuid.NewString()
+	log.Printf("Оплата прошла успешно, transaction_uuid: %s\n", transactionUUID)
 
 	return &paymentV1.PayOrderResponse{
-		TransactionUuid: transactionUUID.String(),
+		TransactionUuid: transactionUUID,
 	}, nil
 }
 
@@ -59,7 +60,12 @@ func main() {
 	}()
 
 	// Создаем gRPC сервер
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			interceptor.LoggerInterceptor(),
+			interceptor.ValidatorInterceptor(),
+		),
+	)
 
 	// Регистрируем наш сервис paymentService
 	service := &paymentService{}
