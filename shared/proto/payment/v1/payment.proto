@@ -13,7 +13,7 @@ service PaymentService {
   // PayOrder Обрабатывает команду на оплату и возвращает transaction_uuid.
   rpc PayOrder(PayOrderRequest) returns(PayOrderResponse) {
     option (google.api.http) = {
-      post: "/api/v1/inventory"
+      post: "/api/v1/payment"
       body: "*"
     };
   };

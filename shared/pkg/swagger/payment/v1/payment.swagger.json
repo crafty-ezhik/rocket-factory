@@ -16,7 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/inventory": {
+    "/api/v1/payment": {
       "post": {
         "summary": "PayOrder Обрабатывает команду на оплату и возвращает transaction_uuid.",
         "operationId": "PaymentService_PayOrder",

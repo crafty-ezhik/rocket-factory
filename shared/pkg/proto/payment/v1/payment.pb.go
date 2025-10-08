@@ -207,9 +207,9 @@ const file_payment_v1_payment_proto_rawDesc = "" +
 	"\x04CARD\x10\x01\x12\a\n" +
 	"\x03SBP\x10\x02\x12\x0f\n" +
 	"\vCREDIT_CARD\x10\x03\x12\x12\n" +
-	"\x0eINVESTOR_MONEY\x10\x042u\n" +
-	"\x0ePaymentService\x12c\n" +
-	"\bPayOrder\x12\x1b.payment.v1.PayOrderRequest\x1a\x1c.payment.v1.PayOrderResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/inventoryBHZFgithub.com/crafty-ezhik/rocket-factory/pkg/proto/payment/v1;payment_v1b\x06proto3"
+	"\x0eINVESTOR_MONEY\x10\x042s\n" +
+	"\x0ePaymentService\x12a\n" +
+	"\bPayOrder\x12\x1b.payment.v1.PayOrderRequest\x1a\x1c.payment.v1.PayOrderResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/paymentBHZFgithub.com/crafty-ezhik/rocket-factory/pkg/proto/payment/v1;payment_v1b\x06proto3"
 
 var (
 	file_payment_v1_payment_proto_rawDescOnce sync.Once

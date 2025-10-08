@@ -71,7 +71,7 @@ func RegisterPaymentServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/payment.v1.PaymentService/PayOrder", runtime.WithHTTPPathPattern("/api/v1/inventory"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/payment.v1.PaymentService/PayOrder", runtime.WithHTTPPathPattern("/api/v1/payment"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -129,7 +129,7 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/payment.v1.PaymentService/PayOrder", runtime.WithHTTPPathPattern("/api/v1/inventory"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/payment.v1.PaymentService/PayOrder", runtime.WithHTTPPathPattern("/api/v1/payment"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -146,7 +146,7 @@ func RegisterPaymentServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 }
 
 var (
-	pattern_PaymentService_PayOrder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "inventory"}, ""))
+	pattern_PaymentService_PayOrder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "payment"}, ""))
 )
 
 var (
