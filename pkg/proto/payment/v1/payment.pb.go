@@ -7,6 +7,7 @@
 package payment_v1
 
 import (
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -192,7 +193,7 @@ var File_payment_v1_payment_proto protoreflect.FileDescriptor
 const file_payment_v1_payment_proto_rawDesc = "" +
 	"\n" +
 	"\x18payment/v1/payment.proto\x12\n" +
-	"payment.v1\"\x8f\x01\n" +
+	"payment.v1\x1a\x1cgoogle/api/annotations.proto\"\x8f\x01\n" +
 	"\x0fPayOrderRequest\x12\x1d\n" +
 	"\n" +
 	"order_uuid\x18\x01 \x01(\tR\torderUuid\x12\x1b\n" +
@@ -205,9 +206,9 @@ const file_payment_v1_payment_proto_rawDesc = "" +
 	"\x04CARD\x10\x01\x12\a\n" +
 	"\x03SBP\x10\x02\x12\x0f\n" +
 	"\vCREDIT_CARD\x10\x03\x12\x12\n" +
-	"\x0eINVESTOR_MONEY\x10\x042W\n" +
-	"\x0ePaymentService\x12E\n" +
-	"\bPayOrder\x12\x1b.payment.v1.PayOrderRequest\x1a\x1c.payment.v1.PayOrderResponseBHZFgithub.com/crafty-ezhik/rocket-factory/pkg/proto/payment/v1;payment_v1b\x06proto3"
+	"\x0eINVESTOR_MONEY\x10\x042u\n" +
+	"\x0ePaymentService\x12c\n" +
+	"\bPayOrder\x12\x1b.payment.v1.PayOrderRequest\x1a\x1c.payment.v1.PayOrderResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/inventoryBHZFgithub.com/crafty-ezhik/rocket-factory/pkg/proto/payment/v1;payment_v1b\x06proto3"
 
 var (
 	file_payment_v1_payment_proto_rawDescOnce sync.Once
