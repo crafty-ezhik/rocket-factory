@@ -2,8 +2,9 @@ package interceptor
 
 import (
 	"context"
-	"google.golang.org/grpc"
 	"log"
+
+	"google.golang.org/grpc"
 )
 
 func ValidatorInterceptor() grpc.UnaryServerInterceptor {

@@ -2,11 +2,12 @@ package interceptor
 
 import (
 	"context"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/status"
 	"log"
 	"path"
 	"time"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 // LoggerInterceptor создает серверный унарный интерцептор, который логирует

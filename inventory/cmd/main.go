@@ -4,14 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/inventory/internal/interceptor"
-	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
-	"google.golang.org/grpc/status"
 	"log"
 	"net"
 	"net/http"
@@ -20,6 +12,19 @@ import (
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/crafty-ezhik/rocket-factory/inventory/internal/interceptor"
+	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 
 const (
@@ -34,14 +39,21 @@ type inventoryService struct {
 	inventoryV1.UnimplementedInventoryServiceServer
 
 	mu    sync.RWMutex
-	store map[string]inventoryV1.Part
+	store map[string]*inventoryV1.Part
 }
 
-func (is *inventoryService) GetPart(context.Context, *inventoryV1.GetPartRequest) (*inventoryV1.GetPartResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetPart not implemented")
+func (is *inventoryService) GetPart(ctx context.Context, req *inventoryV1.GetPartRequest) (*inventoryV1.GetPartResponse, error) {
+	is.mu.RLock()
+	defer is.mu.RUnlock()
+
+	item, ok := is.store[req.GetUuid()]
+	if !ok {
+		return nil, status.Errorf(codes.NotFound, "item not found")
+	}
+	return &inventoryV1.GetPartResponse{Part: item}, nil
 }
 
-func (is *inventoryService) ListParts(context.Context, *inventoryV1.ListPartsRequest) (*inventoryV1.ListPartsResponse, error) {
+func (is *inventoryService) ListParts(ctx context.Context, req *inventoryV1.ListPartsRequest) (*inventoryV1.ListPartsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListParts not implemented")
 }
 
@@ -66,8 +78,12 @@ func main() {
 	)
 
 	// Регистрируем сервис inventoryService
-	service := &inventoryService{store: make(map[string]inventoryV1.Part)}
+	service := &inventoryService{store: generateFakeData(10)} // TODO: Убрать после тестов и вернуть make(map[string]inventoryV1.Part)
 	inventoryV1.RegisterInventoryServiceServer(grpcServer, service)
+	// TODO: УБрать цикл
+	for k := range service.store {
+		log.Printf("key: %s\n", k)
+	}
 
 	// Включаем рефлексию для отладки
 	reflection.Register(grpcServer)
@@ -112,7 +128,7 @@ func main() {
 		httpMux := http.NewServeMux()
 
 		// Регистрируем API ручку
-		httpMux.Handle("/api/v1/inventory", mux)
+		httpMux.Handle("/api/v1/inventory/", mux)
 
 		// Swagger UI ручки
 		httpMux.Handle("/swagger-ui.html", fileServer)
@@ -162,4 +178,37 @@ func main() {
 	// Останавливаем gRPC сервер
 	grpcServer.GracefulStop()
 	log.Println("✅ gRPC Server stopped")
+}
+
+func generateFakeData(n int) map[string]*inventoryV1.Part {
+	fakeData := make(map[string]*inventoryV1.Part)
+
+	for range n {
+		data := &inventoryV1.Part{
+			Uuid:          uuid.NewString(),
+			Name:          gofakeit.Name(),
+			Description:   gofakeit.HackerPhrase(),
+			Price:         gofakeit.Float64Range(1, 1000),
+			StockQuantity: int64(gofakeit.IntRange(1, 100)),
+			Category:      inventoryV1.Category_ENGINE,
+			Dimensions: &inventoryV1.Dimensions{
+				Length: gofakeit.Float64Range(1, 10000),
+				Width:  gofakeit.Float64Range(1, 10000),
+				Height: gofakeit.Float64Range(1, 10000),
+				Weight: gofakeit.Float64Range(1, 10000),
+			},
+			Manufacturer: &inventoryV1.Manufacturer{
+				Name:    gofakeit.Name(),
+				Country: gofakeit.Country(),
+				Website: gofakeit.URL(),
+			},
+			Tags:      []string{gofakeit.Word(), gofakeit.Word(), gofakeit.Word()},
+			Metadata:  nil,
+			CreatedAt: &timestamppb.Timestamp{Seconds: time.Now().Unix(), Nanos: 0},
+			UpdatedAt: &timestamppb.Timestamp{Seconds: time.Now().Unix(), Nanos: 0},
+		}
+
+		fakeData[data.GetUuid()] = data
+	}
+	return fakeData
 }
