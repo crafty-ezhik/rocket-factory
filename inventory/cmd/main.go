@@ -34,12 +34,49 @@ const (
 	httpPort      = 8082
 )
 
+// mapParts -псевдоним для map[string]*inventoryV1.Part
+type mapParts map[string]*inventoryV1.Part
+
+// FilterType - ограничение для типов фильтра
+type FilterType interface {
+	string | inventoryV1.Category
+}
+
 // inventoryService - реализует gRPC сервис для работы с оплатами
 type inventoryService struct {
 	inventoryV1.UnimplementedInventoryServiceServer
 
 	mu    sync.RWMutex
-	store map[string]*inventoryV1.Part
+	store mapParts
+}
+
+// applyFilter - применяет фильтр к мапе. Передается список значений фильтра по которому фильтровать
+// и геттер для получения значения у n-го элемента
+func applyFilter[T FilterType](mp mapParts, filter []T, getter func(p *inventoryV1.Part) T) {
+	for uuidPart, part := range mp {
+		exist := false
+		for _, item := range filter {
+			if getter(part) == item {
+				exist = true
+				break
+			}
+		}
+		if !exist {
+			delete(mp, uuidPart)
+		}
+	}
+}
+
+func (is *inventoryService) map2slice(data map[string]*inventoryV1.Part) []*inventoryV1.Part {
+	sliceParts := make([]*inventoryV1.Part, 0, len(is.store))
+
+	is.mu.RLock()
+	defer is.mu.RUnlock()
+
+	for _, v := range data {
+		sliceParts = append(sliceParts, v)
+	}
+	return sliceParts
 }
 
 func (is *inventoryService) GetPart(ctx context.Context, req *inventoryV1.GetPartRequest) (*inventoryV1.GetPartResponse, error) {
@@ -54,7 +91,63 @@ func (is *inventoryService) GetPart(ctx context.Context, req *inventoryV1.GetPar
 }
 
 func (is *inventoryService) ListParts(ctx context.Context, req *inventoryV1.ListPartsRequest) (*inventoryV1.ListPartsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListParts not implemented")
+	tempMap := make(mapParts)
+	is.mu.RLock()
+	for k, v := range is.store {
+		tempMap[k] = v
+	}
+	is.mu.RUnlock()
+
+	filter := req.GetFilter()
+
+	if filter == nil {
+		return &inventoryV1.ListPartsResponse{Parts: is.map2slice(is.store)}, nil
+	}
+
+	if filter.GetUuids() != nil {
+		applyFilter[string](tempMap, filter.GetUuids(), func(p *inventoryV1.Part) string { return p.GetUuid() })
+	}
+
+	if filter.GetNames() != nil {
+		applyFilter[string](tempMap, filter.GetNames(), func(p *inventoryV1.Part) string { return p.GetName() })
+	}
+
+	if filter.GetCategories() != nil {
+		applyFilter[inventoryV1.Category](
+			tempMap,
+			filter.GetCategories(),
+			func(p *inventoryV1.Part) inventoryV1.Category { return p.GetCategory() },
+		)
+	}
+
+	if filter.GetManufacturerCountries() != nil {
+		applyFilter[string](
+			tempMap,
+			filter.GetManufacturerCountries(),
+			func(p *inventoryV1.Part) string { return p.GetManufacturer().GetCountry() },
+		)
+	}
+
+	if filter.GetTags() != nil {
+		for uuidPart, part := range tempMap {
+			exist := false
+			for _, tag := range filter.GetTags() {
+				for _, partTag := range part.GetTags() {
+					if partTag == tag {
+						exist = true
+						break
+					}
+				}
+			}
+			if !exist {
+				delete(tempMap, uuidPart)
+			}
+		}
+	}
+
+	return &inventoryV1.ListPartsResponse{
+		Parts: is.map2slice(tempMap),
+	}, nil
 }
 
 func main() {
@@ -81,8 +174,8 @@ func main() {
 	service := &inventoryService{store: generateFakeData(10)} // TODO: Убрать после тестов и вернуть make(map[string]inventoryV1.Part)
 	inventoryV1.RegisterInventoryServiceServer(grpcServer, service)
 	// TODO: УБрать цикл
-	for k := range service.store {
-		log.Printf("key: %s\n", k)
+	for k, v := range service.store {
+		log.Printf("key: %s, name: %s, category: %s, country: %s, tags: %s\n", k, v.GetName(), v.GetCategory(), v.GetManufacturer(), v.GetTags())
 	}
 
 	// Включаем рефлексию для отладки
@@ -180,8 +273,15 @@ func main() {
 	log.Println("✅ gRPC Server stopped")
 }
 
-func generateFakeData(n int) map[string]*inventoryV1.Part {
-	fakeData := make(map[string]*inventoryV1.Part)
+func generateFakeData(n int) mapParts {
+	fakeData := make(mapParts)
+	catSlice := []inventoryV1.Category{
+		inventoryV1.Category_ENGINE,
+		inventoryV1.Category_FUEL,
+		inventoryV1.Category_PORTHOLE,
+		inventoryV1.Category_WING,
+		inventoryV1.Category_UNKNOW_UNSPECIFIED,
+	}
 
 	for range n {
 		data := &inventoryV1.Part{
@@ -190,7 +290,7 @@ func generateFakeData(n int) map[string]*inventoryV1.Part {
 			Description:   gofakeit.HackerPhrase(),
 			Price:         gofakeit.Float64Range(1, 1000),
 			StockQuantity: int64(gofakeit.IntRange(1, 100)),
-			Category:      inventoryV1.Category_ENGINE,
+			Category:      catSlice[gofakeit.IntRange(0, len(catSlice))],
 			Dimensions: &inventoryV1.Dimensions{
 				Length: gofakeit.Float64Range(1, 10000),
 				Width:  gofakeit.Float64Range(1, 10000),
