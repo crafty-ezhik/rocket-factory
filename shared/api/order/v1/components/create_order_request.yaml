@@ -11,5 +11,8 @@ properties:
 
   part_uuids:
     type: array
+    items:
+      type: string
+      format: uuid
     description: Список уникальных идентификаторов деталей
     example: [string, string]

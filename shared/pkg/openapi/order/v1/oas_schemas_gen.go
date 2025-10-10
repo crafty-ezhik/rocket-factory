@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/go-faster/errors"
-	"github.com/go-faster/jx"
 	"github.com/google/uuid"
 )
 
@@ -115,7 +114,7 @@ type CreateOrderRequest struct {
 	// Уникальный идентификатор пользователя.
 	UserUUID uuid.UUID `json:"user_uuid"`
 	// Список уникальных идентификаторов деталей.
-	PartUuids []jx.Raw `json:"part_uuids"`
+	PartUuids []uuid.UUID `json:"part_uuids"`
 }
 
 // GetUserUUID returns the value of UserUUID.
@@ -124,7 +123,7 @@ func (s *CreateOrderRequest) GetUserUUID() uuid.UUID {
 }
 
 // GetPartUuids returns the value of PartUuids.
-func (s *CreateOrderRequest) GetPartUuids() []jx.Raw {
+func (s *CreateOrderRequest) GetPartUuids() []uuid.UUID {
 	return s.PartUuids
 }
 
@@ -134,7 +133,7 @@ func (s *CreateOrderRequest) SetUserUUID(val uuid.UUID) {
 }
 
 // SetPartUuids sets the value of PartUuids.
-func (s *CreateOrderRequest) SetPartUuids(val []jx.Raw) {
+func (s *CreateOrderRequest) SetPartUuids(val []uuid.UUID) {
 	s.PartUuids = val
 }
 
@@ -143,7 +142,7 @@ type CreateOrderResponse struct {
 	// Уникальный идентификатор созданного заказа.
 	OrderUUID uuid.UUID `json:"order_uuid"`
 	// Итоговая сумма заказа.
-	TotalPrice float32 `json:"total_price"`
+	TotalPrice float64 `json:"total_price"`
 }
 
 // GetOrderUUID returns the value of OrderUUID.
@@ -152,7 +151,7 @@ func (s *CreateOrderResponse) GetOrderUUID() uuid.UUID {
 }
 
 // GetTotalPrice returns the value of TotalPrice.
-func (s *CreateOrderResponse) GetTotalPrice() float32 {
+func (s *CreateOrderResponse) GetTotalPrice() float64 {
 	return s.TotalPrice
 }
 
@@ -162,7 +161,7 @@ func (s *CreateOrderResponse) SetOrderUUID(val uuid.UUID) {
 }
 
 // SetTotalPrice sets the value of TotalPrice.
-func (s *CreateOrderResponse) SetTotalPrice(val float32) {
+func (s *CreateOrderResponse) SetTotalPrice(val float64) {
 	s.TotalPrice = val
 }
 
@@ -389,7 +388,7 @@ type OrderDto struct {
 	// Уникальный идентификатор пользователя.
 	UserUUID uuid.UUID `json:"user_uuid"`
 	// Массив идентификаторов деталей в заказе.
-	PartUuids []jx.Raw `json:"part_uuids"`
+	PartUuids []uuid.UUID `json:"part_uuids"`
 	// Итоговая сумма заказа.
 	TotalPrice float32 `json:"total_price"`
 	// Уникальный идентификатор транзакции.
@@ -409,7 +408,7 @@ func (s *OrderDto) GetUserUUID() uuid.UUID {
 }
 
 // GetPartUuids returns the value of PartUuids.
-func (s *OrderDto) GetPartUuids() []jx.Raw {
+func (s *OrderDto) GetPartUuids() []uuid.UUID {
 	return s.PartUuids
 }
 
@@ -444,7 +443,7 @@ func (s *OrderDto) SetUserUUID(val uuid.UUID) {
 }
 
 // SetPartUuids sets the value of PartUuids.
-func (s *OrderDto) SetPartUuids(val []jx.Raw) {
+func (s *OrderDto) SetPartUuids(val []uuid.UUID) {
 	s.PartUuids = val
 }
 

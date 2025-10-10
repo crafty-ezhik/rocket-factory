@@ -12,6 +12,6 @@ properties:
 
   total_price:
     type: number
-    format: float
+    format: double
     description: Итоговая сумма заказа
     example: 123.77

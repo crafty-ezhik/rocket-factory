@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
+	"github.com/google/uuid"
 	"github.com/ogen-go/ogen/json"
 	"github.com/ogen-go/ogen/validate"
 )
@@ -368,9 +369,7 @@ func (s *CreateOrderRequest) encodeFields(e *jx.Encoder) {
 		e.FieldStart("part_uuids")
 		e.ArrStart()
 		for _, elem := range s.PartUuids {
-			if len(elem) != 0 {
-				e.Raw(elem)
-			}
+			json.EncodeUUID(e, elem)
 		}
 		e.ArrEnd()
 	}
@@ -405,11 +404,11 @@ func (s *CreateOrderRequest) Decode(d *jx.Decoder) error {
 		case "part_uuids":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.PartUuids = make([]jx.Raw, 0)
+				s.PartUuids = make([]uuid.UUID, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem jx.Raw
-					v, err := d.RawAppend(nil)
-					elem = jx.Raw(v)
+					var elem uuid.UUID
+					v, err := json.DecodeUUID(d)
+					elem = v
 					if err != nil {
 						return err
 					}
@@ -493,7 +492,7 @@ func (s *CreateOrderResponse) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("total_price")
-		e.Float32(s.TotalPrice)
+		e.Float64(s.TotalPrice)
 	}
 }
 
@@ -526,8 +525,8 @@ func (s *CreateOrderResponse) Decode(d *jx.Decoder) error {
 		case "total_price":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Float32()
-				s.TotalPrice = float32(v)
+				v, err := d.Float64()
+				s.TotalPrice = float64(v)
 				if err != nil {
 					return err
 				}
@@ -1160,9 +1159,7 @@ func (s *OrderDto) encodeFields(e *jx.Encoder) {
 		e.FieldStart("part_uuids")
 		e.ArrStart()
 		for _, elem := range s.PartUuids {
-			if len(elem) != 0 {
-				e.Raw(elem)
-			}
+			json.EncodeUUID(e, elem)
 		}
 		e.ArrEnd()
 	}
@@ -1230,11 +1227,11 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 		case "part_uuids":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.PartUuids = make([]jx.Raw, 0)
+				s.PartUuids = make([]uuid.UUID, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem jx.Raw
-					v, err := d.RawAppend(nil)
-					elem = jx.Raw(v)
+					var elem uuid.UUID
+					v, err := json.DecodeUUID(d)
+					elem = v
 					if err != nil {
 						return err
 					}

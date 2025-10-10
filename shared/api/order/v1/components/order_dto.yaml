@@ -23,6 +23,9 @@ properties:
 
   part_uuids:
     type: array
+    items:
+      type: string
+      format: uuid
     description: Массив идентификаторов деталей в заказе
     example: ["string", "string"]
 
