@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"net"
 	"net/http"
 	"os"
@@ -175,7 +176,7 @@ func main() {
 	inventoryV1.RegisterInventoryServiceServer(grpcServer, service)
 	// TODO: УБрать цикл
 	for k, v := range service.store {
-		log.Printf("key: %s, name: %s, category: %s, country: %s, tags: %s\n", k, v.GetName(), v.GetCategory(), v.GetManufacturer(), v.GetTags())
+		log.Printf("key: %s, name: %s, price: %f,category: %s, country: %s, tags: %s\n", k, v.GetName(), v.GetPrice(), v.GetCategory(), v.GetManufacturer(), v.GetTags())
 	}
 
 	// Включаем рефлексию для отладки
@@ -288,7 +289,7 @@ func generateFakeData(n int) mapParts {
 			Uuid:          uuid.NewString(),
 			Name:          gofakeit.Name(),
 			Description:   gofakeit.HackerPhrase(),
-			Price:         gofakeit.Float64Range(1, 1000),
+			Price:         math.Floor(gofakeit.Float64Range(1, 1000)*100) / 100,
 			StockQuantity: int64(gofakeit.IntRange(1, 100)),
 			Category:      catSlice[gofakeit.IntRange(0, len(catSlice)-1)],
 			Dimensions: &inventoryV1.Dimensions{
