@@ -390,7 +390,7 @@ type OrderDto struct {
 	// Массив идентификаторов деталей в заказе.
 	PartUuids []uuid.UUID `json:"part_uuids"`
 	// Итоговая сумма заказа.
-	TotalPrice float32 `json:"total_price"`
+	TotalPrice float64 `json:"total_price"`
 	// Уникальный идентификатор транзакции.
 	TransactionUUID uuid.UUID     `json:"transaction_uuid"`
 	PaymentMethod   PaymentMethod `json:"payment_method"`
@@ -413,7 +413,7 @@ func (s *OrderDto) GetPartUuids() []uuid.UUID {
 }
 
 // GetTotalPrice returns the value of TotalPrice.
-func (s *OrderDto) GetTotalPrice() float32 {
+func (s *OrderDto) GetTotalPrice() float64 {
 	return s.TotalPrice
 }
 
@@ -448,7 +448,7 @@ func (s *OrderDto) SetPartUuids(val []uuid.UUID) {
 }
 
 // SetTotalPrice sets the value of TotalPrice.
-func (s *OrderDto) SetTotalPrice(val float32) {
+func (s *OrderDto) SetTotalPrice(val float64) {
 	s.TotalPrice = val
 }
 
