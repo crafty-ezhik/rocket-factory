@@ -32,6 +32,11 @@ const (
 	grpcPaymentAddr   = "localhost:50051"
 )
 
+var (
+	ErrNotFound    = errors.New("order not found")
+	ErrOrderIsPaid = errors.New("order is paid")
+)
+
 type OrderStorage struct {
 	mu     sync.RWMutex
 	orders map[string]*orderV1.OrderDto
@@ -74,7 +79,33 @@ func (s *OrderStorage) CreateOrder(user uuid.UUID, parts []uuid.UUID, totalPrice
 	return orderUUID, nil
 }
 
-func (s *OrderStorage) UpdateOrder() error {
+func (s *OrderStorage) PayOrder(orderUUID, transactionUUID uuid.UUID, paymentMethod orderV1.PaymentMethod) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	order := s.orders[orderUUID.String()]
+	order.Status = orderV1.OrderStatusPAID
+	order.TransactionUUID = transactionUUID
+	order.PaymentMethod = paymentMethod
+	return nil
+}
+
+func (s *OrderStorage) CancelOrder(orderUUID string) error {
+	// Ищем заказ по переданному UUID
+	s.mu.RLock()
+	order, ok := s.orders[orderUUID]
+	if !ok {
+		return ErrNotFound
+	}
+	s.mu.RUnlock()
+
+	// Проверяем статус на PAID
+	if order.Status == orderV1.OrderStatusPAID {
+		return ErrOrderIsPaid
+	}
+
+	// Меняем статус заказа на CANCELLED
+	order.Status = orderV1.OrderStatusCANCELLED
+
 	return nil
 }
 
@@ -96,8 +127,30 @@ func NewOrderHandler(
 	}
 }
 
-func (h *OrderHandler) OrderCancel(ctx context.Context, params orderV1.OrderCancelParams) (orderV1.OrderCancelRes, error) {
-	return nil, errors.New("not implemented")
+func (h *OrderHandler) OrderCancel(ctx context.Context, req orderV1.OrderCancelParams) (orderV1.OrderCancelRes, error) {
+	if err := uuid.Validate(req.OrderUUID); err != nil {
+		return &orderV1.BadRequestError{
+			Code:    http.StatusBadRequest,
+			Message: "uuid validation failed. " + err.Error(),
+		}, nil
+	}
+
+	err := h.storage.CancelOrder(req.OrderUUID)
+	if errors.Is(err, ErrNotFound) {
+		return &orderV1.NotFoundError{
+			Code:    http.StatusNotFound,
+			Message: fmt.Sprintf("order %s not found", req.OrderUUID),
+		}, nil
+	}
+
+	if errors.Is(err, ErrOrderIsPaid) {
+		return &orderV1.ConflictError{
+			Code:    http.StatusConflict,
+			Message: "a paid order cannot be canceled",
+		}, nil
+	}
+
+	return &orderV1.OrderCancelNoContent{}, nil
 }
 
 func (h *OrderHandler) OrderCreate(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.OrderCreateRes, error) {
@@ -194,7 +247,68 @@ func (h *OrderHandler) OrderGet(ctx context.Context, req orderV1.OrderGetParams)
 }
 
 func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderRequest, params orderV1.OrderPayParams) (orderV1.OrderPayRes, error) {
-	return nil, errors.New("not implemented")
+	// Валидируем uuid
+	if err := uuid.Validate(params.OrderUUID); err != nil {
+		return &orderV1.BadRequestError{
+			Code:    http.StatusBadRequest,
+			Message: "uuid validation failed. " + err.Error(),
+		}, nil
+	}
+
+	// Получаем заказ из хранилища
+	order := h.storage.GetOrder(params.OrderUUID)
+	if order == nil {
+		return &orderV1.NotFoundError{
+			Code:    http.StatusNotFound,
+			Message: "order not found",
+		}, nil
+	}
+
+	// Преобразуем orderV1.PaymentMethod к string для дальнейшей работы
+	methodText, err := req.GetPaymentMethod().MarshalText()
+	if err != nil {
+		log.Printf("MarshalText failed: %v", err)
+		return &orderV1.InternalServerError{
+			Code:    500,
+			Message: "internal server error",
+		}, nil
+	}
+
+	// Отправляем данные для оплаты в PaymentService
+	transactionUUIDstr, err := h.paymentClient.PayOrder(ctx, &paymentV1.PayOrderRequest{
+		OrderUuid:     params.OrderUUID,
+		UserUuid:      order.GetUserUUID().String(),
+		PaymentMethod: paymentV1.PaymentMethod(paymentV1.PaymentMethod_value[string(methodText)]),
+	})
+	if err != nil {
+		log.Printf("PayOrder failed: %v", err)
+		return &orderV1.InternalServerError{
+			Code:    500,
+			Message: "internal server error",
+		}, nil
+	}
+
+	// Преобразуем string к UUID для добавления к заказу
+	transactionUUID, err := uuid.Parse(transactionUUIDstr.GetTransactionUuid())
+	if err != nil {
+		log.Printf("ParseTransactionUUID failed: %v", err)
+		return &orderV1.InternalServerError{
+			Code:    500,
+			Message: "internal server error",
+		}, nil
+	}
+
+	// Обновляем данные по заказу
+	err = h.storage.PayOrder(order.GetOrderUUID(), transactionUUID, req.GetPaymentMethod())
+	if err != nil {
+		log.Printf("PayOrder failed: %v", err)
+		return &orderV1.InternalServerError{
+			Code:    500,
+			Message: "internal server error",
+		}, nil
+	}
+
+	return &orderV1.PayOrderResponse{TransactionUUID: transactionUUID}, nil
 }
 
 // NewError создает новую ошибку в формате GenericError
