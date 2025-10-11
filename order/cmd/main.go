@@ -385,7 +385,7 @@ func main() {
 
 	// Создаем HTTP-сервер
 	server := &http.Server{
-		Addr:              net.JoinHostPort("localhost", httpPort),
+		Addr:              net.JoinHostPort("0.0.0.0", httpPort),
 		Handler:           r,
 		ReadHeaderTimeout: readHeaderTimeout,
 	}
