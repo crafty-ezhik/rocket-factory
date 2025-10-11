@@ -306,7 +306,7 @@ tasks:
       INVENTORY_PORT: 50052
       PAYMENT_PORT: 50051
       ORDER_PORT: 8080
-      HOST: 172.17.32.1
+      HOST: 172.17.32.1 # IP адрес моста между WSL и Windows
     cmds:
       - |
         echo "🧪 Тестирование API микросервисов через gRPC и REST"

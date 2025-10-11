@@ -68,6 +68,7 @@ func applyFilter[T FilterType](mp mapParts, filter []T, getter func(p *inventory
 	}
 }
 
+// map2slice - преобразует мапу в слайс для ответа клиенту
 func (is *inventoryService) map2slice(data map[string]*inventoryV1.Part) []*inventoryV1.Part {
 	sliceParts := make([]*inventoryV1.Part, 0, len(is.store))
 
@@ -80,6 +81,7 @@ func (is *inventoryService) map2slice(data map[string]*inventoryV1.Part) []*inve
 	return sliceParts
 }
 
+// GetPart - возвращает деталь по переданном уникальному идентификатору
 func (is *inventoryService) GetPart(ctx context.Context, req *inventoryV1.GetPartRequest) (*inventoryV1.GetPartResponse, error) {
 	is.mu.RLock()
 	defer is.mu.RUnlock()
@@ -91,6 +93,7 @@ func (is *inventoryService) GetPart(ctx context.Context, req *inventoryV1.GetPar
 	return &inventoryV1.GetPartResponse{Part: item}, nil
 }
 
+// ListParts - возвращает список деталей по указанным фильтрам
 func (is *inventoryService) ListParts(ctx context.Context, req *inventoryV1.ListPartsRequest) (*inventoryV1.ListPartsResponse, error) {
 	tempMap := make(mapParts)
 	is.mu.RLock()
@@ -172,12 +175,8 @@ func main() {
 	)
 
 	// Регистрируем сервис inventoryService
-	service := &inventoryService{store: generateFakeData(10)} // TODO: Убрать после тестов и вернуть make(map[string]inventoryV1.Part)
+	service := &inventoryService{store: generateFakeData(10)}
 	inventoryV1.RegisterInventoryServiceServer(grpcServer, service)
-	// TODO: УБрать цикл
-	for k, v := range service.store {
-		log.Printf("key: %s, name: %s, price: %f,category: %s, country: %s, tags: %s\n", k, v.GetName(), v.GetPrice(), v.GetCategory(), v.GetManufacturer(), v.GetTags())
-	}
 
 	// Включаем рефлексию для отладки
 	reflection.Register(grpcServer)

@@ -37,6 +37,7 @@ var (
 	ErrOrderIsPaid = errors.New("order is paid")
 )
 
+// OrderStorage - хранилище для заказов
 type OrderStorage struct {
 	mu     sync.RWMutex
 	orders map[string]*orderV1.OrderDto
@@ -48,6 +49,7 @@ func NewOrderStorage() *OrderStorage {
 	}
 }
 
+// GetOrder - получает заказ из хранилища по UUID
 func (s *OrderStorage) GetOrder(orderUUID string) *orderV1.OrderDto {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -60,6 +62,7 @@ func (s *OrderStorage) GetOrder(orderUUID string) *orderV1.OrderDto {
 	return order
 }
 
+// CreateOrder - добавляет новый заказ в хранилище
 func (s *OrderStorage) CreateOrder(user uuid.UUID, parts []uuid.UUID, totalPrice float64) (uuid.UUID, error) {
 	orderUUID := uuid.New()
 	newOrder := &orderV1.OrderDto{
@@ -79,6 +82,7 @@ func (s *OrderStorage) CreateOrder(user uuid.UUID, parts []uuid.UUID, totalPrice
 	return orderUUID, nil
 }
 
+// PayOrder - меняет статут оплаты, метод оплаты и уникальный идентификатор транзакции
 func (s *OrderStorage) PayOrder(orderUUID, transactionUUID uuid.UUID, paymentMethod orderV1.PaymentMethod) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -89,6 +93,7 @@ func (s *OrderStorage) PayOrder(orderUUID, transactionUUID uuid.UUID, paymentMet
 	return nil
 }
 
+// CancelOrder - меняет статут заказа на CANCELLED или возвращает ошибку, если он имеет статут PAID
 func (s *OrderStorage) CancelOrder(orderUUID string) error {
 	// Ищем заказ по переданному UUID
 	s.mu.RLock()
@@ -109,6 +114,7 @@ func (s *OrderStorage) CancelOrder(orderUUID string) error {
 	return nil
 }
 
+// OrderHandler - реализует интерфейс Handler для работы с заказами
 type OrderHandler struct {
 	storage         *OrderStorage
 	inventoryClient inventoryV1.InventoryServiceClient
@@ -127,6 +133,7 @@ func NewOrderHandler(
 	}
 }
 
+// OrderCancel - отменяет заказ
 func (h *OrderHandler) OrderCancel(ctx context.Context, req orderV1.OrderCancelParams) (orderV1.OrderCancelRes, error) {
 	if err := uuid.Validate(req.OrderUUID); err != nil {
 		return &orderV1.BadRequestError{
@@ -153,6 +160,7 @@ func (h *OrderHandler) OrderCancel(ctx context.Context, req orderV1.OrderCancelP
 	return &orderV1.OrderCancelNoContent{}, nil
 }
 
+// OrderCreate - Создает заказ и возвращает его уникальный идентификатор
 func (h *OrderHandler) OrderCreate(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.OrderCreateRes, error) {
 	// Валидируем запрос
 	if err := req.Validate(); err != nil {
@@ -227,6 +235,7 @@ func (h *OrderHandler) OrderCreate(ctx context.Context, req *orderV1.CreateOrder
 	}, nil
 }
 
+// OrderGet - Возвращает данные по заказу
 func (h *OrderHandler) OrderGet(ctx context.Context, req orderV1.OrderGetParams) (orderV1.OrderGetRes, error) {
 	// Валидируем uuid
 	if err := uuid.Validate(req.OrderUUID); err != nil {
@@ -246,6 +255,7 @@ func (h *OrderHandler) OrderGet(ctx context.Context, req orderV1.OrderGetParams)
 	return order, nil
 }
 
+// OrderPay - Выполняет оплату заказа
 func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderRequest, params orderV1.OrderPayParams) (orderV1.OrderPayRes, error) {
 	// Валидируем uuid
 	if err := uuid.Validate(params.OrderUUID); err != nil {
