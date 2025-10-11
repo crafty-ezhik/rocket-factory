@@ -290,7 +290,7 @@ func generateFakeData(n int) mapParts {
 			Description:   gofakeit.HackerPhrase(),
 			Price:         gofakeit.Float64Range(1, 1000),
 			StockQuantity: int64(gofakeit.IntRange(1, 100)),
-			Category:      catSlice[gofakeit.IntRange(0, len(catSlice))],
+			Category:      catSlice[gofakeit.IntRange(0, len(catSlice)-1)],
 			Dimensions: &inventoryV1.Dimensions{
 				Length: gofakeit.Float64Range(1, 10000),
 				Width:  gofakeit.Float64Range(1, 10000),
