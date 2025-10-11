@@ -253,23 +253,6 @@ func (s *GenericErrorStatusCode) SetResponse(val GenericError) {
 	s.Response = val
 }
 
-// Ref: #/components/schemas/get_order_response
-type GetOrderResponse struct {
-	AllOf OptOrderDto `json:"allOf"`
-}
-
-// GetAllOf returns the value of AllOf.
-func (s *GetOrderResponse) GetAllOf() OptOrderDto {
-	return s.AllOf
-}
-
-// SetAllOf sets the value of AllOf.
-func (s *GetOrderResponse) SetAllOf(val OptOrderDto) {
-	s.AllOf = val
-}
-
-func (*GetOrderResponse) orderGetRes() {}
-
 // Ref: #/components/schemas/internal_server_error
 type InternalServerError struct {
 	// HTTP-код ошибки.
@@ -334,52 +317,6 @@ func (s *NotFoundError) SetMessage(val string) {
 func (*NotFoundError) orderCancelRes() {}
 func (*NotFoundError) orderGetRes()    {}
 func (*NotFoundError) orderPayRes()    {}
-
-// NewOptOrderDto returns new OptOrderDto with value set to v.
-func NewOptOrderDto(v OrderDto) OptOrderDto {
-	return OptOrderDto{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptOrderDto is optional OrderDto.
-type OptOrderDto struct {
-	Value OrderDto
-	Set   bool
-}
-
-// IsSet returns true if OptOrderDto was set.
-func (o OptOrderDto) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptOrderDto) Reset() {
-	var v OrderDto
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptOrderDto) SetTo(v OrderDto) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptOrderDto) Get() (v OrderDto, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptOrderDto) Or(d OrderDto) OrderDto {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
 
 // Ref: #/components/schemas/order_dto
 type OrderDto struct {
@@ -468,6 +405,7 @@ func (s *OrderDto) SetStatus(val OrderStatus) {
 }
 
 func (*OrderDto) orderCancelRes() {}
+func (*OrderDto) orderGetRes()    {}
 
 // Статус заказа.
 // Ref: #/components/schemas/order_status

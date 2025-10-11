@@ -249,7 +249,7 @@ func encodeOrderCreateResponse(response OrderCreateRes, w http.ResponseWriter, s
 
 func encodeOrderGetResponse(response OrderGetRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetOrderResponse:
+	case *OrderDto:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
