@@ -10,10 +10,6 @@ post:
   responses:
     '204':
       description: Заказ успешно отменен
-      content:
-        application/json:
-          schema:
-            $ref: ../components/order_dto.yaml
 
     '404':
       description: Заказ не найден

@@ -14,16 +14,9 @@ import (
 
 func encodeOrderCancelResponse(response OrderCancelRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *OrderDto:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	case *OrderCancelNoContent:
 		w.WriteHeader(204)
 		span.SetStatus(codes.Ok, http.StatusText(204))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
 
 		return nil
 

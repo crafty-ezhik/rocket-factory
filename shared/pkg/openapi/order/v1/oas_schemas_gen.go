@@ -318,6 +318,11 @@ func (*NotFoundError) orderCancelRes() {}
 func (*NotFoundError) orderGetRes()    {}
 func (*NotFoundError) orderPayRes()    {}
 
+// OrderCancelNoContent is response for OrderCancel operation.
+type OrderCancelNoContent struct{}
+
+func (*OrderCancelNoContent) orderCancelRes() {}
+
 // Ref: #/components/schemas/order_dto
 type OrderDto struct {
 	// Уникальный идентификатор заказа.
@@ -404,8 +409,7 @@ func (s *OrderDto) SetStatus(val OrderStatus) {
 	s.Status = val
 }
 
-func (*OrderDto) orderCancelRes() {}
-func (*OrderDto) orderGetRes()    {}
+func (*OrderDto) orderGetRes() {}
 
 // Статус заказа.
 // Ref: #/components/schemas/order_status
