@@ -70,8 +70,8 @@ func (s *OrderStorage) CreateOrder(user uuid.UUID, parts []uuid.UUID, totalPrice
 		UserUUID:        user,
 		PartUuids:       parts,
 		TotalPrice:      totalPrice,
-		TransactionUUID: uuid.UUID{},
-		PaymentMethod:   "",
+		TransactionUUID: orderV1.OptNilUUID{},
+		PaymentMethod:   orderV1.OptNilPaymentMethod{},
 		Status:          orderV1.OrderStatusPENDINGPAYMENT,
 	}
 
@@ -88,8 +88,8 @@ func (s *OrderStorage) PayOrder(orderUUID, transactionUUID uuid.UUID, paymentMet
 	defer s.mu.Unlock()
 	order := s.orders[orderUUID.String()]
 	order.Status = orderV1.OrderStatusPAID
-	order.TransactionUUID = transactionUUID
-	order.PaymentMethod = paymentMethod
+	order.TransactionUUID = orderV1.OptNilUUID{Value: transactionUUID}
+	order.PaymentMethod = orderV1.OptNilPaymentMethod{Value: paymentMethod}
 	return nil
 }
 
@@ -275,7 +275,15 @@ func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderReques
 	}
 
 	// Преобразуем orderV1.PaymentMethod к string для дальнейшей работы
-	methodText, err := req.GetPaymentMethod().MarshalText()
+	paymentMethod, ok := req.GetPaymentMethod().Get()
+	if !ok {
+		return &orderV1.BadRequestError{
+			Code:    http.StatusBadRequest,
+			Message: "Payment method not found",
+		}, nil
+	}
+
+	paymentMethodText, err := paymentMethod.MarshalText()
 	if err != nil {
 		log.Printf("MarshalText failed: %v", err)
 		return &orderV1.InternalServerError{
@@ -288,7 +296,7 @@ func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderReques
 	transactionUUIDstr, err := h.paymentClient.PayOrder(ctx, &paymentV1.PayOrderRequest{
 		OrderUuid:     params.OrderUUID,
 		UserUuid:      order.GetUserUUID().String(),
-		PaymentMethod: paymentV1.PaymentMethod(paymentV1.PaymentMethod_value[string(methodText)]),
+		PaymentMethod: paymentV1.PaymentMethod(paymentV1.PaymentMethod_value[string(paymentMethodText)]),
 	})
 	if err != nil {
 		log.Printf("PayOrder failed: %v", err)
@@ -309,7 +317,7 @@ func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderReques
 	}
 
 	// Обновляем данные по заказу
-	err = h.storage.PayOrder(order.GetOrderUUID(), transactionUUID, req.GetPaymentMethod())
+	err = h.storage.PayOrder(order.GetOrderUUID(), transactionUUID, paymentMethod)
 	if err != nil {
 		log.Printf("PayOrder failed: %v", err)
 		return &orderV1.InternalServerError{

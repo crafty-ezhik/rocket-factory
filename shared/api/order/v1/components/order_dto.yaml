@@ -4,8 +4,6 @@ required:
   - user_uuid
   - part_uuids
   - total_price
-  - transaction_uuid
-  - payment_method
   - status
 
 properties:
@@ -38,11 +36,13 @@ properties:
   transaction_uuid:
     type: string
     format: uuid
+    nullable: true
     description: Уникальный идентификатор транзакции
     example: "string"
 
   payment_method:
     $ref: ./enums/payment_method.yaml
+
 
   status:
     $ref: ./enums/order_status.yaml

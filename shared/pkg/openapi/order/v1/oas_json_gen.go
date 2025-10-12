@@ -929,6 +929,50 @@ func (s *InternalServerError) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes PaymentMethod as json.
+func (o NilPaymentMethod) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes PaymentMethod from json.
+func (o *NilPaymentMethod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilPaymentMethod to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v PaymentMethod
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilPaymentMethod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilPaymentMethod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *NotFoundError) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -1042,6 +1086,106 @@ func (s *NotFoundError) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes PaymentMethod as json.
+func (o OptNilPaymentMethod) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes PaymentMethod from json.
+func (o *OptNilPaymentMethod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilPaymentMethod to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v PaymentMethod
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilPaymentMethod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilPaymentMethod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes uuid.UUID as json.
+func (o OptNilUUID) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	json.EncodeUUID(e, o.Value)
+}
+
+// Decode decodes uuid.UUID from json.
+func (o *OptNilUUID) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilUUID to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v uuid.UUID
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	v, err := json.DecodeUUID(d)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilUUID) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilUUID) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
 func (s *OrderDto) Encode(e *jx.Encoder) {
 	e.ObjStart()
@@ -1072,12 +1216,16 @@ func (s *OrderDto) encodeFields(e *jx.Encoder) {
 		e.Float64(s.TotalPrice)
 	}
 	{
-		e.FieldStart("transaction_uuid")
-		json.EncodeUUID(e, s.TransactionUUID)
+		if s.TransactionUUID.Set {
+			e.FieldStart("transaction_uuid")
+			s.TransactionUUID.Encode(e)
+		}
 	}
 	{
-		e.FieldStart("payment_method")
-		s.PaymentMethod.Encode(e)
+		if s.PaymentMethod.Set {
+			e.FieldStart("payment_method")
+			s.PaymentMethod.Encode(e)
+		}
 	}
 	{
 		e.FieldStart("status")
@@ -1161,11 +1309,9 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"total_price\"")
 			}
 		case "transaction_uuid":
-			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				v, err := json.DecodeUUID(d)
-				s.TransactionUUID = v
-				if err != nil {
+				s.TransactionUUID.Reset()
+				if err := s.TransactionUUID.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1173,8 +1319,8 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"transaction_uuid\"")
 			}
 		case "payment_method":
-			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
+				s.PaymentMethod.Reset()
 				if err := s.PaymentMethod.Decode(d); err != nil {
 					return err
 				}
@@ -1202,7 +1348,7 @@ func (s *OrderDto) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b01111111,
+		0b01001111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

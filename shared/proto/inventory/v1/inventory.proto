@@ -112,7 +112,7 @@ message PartsFilter{
 // Category перечисление категорий деталей
 enum Category {
   // Неизвестная категория
-  UNKNOW_UNSPECIFIED = 0;
+  UNKNOWN_UNSPECIFIED = 0;
 
   // Двигатель
   ENGINE = 1;

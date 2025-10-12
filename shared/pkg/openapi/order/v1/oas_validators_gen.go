@@ -82,8 +82,15 @@ func (s *OrderDto) Validate() error {
 		})
 	}
 	if err := func() error {
-		if err := s.PaymentMethod.Validate(); err != nil {
-			return err
+		if value, ok := s.PaymentMethod.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
@@ -129,8 +136,15 @@ func (s *PayOrderRequest) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := s.PaymentMethod.Validate(); err != nil {
-			return err
+		if value, ok := s.PaymentMethod.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {

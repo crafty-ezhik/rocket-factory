@@ -39,7 +39,7 @@ message PayOrderResponse {
 
 // PaymentMethod перечисление способов оплаты
 enum PaymentMethod {
-  UNKNOW_UNSPECIFIED = 0;
+  UNKNOWN_UNSPECIFIED = 0;
   CARD = 1;
   SBP = 2;
   CREDIT_CARD = 3;
