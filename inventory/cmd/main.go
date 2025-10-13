@@ -35,9 +35,6 @@ const (
 	httpPort      = 8082
 )
 
-// mapParts -псевдоним для map[string]*inventoryV1.Part
-type mapParts map[string]*inventoryV1.Part
-
 // FilterType - ограничение для типов фильтра
 type FilterType interface {
 	string | inventoryV1.Category
@@ -48,12 +45,12 @@ type inventoryService struct {
 	inventoryV1.UnimplementedInventoryServiceServer
 
 	mu    sync.RWMutex
-	store mapParts
+	store map[string]*inventoryV1.Part
 }
 
 // applyFilter - применяет фильтр к мапе. Передается список значений фильтра по которому фильтровать
 // и геттер для получения значения у n-го элемента
-func applyFilter[T FilterType](mp mapParts, filter []T, getter func(p *inventoryV1.Part) T) {
+func applyFilter[T FilterType](mp map[string]*inventoryV1.Part, filter []T, getter func(p *inventoryV1.Part) T) {
 	for uuidPart, part := range mp {
 		exist := false
 		for _, item := range filter {
@@ -95,7 +92,7 @@ func (is *inventoryService) GetPart(ctx context.Context, req *inventoryV1.GetPar
 
 // ListParts - возвращает список деталей по указанным фильтрам
 func (is *inventoryService) ListParts(ctx context.Context, req *inventoryV1.ListPartsRequest) (*inventoryV1.ListPartsResponse, error) {
-	tempMap := make(mapParts)
+	tempMap := make(map[string]*inventoryV1.Part)
 	is.mu.RLock()
 	for k, v := range is.store {
 		tempMap[k] = v
@@ -273,8 +270,8 @@ func main() {
 	log.Println("✅ gRPC Server stopped")
 }
 
-func generateFakeData(n int) mapParts {
-	fakeData := make(mapParts)
+func generateFakeData(n int) map[string]*inventoryV1.Part {
+	fakeData := make(map[string]*inventoryV1.Part)
 	catSlice := []inventoryV1.Category{
 		inventoryV1.Category_ENGINE,
 		inventoryV1.Category_FUEL,

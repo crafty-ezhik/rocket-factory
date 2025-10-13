@@ -82,8 +82,8 @@ func (s *OrderStorage) CreateOrder(user uuid.UUID, parts []uuid.UUID, totalPrice
 	return orderUUID, nil
 }
 
-// PayOrder - меняет статут оплаты, метод оплаты и уникальный идентификатор транзакции
-func (s *OrderStorage) PayOrder(orderUUID, transactionUUID uuid.UUID, paymentMethod orderV1.PaymentMethod) error {
+// UpdateOrder - меняет статут оплаты, метод оплаты и уникальный идентификатор транзакции
+func (s *OrderStorage) UpdateOrder(orderUUID, transactionUUID uuid.UUID, paymentMethod orderV1.PaymentMethod) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	order := s.orders[orderUUID.String()]
@@ -162,32 +162,19 @@ func (h *OrderHandler) OrderCancel(ctx context.Context, req orderV1.OrderCancelP
 
 // OrderCreate - Создает заказ и возвращает его уникальный идентификатор
 func (h *OrderHandler) OrderCreate(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.OrderCreateRes, error) {
-	// Валидируем запрос
-	if err := req.Validate(); err != nil {
+	if err := validateCreateRequest(req); err != nil {
 		return &orderV1.BadRequestError{
 			Code:    http.StatusBadRequest,
-			Message: fmt.Sprintf("Invalid request. Error: %s", err.Error()),
+			Message: err.Error(),
 		}, nil
 	}
 
-	// Проверяем userUUID
-	if err := uuid.Validate(req.GetUserUUID().String()); err != nil {
+	partsUUID, err := convertUUIDStoString(req)
+	if err != nil {
 		return &orderV1.BadRequestError{
 			Code:    http.StatusBadRequest,
-			Message: "uuid validation failed. " + err.Error(),
+			Message: err.Error(),
 		}, nil
-	}
-
-	// Преобразуем входящий []uuid.UUID к []string
-	partsUUID := make([]string, 0, len(req.GetPartUuids()))
-	for _, partUUID := range req.GetPartUuids() {
-		if err := uuid.Validate(partUUID.String()); err != nil {
-			return &orderV1.BadRequestError{
-				Code:    http.StatusBadRequest,
-				Message: "uuid validation failed. " + err.Error(),
-			}, nil
-		}
-		partsUUID = append(partsUUID, partUUID.String())
 	}
 
 	// Идем в InventoryService для получения списка запрашиваемых деталей
@@ -202,23 +189,12 @@ func (h *OrderHandler) OrderCreate(ctx context.Context, req *orderV1.CreateOrder
 		}, nil
 	}
 
-	// Проверяем, что все запрашиваемые детали есть в наличии и считаем total_price
-	totalPrice := 0.0
-	for _, UUID := range partsUUID {
-		exist := false
-		for _, part := range parts.GetParts() {
-			if part.Uuid == UUID {
-				exist = true
-				totalPrice += part.Price
-				break
-			}
-		}
-		if !exist {
-			return &orderV1.BadRequestError{
-				Code:    400,
-				Message: fmt.Sprintf("part with uuid %s not found", UUID),
-			}, nil
-		}
+	totalPrice, err := checkPartsAndCountTotalPrice(partsUUID, parts)
+	if err != nil {
+		return &orderV1.BadRequestError{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}, nil
 	}
 
 	orderUUID, err := h.storage.CreateOrder(req.GetUserUUID(), req.GetPartUuids(), totalPrice)
@@ -317,7 +293,7 @@ func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderReques
 	}
 
 	// Обновляем данные по заказу
-	err = h.storage.PayOrder(order.GetOrderUUID(), transactionUUID, paymentMethod)
+	err = h.storage.UpdateOrder(order.GetOrderUUID(), transactionUUID, paymentMethod)
 	if err != nil {
 		log.Printf("PayOrder failed: %v", err)
 		return &orderV1.InternalServerError{
@@ -340,6 +316,45 @@ func (h *OrderHandler) NewError(_ context.Context, err error) *orderV1.GenericEr
 	}
 }
 
+func convertUUIDStoString(req *orderV1.CreateOrderRequest) ([]string, error) {
+	partsUUID := make([]string, 0, len(req.GetPartUuids()))
+	for _, partUUID := range req.GetPartUuids() {
+		if err := uuid.Validate(partUUID.String()); err != nil {
+			return nil, errors.New("uuid validation failed")
+		}
+		partsUUID = append(partsUUID, partUUID.String())
+	}
+	return partsUUID, nil
+}
+
+func validateCreateRequest(req *orderV1.CreateOrderRequest) error {
+	if err := req.Validate(); err != nil {
+		return errors.New("validate CreateOrder Request failed")
+	}
+
+	if err := uuid.Validate(req.GetUserUUID().String()); err != nil {
+		return errors.New("uuid validation failed")
+	}
+	return nil
+}
+
+func checkPartsAndCountTotalPrice(partsUUID []string, parts *inventoryV1.ListPartsResponse) (float64, error) {
+	totalPrice := 0.0
+	for _, UUID := range partsUUID {
+		exist := false
+		for _, part := range parts.GetParts() {
+			if part.Uuid == UUID {
+				exist = true
+				totalPrice += part.Price
+				break
+			}
+		}
+		if !exist {
+			return 0, errors.New(fmt.Sprintf("part with uuid %s not found", UUID))
+		}
+	}
+	return totalPrice, nil
+}
 func main() {
 	// Создаем хранилище для данных о заказах
 	storage := NewOrderStorage()
