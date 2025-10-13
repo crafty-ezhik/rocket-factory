@@ -49,6 +49,13 @@ post:
           schema:
             $ref: ../components/errors/forbidden_error.yaml
 
+    '409':
+      description: Невозможно оплатить отмененный или уже оплаченный заказ
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/conflict_error.yaml
+
     '429':
       description: Превышено количество запросов к серверу
       content:

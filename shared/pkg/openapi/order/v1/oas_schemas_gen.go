@@ -108,6 +108,7 @@ func (s *ConflictError) SetMessage(val string) {
 }
 
 func (*ConflictError) orderCancelRes() {}
+func (*ConflictError) orderPayRes()    {}
 
 // Ref: #/components/schemas/create_order_request
 type CreateOrderRequest struct {

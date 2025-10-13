@@ -169,7 +169,7 @@ func (h *OrderHandler) OrderCreate(ctx context.Context, req *orderV1.CreateOrder
 		}, nil
 	}
 
-	partsUUID, err := convertUUIDStoString(req)
+	partsUUID, err := convertUUIDStoStrings(req)
 	if err != nil {
 		return &orderV1.BadRequestError{
 			Code:    http.StatusBadRequest,
@@ -178,9 +178,11 @@ func (h *OrderHandler) OrderCreate(ctx context.Context, req *orderV1.CreateOrder
 	}
 
 	// Идем в InventoryService для получения списка запрашиваемых деталей
-	parts, err := h.inventoryClient.ListParts(ctx, &inventoryV1.ListPartsRequest{Filter: &inventoryV1.PartsFilter{
+	ctxReq, cancel := context.WithTimeout(ctx, 3*time.Second)
+	parts, err := h.inventoryClient.ListParts(ctxReq, &inventoryV1.ListPartsRequest{Filter: &inventoryV1.PartsFilter{
 		Uuids: partsUUID,
 	}})
+	defer cancel()
 	if err != nil {
 		log.Printf("ListParts failed: %v", err)
 		return &orderV1.InternalServerError{
@@ -237,7 +239,7 @@ func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderReques
 	if err := uuid.Validate(params.OrderUUID); err != nil {
 		return &orderV1.BadRequestError{
 			Code:    http.StatusBadRequest,
-			Message: "uuid validation failed. " + err.Error(),
+			Message: "uuid validation failed",
 		}, nil
 	}
 
@@ -247,6 +249,14 @@ func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderReques
 		return &orderV1.NotFoundError{
 			Code:    http.StatusNotFound,
 			Message: "order not found",
+		}, nil
+	}
+
+	// Проверка статуса
+	if order.Status != orderV1.OrderStatusPENDINGPAYMENT {
+		return &orderV1.ConflictError{
+			Code:    http.StatusConflict,
+			Message: fmt.Sprintf("order is %s, cannot process payment", order.Status),
 		}, nil
 	}
 
@@ -269,7 +279,10 @@ func (h *OrderHandler) OrderPay(ctx context.Context, req *orderV1.PayOrderReques
 	}
 
 	// Отправляем данные для оплаты в PaymentService
-	transactionUUIDstr, err := h.paymentClient.PayOrder(ctx, &paymentV1.PayOrderRequest{
+	ctxReq, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+
+	transactionUUIDstr, err := h.paymentClient.PayOrder(ctxReq, &paymentV1.PayOrderRequest{
 		OrderUuid:     params.OrderUUID,
 		UserUuid:      order.GetUserUUID().String(),
 		PaymentMethod: paymentV1.PaymentMethod(paymentV1.PaymentMethod_value[string(paymentMethodText)]),
@@ -316,7 +329,7 @@ func (h *OrderHandler) NewError(_ context.Context, err error) *orderV1.GenericEr
 	}
 }
 
-func convertUUIDStoString(req *orderV1.CreateOrderRequest) ([]string, error) {
+func convertUUIDStoStrings(req *orderV1.CreateOrderRequest) ([]string, error) {
 	partsUUID := make([]string, 0, len(req.GetPartUuids()))
 	for _, partUUID := range req.GetPartUuids() {
 		if err := uuid.Validate(partUUID.String()); err != nil {
