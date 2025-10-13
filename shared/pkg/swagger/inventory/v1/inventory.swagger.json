@@ -59,14 +59,14 @@
           },
           {
             "name": "filter.categories",
-            "description": "categories - Список категорий. Пусто — не фильтруем по категории\n\n - UNKNOW_UNSPECIFIED: Неизвестная категория\n - ENGINE: Двигатель\n - FUEL: Топливо\n - PORTHOLE: Иллюминатор\n - WING: Крыло",
+            "description": "categories - Список категорий. Пусто — не фильтруем по категории\n\n - UNKNOWN_UNSPECIFIED: Неизвестная категория\n - ENGINE: Двигатель\n - FUEL: Топливо\n - PORTHOLE: Иллюминатор\n - WING: Крыло",
             "in": "query",
             "required": false,
             "type": "array",
             "items": {
               "type": "string",
               "enum": [
-                "UNKNOW_UNSPECIFIED",
+                "UNKNOWN_UNSPECIFIED",
                 "ENGINE",
                 "FUEL",
                 "PORTHOLE",
@@ -168,14 +168,14 @@
     "v1Category": {
       "type": "string",
       "enum": [
-        "UNKNOW_UNSPECIFIED",
+        "UNKNOWN_UNSPECIFIED",
         "ENGINE",
         "FUEL",
         "PORTHOLE",
         "WING"
       ],
-      "default": "UNKNOW_UNSPECIFIED",
-      "description": "- UNKNOW_UNSPECIFIED: Неизвестная категория\n - ENGINE: Двигатель\n - FUEL: Топливо\n - PORTHOLE: Иллюминатор\n - WING: Крыло",
+      "default": "UNKNOWN_UNSPECIFIED",
+      "description": "- UNKNOWN_UNSPECIFIED: Неизвестная категория\n - ENGINE: Двигатель\n - FUEL: Топливо\n - PORTHOLE: Иллюминатор\n - WING: Крыло",
       "title": "Category перечисление категорий деталей"
     },
     "v1Dimensions": {

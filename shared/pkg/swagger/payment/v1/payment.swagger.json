@@ -110,13 +110,13 @@
     "v1PaymentMethod": {
       "type": "string",
       "enum": [
-        "UNKNOW_UNSPECIFIED",
+        "UNKNOWN_UNSPECIFIED",
         "CARD",
         "SBP",
         "CREDIT_CARD",
         "INVESTOR_MONEY"
       ],
-      "default": "UNKNOW_UNSPECIFIED",
+      "default": "UNKNOWN_UNSPECIFIED",
       "title": "PaymentMethod перечисление способов оплаты"
     }
   }

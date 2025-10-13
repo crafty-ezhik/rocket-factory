@@ -27,28 +27,28 @@ const (
 type PaymentMethod int32
 
 const (
-	PaymentMethod_UNKNOW_UNSPECIFIED PaymentMethod = 0
-	PaymentMethod_CARD               PaymentMethod = 1
-	PaymentMethod_SBP                PaymentMethod = 2
-	PaymentMethod_CREDIT_CARD        PaymentMethod = 3
-	PaymentMethod_INVESTOR_MONEY     PaymentMethod = 4
+	PaymentMethod_UNKNOWN_UNSPECIFIED PaymentMethod = 0
+	PaymentMethod_CARD                PaymentMethod = 1
+	PaymentMethod_SBP                 PaymentMethod = 2
+	PaymentMethod_CREDIT_CARD         PaymentMethod = 3
+	PaymentMethod_INVESTOR_MONEY      PaymentMethod = 4
 )
 
 // Enum value maps for PaymentMethod.
 var (
 	PaymentMethod_name = map[int32]string{
-		0: "UNKNOW_UNSPECIFIED",
+		0: "UNKNOWN_UNSPECIFIED",
 		1: "CARD",
 		2: "SBP",
 		3: "CREDIT_CARD",
 		4: "INVESTOR_MONEY",
 	}
 	PaymentMethod_value = map[string]int32{
-		"UNKNOW_UNSPECIFIED": 0,
-		"CARD":               1,
-		"SBP":                2,
-		"CREDIT_CARD":        3,
-		"INVESTOR_MONEY":     4,
+		"UNKNOWN_UNSPECIFIED": 0,
+		"CARD":                1,
+		"SBP":                 2,
+		"CREDIT_CARD":         3,
+		"INVESTOR_MONEY":      4,
 	}
 )
 
@@ -140,7 +140,7 @@ func (x *PayOrderRequest) GetPaymentMethod() PaymentMethod {
 	if x != nil {
 		return x.PaymentMethod
 	}
-	return PaymentMethod_UNKNOW_UNSPECIFIED
+	return PaymentMethod_UNKNOWN_UNSPECIFIED
 }
 
 // PayOrderResponse ответ на запрос оплаты
@@ -201,9 +201,9 @@ const file_payment_v1_payment_proto_rawDesc = "" +
 	"\tuser_uuid\x18\x02 \x01(\tB\b\xfaB\x05r\x03\x98\x01$R\buserUuid\x12@\n" +
 	"\x0epayment_method\x18\x03 \x01(\x0e2\x19.payment.v1.PaymentMethodR\rpaymentMethod\"=\n" +
 	"\x10PayOrderResponse\x12)\n" +
-	"\x10transaction_uuid\x18\x01 \x01(\tR\x0ftransactionUuid*_\n" +
-	"\rPaymentMethod\x12\x16\n" +
-	"\x12UNKNOW_UNSPECIFIED\x10\x00\x12\b\n" +
+	"\x10transaction_uuid\x18\x01 \x01(\tR\x0ftransactionUuid*`\n" +
+	"\rPaymentMethod\x12\x17\n" +
+	"\x13UNKNOWN_UNSPECIFIED\x10\x00\x12\b\n" +
 	"\x04CARD\x10\x01\x12\a\n" +
 	"\x03SBP\x10\x02\x12\x0f\n" +
 	"\vCREDIT_CARD\x10\x03\x12\x12\n" +

@@ -35,10 +35,7 @@ const (
 	httpPort      = 8082
 )
 
-// FilterType - ограничение для типов фильтра
-type FilterType interface {
-	string | inventoryV1.Category
-}
+type filter func(part *inventoryV1.Part) bool
 
 // inventoryService - реализует gRPC сервис для работы с оплатами
 type inventoryService struct {
@@ -46,23 +43,6 @@ type inventoryService struct {
 
 	mu    sync.RWMutex
 	store map[string]*inventoryV1.Part
-}
-
-// applyFilter - применяет фильтр к мапе. Передается список значений фильтра по которому фильтровать
-// и геттер для получения значения у n-го элемента
-func applyFilter[T FilterType](mp map[string]*inventoryV1.Part, filter []T, getter func(p *inventoryV1.Part) T) {
-	for uuidPart, part := range mp {
-		exist := false
-		for _, item := range filter {
-			if getter(part) == item {
-				exist = true
-				break
-			}
-		}
-		if !exist {
-			delete(mp, uuidPart)
-		}
-	}
 }
 
 // map2slice - преобразует мапу в слайс для ответа клиенту
@@ -92,63 +72,110 @@ func (is *inventoryService) GetPart(ctx context.Context, req *inventoryV1.GetPar
 
 // ListParts - возвращает список деталей по указанным фильтрам
 func (is *inventoryService) ListParts(ctx context.Context, req *inventoryV1.ListPartsRequest) (*inventoryV1.ListPartsResponse, error) {
-	tempMap := make(map[string]*inventoryV1.Part)
-	is.mu.RLock()
-	for k, v := range is.store {
-		tempMap[k] = v
-	}
-	is.mu.RUnlock()
-
-	filter := req.GetFilter()
-
-	if filter == nil {
+	// Проверка наличия фильтров
+	if req.GetFilter() == nil {
 		return &inventoryV1.ListPartsResponse{Parts: is.map2slice(is.store)}, nil
 	}
 
-	if filter.GetUuids() != nil {
-		applyFilter[string](tempMap, filter.GetUuids(), func(p *inventoryV1.Part) string { return p.GetUuid() })
-	}
+	var filteredParts []*inventoryV1.Part
+	filters := getFilterFuncs(req.GetFilter())
 
-	if filter.GetNames() != nil {
-		applyFilter[string](tempMap, filter.GetNames(), func(p *inventoryV1.Part) string { return p.GetName() })
-	}
+	is.mu.RLock()
+	defer is.mu.RUnlock()
 
-	if filter.GetCategories() != nil {
-		applyFilter[inventoryV1.Category](
-			tempMap,
-			filter.GetCategories(),
-			func(p *inventoryV1.Part) inventoryV1.Category { return p.GetCategory() },
-		)
-	}
-
-	if filter.GetManufacturerCountries() != nil {
-		applyFilter[string](
-			tempMap,
-			filter.GetManufacturerCountries(),
-			func(p *inventoryV1.Part) string { return p.GetManufacturer().GetCountry() },
-		)
-	}
-
-	if filter.GetTags() != nil {
-		for uuidPart, part := range tempMap {
-			exist := false
-			for _, tag := range filter.GetTags() {
-				for _, partTag := range part.GetTags() {
-					if partTag == tag {
-						exist = true
-						break
-					}
-				}
+	for _, part := range is.store {
+		ok := true
+		for _, filterFn := range filters {
+			if !filterFn(part) {
+				ok = false
+				break
 			}
-			if !exist {
-				delete(tempMap, uuidPart)
-			}
+		}
+
+		if ok {
+			filteredParts = append(filteredParts, part)
 		}
 	}
 
 	return &inventoryV1.ListPartsResponse{
-		Parts: is.map2slice(tempMap),
+		Parts: filteredParts,
 	}, nil
+}
+
+// set - преобразует слайс в множество
+func set(data []string) map[string]struct{} {
+	m := make(map[string]struct{})
+	for _, v := range data {
+		m[v] = struct{}{}
+	}
+	return m
+}
+
+// cat2string - конвертирует тип []inventoryV1.Category в []string для фильтрации
+func cat2string(cats []inventoryV1.Category) []string {
+	result := make([]string, 0, len(cats))
+	for _, v := range cats {
+		result = append(result, v.String())
+	}
+	return result
+}
+
+// getFilterFuncs - возвращает список фильтрующих функций
+func getFilterFuncs(filterValues *inventoryV1.PartsFilter) []filter {
+	uuidSet := set(filterValues.GetUuids())
+	nameSet := set(filterValues.GetNames())
+	catSet := set(cat2string(filterValues.GetCategories()))
+	countrySet := set(filterValues.GetManufacturerCountries())
+	tagSet := set(filterValues.GetTags())
+
+	return []filter{
+		func(part *inventoryV1.Part) bool {
+			if len(uuidSet) > 0 {
+				if _, ok := uuidSet[part.Uuid]; !ok {
+					return false
+				}
+			}
+			return true
+		},
+		func(part *inventoryV1.Part) bool {
+			if len(nameSet) > 0 {
+				if _, ok := nameSet[part.Name]; !ok {
+					return false
+				}
+			}
+			return true
+		},
+		func(part *inventoryV1.Part) bool {
+			if len(catSet) > 0 {
+				if _, ok := catSet[part.Category.String()]; !ok {
+					return false
+				}
+			}
+			return true
+		},
+		func(part *inventoryV1.Part) bool {
+			if len(countrySet) > 0 {
+				if _, ok := countrySet[part.Manufacturer.Country]; !ok {
+					return false
+				}
+			}
+			return true
+		},
+		func(part *inventoryV1.Part) bool {
+			if len(tagSet) > 0 {
+				exist := false
+				for _, partTag := range part.Tags {
+					if _, ok := tagSet[partTag]; ok {
+						exist = true
+					}
+				}
+				if !exist {
+					return false
+				}
+			}
+			return true
+		},
+	}
 }
 
 func main() {
@@ -277,7 +304,7 @@ func generateFakeData(n int) map[string]*inventoryV1.Part {
 		inventoryV1.Category_FUEL,
 		inventoryV1.Category_PORTHOLE,
 		inventoryV1.Category_WING,
-		inventoryV1.Category_UNKNOW_UNSPECIFIED,
+		inventoryV1.Category_UNKNOWN_UNSPECIFIED,
 	}
 
 	for range n {

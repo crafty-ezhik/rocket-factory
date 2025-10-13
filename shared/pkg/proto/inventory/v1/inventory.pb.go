@@ -31,7 +31,7 @@ type Category int32
 
 const (
 	// Неизвестная категория
-	Category_UNKNOW_UNSPECIFIED Category = 0
+	Category_UNKNOWN_UNSPECIFIED Category = 0
 	// Двигатель
 	Category_ENGINE Category = 1
 	// Топливо
@@ -45,18 +45,18 @@ const (
 // Enum value maps for Category.
 var (
 	Category_name = map[int32]string{
-		0: "UNKNOW_UNSPECIFIED",
+		0: "UNKNOWN_UNSPECIFIED",
 		1: "ENGINE",
 		2: "FUEL",
 		3: "PORTHOLE",
 		4: "WING",
 	}
 	Category_value = map[string]int32{
-		"UNKNOW_UNSPECIFIED": 0,
-		"ENGINE":             1,
-		"FUEL":               2,
-		"PORTHOLE":           3,
-		"WING":               4,
+		"UNKNOWN_UNSPECIFIED": 0,
+		"ENGINE":              1,
+		"FUEL":                2,
+		"PORTHOLE":            3,
+		"WING":                4,
 	}
 )
 
@@ -371,7 +371,7 @@ func (x *Part) GetCategory() Category {
 	if x != nil {
 		return x.Category
 	}
-	return Category_UNKNOW_UNSPECIFIED
+	return Category_UNKNOWN_UNSPECIFIED
 }
 
 func (x *Part) GetDimensions() *Dimensions {
@@ -810,9 +810,9 @@ const file_inventory_v1_inventory_proto_rawDesc = "" +
 	"\n" +
 	"bool_value\x18\x04 \x01(\bH\x00R\tboolValueB\f\n" +
 	"\n" +
-	"value_type*P\n" +
-	"\bCategory\x12\x16\n" +
-	"\x12UNKNOW_UNSPECIFIED\x10\x00\x12\n" +
+	"value_type*Q\n" +
+	"\bCategory\x12\x17\n" +
+	"\x13UNKNOWN_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
 	"\x06ENGINE\x10\x01\x12\b\n" +
 	"\x04FUEL\x10\x02\x12\f\n" +
