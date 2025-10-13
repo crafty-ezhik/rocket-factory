@@ -342,11 +342,11 @@ func convertUUIDStoStrings(req *orderV1.CreateOrderRequest) ([]string, error) {
 
 func validateCreateRequest(req *orderV1.CreateOrderRequest) error {
 	if err := req.Validate(); err != nil {
-		return errors.New("validate CreateOrder Request failed")
+		return fmt.Errorf("validate CreateOrder Request failed")
 	}
 
 	if err := uuid.Validate(req.GetUserUUID().String()); err != nil {
-		return errors.New("uuid validation failed")
+		return fmt.Errorf("uuid validation failed")
 	}
 	return nil
 }
@@ -363,11 +363,12 @@ func checkPartsAndCountTotalPrice(partsUUID []string, parts *inventoryV1.ListPar
 			}
 		}
 		if !exist {
-			return 0, errors.New(fmt.Sprintf("part with uuid %s not found", UUID))
+			return 0, fmt.Errorf("part with uuid %s not found", UUID)
 		}
 	}
 	return totalPrice, nil
 }
+
 func main() {
 	// Создаем хранилище для данных о заказах
 	storage := NewOrderStorage()
