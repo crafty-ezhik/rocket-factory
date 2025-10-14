@@ -497,5 +497,86 @@ tasks:
         fi
         echo "✅ Статус второго заказа после отмены: $ORDER2_STATUS"
         
+                echo
+        echo "📝 Тест 10: Создание третьего заказа для проверки правильности обработки повторной оплаты (REST API)"
+        ORDER2_RESPONSE=$(curl -s -X POST "http://{{.HOST}}:{{.ORDER_PORT}}/api/v1/orders" \
+          -H "Content-Type: application/json" \
+          -d "{\"user_uuid\":\"$USER_UUID\",\"part_uuids\":[\"$PART_UUID\"]}")
+        
+        if [[ -z "$ORDER2_RESPONSE" || "$ORDER2_RESPONSE" == *"error"* ]]; then
+          echo "❌ Не удалось создать третий заказ."
+          echo "🔍 Ответ сервера: $ORDER2_RESPONSE"
+          exit 1
+        fi
+        
+        # Извлекаем UUID третьего заказа с учетом разных форматов JSON
+        ORDER2_UUID=$(echo $ORDER2_RESPONSE | grep -o '"order_uuid":"[^"]*' | cut -d'"' -f4)
+        if [ -z "$ORDER2_UUID" ]; then
+          ORDER2_UUID=$(echo $ORDER2_RESPONSE | grep -o '"order_uuid": "[^"]*' | cut -d'"' -f4)
+          if [ -z "$ORDER2_UUID" ]; then
+            echo "❌ Не удалось извлечь UUID третьего заказа из ответа."
+            echo "🔍 Ответ сервера: $ORDER2_RESPONSE"
+            exit 1
+          fi
+        fi
+        echo "✅ Успешно создан третий заказ с UUID: $ORDER2_UUID"
+        
+        # Проверяем его начальный статус
+        ORDER2_INFO=$(curl -s -X GET "http://{{.HOST}}:{{.ORDER_PORT}}/api/v1/orders/$ORDER2_UUID")
+        ORDER2_STATUS=$(echo $ORDER2_INFO | grep -o '"status":"[^"]*' | cut -d'"' -f4)
+        if [ -z "$ORDER2_STATUS" ]; then
+          ORDER2_STATUS=$(echo $ORDER2_INFO | grep -o '"status": "[^"]*' | cut -d'"' -f4)
+        fi
+        
+        if [[ "$ORDER2_STATUS" != *"PENDING_PAYMENT"* ]]; then
+          echo "❌ Неверный начальный статус третьего заказа. Ожидался PENDING_PAYMENT, получен: $ORDER2_STATUS"
+          exit 1
+        fi
+        echo "✅ Начальный статус третьего заказа: $ORDER2_STATUS"
+        
+        echo "💰 Оплата третьего заказа (REST API)"
+        PAY_RESPONSE=$(curl -s -X POST "http://{{.HOST}}:{{.ORDER_PORT}}/api/v1/orders/$ORDER_UUID/pay" \
+          -H "Content-Type: application/json" \
+          -d "{\"payment_method\":\"CARD\"}")
+        
+        if [[ "$PAY_RESPONSE" == *"error"* ]]; then
+          echo "❌ Ошибка при оплате заказа."
+          echo "🔍 Ответ сервера: $PAY_RESPONSE"
+          exit 1
+        fi
+        echo "✅ Заказ успешно оплачен"
+        
+        echo "📊 Проверка статуса третьего заказа после оплаты (должен быть PAID)"
+        ORDER_INFO_RESPONSE=$(curl -s -X GET "http://{{.HOST}}:{{.ORDER_PORT}}/api/v1/orders/$ORDER_UUID")
+        
+        # Извлекаем статус заказа
+        ORDER_STATUS=$(echo $ORDER_INFO_RESPONSE | grep -o '"status":"[^"]*' | cut -d'"' -f4)
+        if [ -z "$ORDER_STATUS" ]; then
+          ORDER_STATUS=$(echo $ORDER_INFO_RESPONSE | grep -o '"status": "[^"]*' | cut -d'"' -f4)
+        fi
+        
+        # Проверяем, что статус стал PAID
+        if [[ "$ORDER_STATUS" != *"PAID"* && "$ORDER_STATUS" != *"ASSEMBLED"* ]]; then
+          echo "❌ Неверный статус заказа после оплаты. Ожидался PAID или ASSEMBLED, получен: $ORDER_STATUS"
+          exit 1
+        fi
+        echo "✅ Статус третьего заказа после оплаты: $ORDER_STATUS"
+        
+        echo "💰 Повторная оплата третьего заказа (REST API)"
+        PAY_RESPONSE=$(curl -s -o response_body.json -w "%{http_code}" -X POST "http://{{.HOST}}:{{.ORDER_PORT}}/api/v1/orders/$ORDER_UUID/pay" \
+          -H "Content-Type: application/json" \
+          -d "{\"payment_method\":\"CARD\"}")
+        
+        
+        echo "Проверяем код ответа, должен быть 409..."
+        
+        if [[ "$PAY_RESPONSE" != 409 ]]; then
+          echo "❌ Ошибка при повторной оплате заказа."
+          echo "🔍 Ответ сервера: $PAY_RESPONSE"
+          exit 1
+        fi
+        echo "✅ Код ответа $PAY_RESPONSE"
+        
+        
         echo
         echo "🎉 Все тесты API успешно выполнены!"
