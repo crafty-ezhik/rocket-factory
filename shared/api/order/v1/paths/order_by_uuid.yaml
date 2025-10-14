@@ -1,0 +1,79 @@
+parameters:
+  - $ref: ../params/order_uuid.yaml
+
+get:
+  summary: Возвращает информацию о заказе
+  operationId: OrderGet
+  tags:
+    - Order
+
+  responses:
+    '200':
+      description: Заказ найден
+      content:
+        application/json:
+          schema:
+            $ref: ../components/get_order_response.yaml
+
+    '404':
+      description: Заказ не найден
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/not_found_error.yaml
+
+    '400':
+      description: Недопустимый запрос
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/bad_request_error.yaml
+
+    '401':
+      description: Необходима аутентификация пользователя
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/unauthorized_error.yaml
+
+    '403':
+      description: Доступ запрещен
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/forbidden_error.yaml
+
+    '429':
+      description: Превышено количество запросов к серверу
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/rate_limit_error.yaml
+
+    '500':
+      description: Внутренняя ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/internal_server_error.yaml
+
+    '502':
+      description: Некорректный ответ от сервера
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/bad_gateway_error.yaml
+
+    '503':
+      description: Сервер недоступен
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/service_unavailable_error.yaml
+
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/generic_error.yaml

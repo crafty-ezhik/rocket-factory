@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+// Package inventory.v1 содержит API для работы с InventoryService
+package inventory.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+// Описываем, куда будет положены сгенерированные файла и как будет называться пакет в Go
+option go_package = "github.com/crafty-ezhik/rocket-factory/pkg/proto/inventory/v1;inventory_v1";
+
+// InventoryService предоставляет API для работы с сервисом деталей
+service InventoryService {
+  // GetPart возвращает информацию о детали по её UUID.
+  rpc GetPart(GetPartRequest) returns (GetPartResponse){
+    // Описываем метаинформацию, которая поможет gateway'ю как именно сконфигурировать http endpoint
+    option (google.api.http) = {
+      get: "/api/v1/inventory/{uuid}"
+    };
+  };
+
+  // ListParts возвращает список деталей с возможностью фильтрации.
+  rpc ListParts(ListPartsRequest) returns(ListPartsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/inventory"
+    };
+  };
+}
+
+// GetPartRequest запрос на получение информации о детали по её UUID
+message GetPartRequest {
+  // uuid - идентификатор детали
+  string uuid = 1 [(validate.rules).string.len = 36];
+}
+
+// GetPartResponse ответ на запрос получения информации о детали по её UUID
+message GetPartResponse {
+  // part - информация о детали
+  Part part = 1;
+}
+
+// ListPartsRequest запрос на получение списка деталей с возможностью фильтрации
+message ListPartsRequest {
+  // filter - фильтр по деталям
+  PartsFilter filter = 1;
+}
+
+// ListPartsResponse ответ на запрос получения списка деталей с возможностью фильтрации
+message ListPartsResponse {
+  // parts - Список деталей
+  repeated Part parts = 1;
+}
+
+// Part информация о детали
+message Part {
+  // uuid - Уникальный идентификатор детали
+  string uuid = 1;
+
+  // name - Название детали
+  string name = 2;
+
+  // description - Описание детали
+  string description = 3;
+
+  // price - Цена за единицу
+  double price = 4;
+
+  // stock_quantity - Количество на складе
+  int64 stock_quantity = 5;
+
+  // category - Категория
+  Category category = 6;
+
+  // dimensions - Размеры детали
+  Dimensions dimensions = 7;
+
+  // manufacturer - Информация о производителе
+  Manufacturer manufacturer = 8;
+
+  // tags - Теги для быстрого поиска
+  repeated string tags = 9;
+
+  // metadata - Гибкие метаданные
+  map<string, Value> metadata = 10;
+
+  // created_at - Дата создания
+  google.protobuf.Timestamp created_at = 11;
+
+  // updated_at - Дата обновления
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+// PartsFilter доступные поля для фильтрации деталей (опционально)
+message PartsFilter{
+  // uuids - Список UUID'ов. Пусто — не фильтруем по UUID
+  repeated string uuids = 1;
+
+  // names - Список имён. Пусто — не фильтруем по имени
+  repeated string names = 2;
+
+  // categories - Список категорий. Пусто — не фильтруем по категории
+  repeated Category categories = 3;
+
+  // manufacturer_countries - Список стран производителей. Пусто — не фильтруем по стране
+  repeated string manufacturer_countries = 4;
+
+  // tags - Список тегов. Пусто — не фильтруем по тегам
+  repeated string tags = 5;
+}
+
+// Category перечисление категорий деталей
+enum Category {
+  // Неизвестная категория
+  UNKNOWN_UNSPECIFIED = 0;
+
+  // Двигатель
+  ENGINE = 1;
+
+  // Топливо
+  FUEL = 2;
+
+  // Иллюминатор
+  PORTHOLE = 3;
+
+  // Крыло
+  WING = 4;
+}
+
+// Dimensions описание размеров и веса детали
+message Dimensions {
+  // length - длина в см
+  double length = 1;
+
+  // width - ширина в см
+  double width = 2;
+
+  // height - высота в см
+  double height = 3;
+
+  // weight - вес в кг
+  double weight = 4;
+}
+
+// Manufacturer описание производителя
+message Manufacturer {
+  // name - Название
+  string name = 1;
+
+  // country - Страна производителя
+  string country = 2;
+
+  // website - Сайт производителя
+  string website = 3;
+}
+
+// Value значения для metadata
+message Value {
+  oneof value_type{
+    string string_value = 1;
+    int64 int64_value = 2;
+    double double_value = 3;
+    bool bool_value = 4;
+  }
+}

@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package payment.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+// Описываем, куда будет положены сгенерированные файла и как будет называться пакет в Go
+option go_package = "github.com/crafty-ezhik/rocket-factory/pkg/proto/payment/v1;payment_v1";
+
+
+service PaymentService {
+  // PayOrder Обрабатывает команду на оплату и возвращает transaction_uuid.
+  rpc PayOrder(PayOrderRequest) returns(PayOrderResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/payment"
+      body: "*"
+    };
+  };
+}
+
+// PayOrderRequest запрос на оплату
+message PayOrderRequest {
+  // order_uuid - UUID заказа
+  string order_uuid = 1 [(validate.rules).string.len = 36];
+
+  // user_uuid - UUID пользователя
+  string user_uuid = 2 [(validate.rules).string.len = 36] ;
+
+  // payment_method - выбранный способ оплаты
+  PaymentMethod payment_method = 3;
+}
+
+// PayOrderResponse ответ на запрос оплаты
+message PayOrderResponse {
+  // transaction_uuid - UUID транзакции оплаты
+  string transaction_uuid = 1;
+}
+
+// PaymentMethod перечисление способов оплаты
+enum PaymentMethod {
+  UNKNOWN_UNSPECIFIED = 0;
+  CARD = 1;
+  SBP = 2;
+  CREDIT_CARD = 3;
+  INVESTOR_MONEY = 4;
+}
