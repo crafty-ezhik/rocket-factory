@@ -33,3 +33,11 @@ type Manufacturer struct {
 	Country string
 	Website string
 }
+
+type PartsFilter struct {
+	UUIDs               []string
+	Names               []string
+	Categories          []string
+	ManufacturerCountry []string
+	Tags                []string
+}
