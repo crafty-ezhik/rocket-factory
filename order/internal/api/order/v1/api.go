@@ -1,7 +1,6 @@
 package v1
 
-type api struct {
-}
+type api struct{}
 
 func NewAPI() *api {
 	return &api{}

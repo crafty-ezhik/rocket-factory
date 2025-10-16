@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+
 	clientConverter "github.com/crafty-ezhik/rocket-factory/order/internal/client/converter"
 	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	generatedInventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"

@@ -1,8 +1,9 @@
 package converter
 
 import (
-	"github.com/google/uuid"
 	"log"
+
+	"github.com/google/uuid"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	genInventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
