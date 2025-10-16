@@ -8,12 +8,13 @@ type Order struct {
 	PartUUIDs       []uuid.UUID
 	TotalPrice      float64
 	TransactionUUID uuid.UUID
-	PaymentMethod   string
-	Status          string
+	PaymentMethod   PaymentMethod
+	Status          OrderStatus
 }
 
 type UpdateOrderInfo struct {
 	UUID            uuid.UUID
-	TransactionUUID *uuid.UUID
-	PaymentMethod   *string
+	TransactionUUID uuid.UUID
+	PaymentMethod   PaymentMethod
+	OrderStatus     OrderStatus
 }
