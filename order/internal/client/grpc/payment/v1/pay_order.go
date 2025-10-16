@@ -2,8 +2,10 @@ package v1
 
 import (
 	"context"
-	genPaymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
+
 	"github.com/google/uuid"
+
+	genPaymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 func (c *client) PayOrder(ctx context.Context, orderUUID, userUUID uuid.UUID, paymentMethod string) (string, error) {

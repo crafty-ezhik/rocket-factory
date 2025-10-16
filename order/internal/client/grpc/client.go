@@ -2,8 +2,10 @@ package grpc
 
 import (
 	"context"
-	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
+
 	"github.com/google/uuid"
+
+	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
 
 type InventoryClient interface {
