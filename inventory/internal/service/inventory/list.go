@@ -7,5 +7,9 @@ import (
 )
 
 func (s *service) List(ctx context.Context, filters serviceModel.PartsFilter) ([]serviceModel.Part, error) {
-	return []serviceModel.Part{}, nil
+	parts, err := s.inventoryRepo.List(ctx, filters)
+	if err != nil {
+		return []serviceModel.Part{}, err
+	}
+	return parts, nil
 }
