@@ -1,8 +1,12 @@
 package part
 
-import repoModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
+import (
+	"context"
+	repoModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
+)
 
-func (r *repository) List() ([]repoModel.Part, error) {
+func (r *repository) List(ctx context.Context, filters repoModel.PartsFilter) ([]repoModel.Part, error) {
+	// TODO: Реализовать фильтрацию
 	partList := make([]repoModel.Part, 0)
 
 	r.mu.RLock()

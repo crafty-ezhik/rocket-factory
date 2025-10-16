@@ -1,7 +1,10 @@
 package inventory
 
-import serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
+import (
+	"context"
+	serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
+)
 
-func (s *service) List(filters serviceModel.PartsFilter) ([]serviceModel.Part, error) {
+func (s *service) List(ctx context.Context, filters serviceModel.PartsFilter) ([]serviceModel.Part, error) {
 	return []serviceModel.Part{}, nil
 }
