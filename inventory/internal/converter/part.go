@@ -9,6 +9,15 @@ import (
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 
+// SlicePartToProto - конвертация []serviceModel.Part в []*inventoryV1.Part
+func SlicePartToProto(parts []serviceModel.Part) []*inventoryV1.Part {
+	protoParts := make([]*inventoryV1.Part, len(parts))
+	for i, part := range parts {
+		protoParts[i] = PartToProto(part)
+	}
+	return protoParts
+}
+
 // PartToProto - Конвертация serviceModel в inventoryV1.Part
 func PartToProto(part serviceModel.Part) *inventoryV1.Part {
 	return &inventoryV1.Part{
