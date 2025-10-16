@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/google/uuid"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"

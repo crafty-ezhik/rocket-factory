@@ -2,6 +2,7 @@ package inventory
 
 import (
 	"context"
+
 	serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 )
 
