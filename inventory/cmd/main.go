@@ -57,6 +57,9 @@ func main() {
 	service := inventoryService.NewService(repo)
 	api := inventoryV1API.NewAPI(service)
 
+	// Добавляем случайные детали
+	repo.Init(10)
+
 	inventoryV1.RegisterInventoryServiceServer(grpcServer, api)
 
 	// Включаем рефлексию для отладки
