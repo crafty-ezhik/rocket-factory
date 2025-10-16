@@ -5,11 +5,11 @@ import (
 
 	"github.com/google/uuid"
 
-	repoModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
+	serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 )
 
 type InventoryRepository interface {
-	Get(ctx context.Context, partID uuid.UUID) (repoModel.Part, error)
-	List(ctx context.Context, filters repoModel.PartsFilter) ([]repoModel.Part, error)
+	Get(ctx context.Context, partID uuid.UUID) (serviceModel.Part, error)
+	List(ctx context.Context, filters serviceModel.PartsFilter) ([]serviceModel.Part, error)
 	Init(n int)
 }

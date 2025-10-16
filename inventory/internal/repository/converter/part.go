@@ -5,6 +5,14 @@ import (
 	repoModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
 )
 
+func SlicePartToServiceModel(parts []repoModel.Part) []serviceModel.Part {
+	filteredParts := make([]serviceModel.Part, len(parts))
+	for i, part := range parts {
+		filteredParts[i] = PartToServiceModel(part)
+	}
+	return filteredParts
+}
+
 // PartToServiceModel - преобразует модель репозитория в сервисную модель
 func PartToServiceModel(part repoModel.Part) serviceModel.Part {
 	return serviceModel.Part{

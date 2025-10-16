@@ -6,16 +6,16 @@ import (
 	"github.com/google/uuid"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
-	repoModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
+	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/converter"
 )
 
-func (r *repository) Get(ctx context.Context, partID uuid.UUID) (repoModel.Part, error) {
+func (r *repository) Get(_ context.Context, partID uuid.UUID) (serviceModel.Part, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	part, ok := r.data[partID.String()]
 	if !ok {
-		return repoModel.Part{}, serviceModel.ErrPartNotFound
+		return serviceModel.Part{}, serviceModel.ErrPartNotFound
 	}
-	return part, nil
+	return converter.PartToServiceModel(part), nil
 }
