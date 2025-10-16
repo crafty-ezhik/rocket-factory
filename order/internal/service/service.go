@@ -1,13 +1,16 @@
 package service
 
 import (
-	"github.com/crafty-ezhik/rocket-factory/order/internal/repository/model"
+	"context"
+
 	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
 
 type OrderService interface {
-	Get(orderID uuid.UUID) (model.Order, error)
-	Create(userID uuid.UUID, parts []uuid.UUID) (uuid.UUID, error)
-	Cancel(orderID uuid.UUID) error
-	Pay(orderID uuid.UUID, paymentMethod string) (uuid.UUID, error)
+	Get(ctx context.Context, orderID uuid.UUID) (model.Order, error)
+	Create(ctx context.Context, userID uuid.UUID, parts []uuid.UUID) (uuid.UUID, error)
+	Cancel(ctx context.Context, orderID uuid.UUID) error
+	Pay(ctx context.Context, orderID, userID uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error)
 }

@@ -1,10 +1,17 @@
 package order
 
 import (
-	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
+	"context"
+
 	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
 
-func (s *service) Get(orderID uuid.UUID) (model.Order, error) {
-	return model.Order{}, nil
+func (s *service) Get(ctx context.Context, orderID uuid.UUID) (model.Order, error) {
+	order, err := s.orderRepo.Get(ctx, orderID)
+	if err != nil {
+		return model.Order{}, err
+	}
+	return order, nil
 }
