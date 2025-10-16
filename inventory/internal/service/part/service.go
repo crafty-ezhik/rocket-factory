@@ -1,4 +1,4 @@
-package inventory
+package part
 
 import (
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository"
