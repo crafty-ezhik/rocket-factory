@@ -1,12 +1,14 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 type OrderUpdateKind string
 
 const (
-	OrderUpdateCancel     OrderUpdateKind = "cancel"
-	OrderUpdateUpdateInfo OrderUpdateKind = "update_info"
+	OrderUpdateCANCEL     OrderUpdateKind = "cancel"
+	OrderUpdateUPDATEINFO OrderUpdateKind = "update_info"
 )
 
 type Order struct {
@@ -15,12 +17,13 @@ type Order struct {
 	PartUUIDs       []uuid.UUID
 	TotalPrice      float64
 	TransactionUUID uuid.UUID
-	PaymentMethod   string
-	Status          string
+	PaymentMethod   PaymentMethod
+	Status          OrderStatus
 }
 
 type UpdateOrderInfo struct {
 	UUID            uuid.UUID
-	TransactionUUID *uuid.UUID
-	PaymentMethod   *string
+	TransactionUUID uuid.UUID
+	PaymentMethod   PaymentMethod
+	OrderStatus     OrderStatus
 }
