@@ -1,10 +1,20 @@
 package order
 
 import (
-	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
+	"context"
+
 	"github.com/google/uuid"
+
+	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
+	"github.com/crafty-ezhik/rocket-factory/order/internal/repository/converter"
 )
 
-func (r *repository) Create(order serviceModel.Order) (uuid.UUID, error) {
-	return uuid.UUID{}, nil
+func (r *repository) Create(_ context.Context, order serviceModel.Order) (uuid.UUID, error) {
+	repoOrder := converter.OrderToRepoModel(order)
+
+	r.mu.Lock()
+	r.data[repoOrder.UUID] = repoOrder
+	r.mu.Unlock()
+
+	return repoOrder.UUID, nil
 }

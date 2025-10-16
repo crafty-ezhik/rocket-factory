@@ -1,10 +1,15 @@
 package order
 
 import (
-	repoModel "github.com/crafty-ezhik/rocket-factory/order/internal/repository/model"
-	"github.com/google/uuid"
 	"sync"
+
+	"github.com/google/uuid"
+
+	def "github.com/crafty-ezhik/rocket-factory/order/internal/repository"
+	repoModel "github.com/crafty-ezhik/rocket-factory/order/internal/repository/model"
 )
+
+var _ def.OrderRepository = (*repository)(nil)
 
 type repository struct {
 	mu   sync.RWMutex
