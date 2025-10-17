@@ -763,6 +763,37 @@ func (*RateLimitError) orderCreateRes() {}
 func (*RateLimitError) orderGetRes()    {}
 func (*RateLimitError) orderPayRes()    {}
 
+// Ref: #/components/schemas/request_timeout_error
+type RequestTimeoutError struct {
+	// HTTP-код ошибки.
+	Code int `json:"code"`
+	// Описание ошибки.
+	Message string `json:"message"`
+}
+
+// GetCode returns the value of Code.
+func (s *RequestTimeoutError) GetCode() int {
+	return s.Code
+}
+
+// GetMessage returns the value of Message.
+func (s *RequestTimeoutError) GetMessage() string {
+	return s.Message
+}
+
+// SetCode sets the value of Code.
+func (s *RequestTimeoutError) SetCode(val int) {
+	s.Code = val
+}
+
+// SetMessage sets the value of Message.
+func (s *RequestTimeoutError) SetMessage(val string) {
+	s.Message = val
+}
+
+func (*RequestTimeoutError) orderCreateRes() {}
+func (*RequestTimeoutError) orderPayRes()    {}
+
 // Ref: #/components/schemas/service_unavailable_error
 type ServiceUnavailableError struct {
 	// HTTP-код ошибки.
