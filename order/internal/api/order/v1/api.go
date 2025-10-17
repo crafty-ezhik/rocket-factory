@@ -1,6 +1,10 @@
 package v1
 
-type api struct{}
+import "github.com/crafty-ezhik/rocket-factory/order/internal/service"
+
+type api struct {
+	orderService service.OrderService
+}
 
 func NewAPI() *api {
 	return &api{}
