@@ -10,7 +10,7 @@ import (
 
 type OrderService interface {
 	Get(ctx context.Context, orderID uuid.UUID) (model.Order, error)
-	Create(ctx context.Context, userID uuid.UUID, parts []uuid.UUID) (uuid.UUID, error)
+	Create(ctx context.Context, userID uuid.UUID, parts []uuid.UUID) (uuid.UUID, float64, error)
 	Cancel(ctx context.Context, orderID uuid.UUID) error
-	Pay(ctx context.Context, orderID, userID uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error)
+	Pay(ctx context.Context, orderID uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error)
 }

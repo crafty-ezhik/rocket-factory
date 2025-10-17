@@ -15,7 +15,7 @@ func (r *repository) Get(_ context.Context, orderID uuid.UUID) (serviceModel.Ord
 
 	order, ok := r.data[orderID]
 	if !ok {
-		return serviceModel.Order{}, serviceModel.ErrNotFound
+		return serviceModel.Order{}, serviceModel.ErrOrderNotFound
 	}
 
 	return converter.OrderToServiceModel(order), nil

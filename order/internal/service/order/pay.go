@@ -9,7 +9,7 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
 
-func (s *service) Pay(ctx context.Context, orderID, userID uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error) {
+func (s *service) Pay(ctx context.Context, orderID uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error) {
 	order, err := s.orderRepo.Get(ctx, orderID)
 	if err != nil {
 		return uuid.Nil, err
@@ -23,7 +23,7 @@ func (s *service) Pay(ctx context.Context, orderID, userID uuid.UUID, paymentMet
 	defer cancel()
 
 	// Оплачиваем заказ
-	strTransactionUUID, err := s.paymentClient.PayOrder(ctxReq, orderID, userID, paymentMethod)
+	strTransactionUUID, err := s.paymentClient.PayOrder(ctxReq, order.UUID, order.UserUUID, paymentMethod)
 	if err != nil {
 		return uuid.Nil, err
 	}
