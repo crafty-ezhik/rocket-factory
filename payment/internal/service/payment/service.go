@@ -1,7 +1,7 @@
 package payment
 
-type service struct{}
+type Service struct{}
 
-func NewService() *service {
-	return &service{}
+func NewService() *Service {
+	return &Service{}
 }

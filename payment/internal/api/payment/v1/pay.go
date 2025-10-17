@@ -11,7 +11,7 @@ import (
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
-func (a *api) PayOrder(ctx context.Context, req *paymentV1.PayOrderRequest) (*paymentV1.PayOrderResponse, error) {
+func (a *API) PayOrder(ctx context.Context, req *paymentV1.PayOrderRequest) (*paymentV1.PayOrderResponse, error) {
 	orderUUID, err := uuid.Parse(req.OrderUuid)
 	if err != nil {
 		return &paymentV1.PayOrderResponse{}, status.Error(codes.InvalidArgument, "order uuid is not valid")

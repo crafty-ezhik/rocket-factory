@@ -5,12 +5,12 @@ import (
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
-type api struct {
+type API struct {
 	paymentV1.UnimplementedPaymentServiceServer
 
 	paymentService service.PaymentService
 }
 
-func NewAPI(paymentService service.PaymentService) *api {
-	return &api{paymentService: paymentService}
+func NewAPI(paymentService service.PaymentService) *API {
+	return &API{paymentService: paymentService}
 }

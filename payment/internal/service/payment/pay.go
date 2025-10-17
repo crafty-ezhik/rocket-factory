@@ -8,7 +8,7 @@ import (
 )
 
 // PayOrder - обрабатывает команду на оплату и возвращает transaction_uuid
-func (s *service) PayOrder(_ context.Context, orderID, userID uuid.UUID, paymentMethod string) (string, error) {
+func (s *Service) PayOrder(_ context.Context, orderID, userID uuid.UUID, paymentMethod string) (string, error) {
 	log.Printf(`
 	💳 [Order Paid]
 	• 🆔 Order UUID: %s
