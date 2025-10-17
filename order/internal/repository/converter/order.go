@@ -12,8 +12,8 @@ func OrderToServiceModel(order repoModel.Order) serviceModel.Order {
 		PartUUIDs:       order.PartUUIDs,
 		TotalPrice:      order.TotalPrice,
 		TransactionUUID: order.TransactionUUID,
-		PaymentMethod:   PaymentMethodToService(order.PaymentMethod),
-		Status:          OrderStatusToService(order.Status),
+		PaymentMethod:   order.PaymentMethod,
+		Status:          order.Status,
 	}
 }
 
@@ -24,16 +24,7 @@ func OrderToRepoModel(order serviceModel.Order) repoModel.Order {
 		PartUUIDs:       order.PartUUIDs,
 		TotalPrice:      order.TotalPrice,
 		TransactionUUID: order.TransactionUUID,
-		PaymentMethod:   PaymentMethodToRepo(order.PaymentMethod),
-		Status:          OrderStatusToRepo(order.Status),
-	}
-}
-
-func UpdateOrderInfoToRepoModel(order serviceModel.UpdateOrderInfo) repoModel.UpdateOrderInfo {
-	return repoModel.UpdateOrderInfo{
-		UUID:            order.UUID,
-		TransactionUUID: order.TransactionUUID,
-		PaymentMethod:   PaymentMethodToRepo(order.PaymentMethod),
-		OrderStatus:     OrderStatusToRepo(order.OrderStatus),
+		PaymentMethod:   order.PaymentMethod,
+		Status:          order.Status,
 	}
 }

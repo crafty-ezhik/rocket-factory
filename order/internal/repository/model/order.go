@@ -1,6 +1,9 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
+	"github.com/google/uuid"
+)
 
 type Order struct {
 	UUID            uuid.UUID
@@ -8,13 +11,13 @@ type Order struct {
 	PartUUIDs       []uuid.UUID
 	TotalPrice      float64
 	TransactionUUID uuid.UUID
-	PaymentMethod   PaymentMethod
-	Status          OrderStatus
+	PaymentMethod   model.PaymentMethod
+	Status          model.OrderStatus
 }
 
 type UpdateOrderInfo struct {
 	UUID            uuid.UUID
 	TransactionUUID uuid.UUID
-	PaymentMethod   PaymentMethod
-	OrderStatus     OrderStatus
+	PaymentMethod   model.PaymentMethod
+	OrderStatus     model.OrderStatus
 }
