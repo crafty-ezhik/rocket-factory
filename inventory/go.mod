@@ -9,7 +9,6 @@ require (
 	github.com/crafty-ezhik/rocket-factory/shared v0.0.0-00010101000000-000000000000
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3
-	github.com/samber/lo v1.52.0
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
 )

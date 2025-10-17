@@ -309,7 +309,7 @@ tasks:
       - |
         [ -f {{.MOCKERY}} ] || {
           echo '📦 Installing mockery...'
-          GOBIN={{.BIN_DIR}} go install github.com/vektra/mockery/v2@{{.MOCKERY_VERSION}}
+          GOBIN={{.BIN_DIR}} go install github.com/vektra/mockery/v3@{{.MOCKERY_VERSION}}
         }
     status:
       - test -x {{.MOCKERY}}
