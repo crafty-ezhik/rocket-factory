@@ -6,6 +6,8 @@ type api struct {
 	orderService service.OrderService
 }
 
-func NewAPI() *api {
-	return &api{}
+func NewAPI(orderService service.OrderService) *api {
+	return &api{
+		orderService: orderService,
+	}
 }

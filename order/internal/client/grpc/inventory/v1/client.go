@@ -11,7 +11,7 @@ type client struct {
 	generatedClient generatedInventoryV1.InventoryServiceClient
 }
 
-func NewClient(generatedClient generatedInventoryV1.InventoryServiceClient) *client {
+func NewInventoryClient(generatedClient generatedInventoryV1.InventoryServiceClient) *client {
 	return &client{
 		generatedClient: generatedClient,
 	}
