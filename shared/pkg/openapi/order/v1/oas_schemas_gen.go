@@ -791,7 +791,9 @@ func (s *RequestTimeoutError) SetMessage(val string) {
 	s.Message = val
 }
 
+func (*RequestTimeoutError) orderCancelRes() {}
 func (*RequestTimeoutError) orderCreateRes() {}
+func (*RequestTimeoutError) orderGetRes()    {}
 func (*RequestTimeoutError) orderPayRes()    {}
 
 // Ref: #/components/schemas/service_unavailable_error
