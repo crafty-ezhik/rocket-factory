@@ -27,7 +27,6 @@ func (s *service) Create(ctx context.Context, userID uuid.UUID, partsIDs []uuid.
 	}
 
 	newOrder := model.Order{
-		UUID:            uuid.New(),
 		UserUUID:        userID,
 		PartUUIDs:       partsIDs,
 		TotalPrice:      totalPrice,

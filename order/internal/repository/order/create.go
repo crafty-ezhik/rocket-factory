@@ -10,6 +10,7 @@ import (
 )
 
 func (r *repository) Create(_ context.Context, order serviceModel.Order) (uuid.UUID, error) {
+	order.UUID = uuid.New()
 	repoOrder := converter.OrderToRepoModel(order)
 
 	r.mu.Lock()
