@@ -3,9 +3,11 @@ package order
 import (
 	"errors"
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
+
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
 
 func (s *ServiceSuite) TestCreateOrderSuccess() {
@@ -39,7 +41,8 @@ func (s *ServiceSuite) TestCreateOrderSuccess() {
 				}).
 					Return([]model.Part{
 						{UUID: partIDs[0], Price: 100},
-						{UUID: partIDs[1], Price: 200}},
+						{UUID: partIDs[1], Price: 200},
+					},
 						nil).Once()
 
 				s.repo.On("Create", s.ctx, mock.Anything).Return(orderID, nil)
@@ -80,7 +83,6 @@ func (s *ServiceSuite) TestCreateOrder() {
 		expectedErr        error
 		setupMocks         func()
 	}{
-
 		{
 			name:               "client error",
 			userID:             userID,
@@ -109,7 +111,8 @@ func (s *ServiceSuite) TestCreateOrder() {
 				}).
 					Return([]model.Part{
 						{UUID: partIDs[0], Price: 100},
-						{UUID: partIDs[1], Price: 200}},
+						{UUID: partIDs[1], Price: 200},
+					},
 						nil).
 					Once()
 
@@ -147,7 +150,6 @@ func (s *ServiceSuite) TestCreateOrder() {
 
 			s.Equal(tt.expectedOrderID, orderUUID)
 			s.Equal(tt.expectedTotalPrice, totalPrice)
-
 		})
 	}
 }

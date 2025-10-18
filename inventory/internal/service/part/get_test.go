@@ -3,10 +3,12 @@ package part
 import (
 	"errors"
 	"fmt"
-	"github.com/brianvoe/gofakeit/v7"
-	"github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/brianvoe/gofakeit/v7"
+	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 )
 
 func (s *ServiceSuite) TestGetPartSuccess() {
@@ -87,7 +89,5 @@ func (s *ServiceSuite) TestGetPartFailure() {
 
 			s.Zero(resp)
 		})
-
 	}
-
 }

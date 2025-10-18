@@ -2,15 +2,17 @@ package part
 
 import (
 	"context"
-	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/mocks"
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
+
+	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/mocks"
 )
 
 type ServiceSuite struct {
 	suite.Suite
 
-	ctx context.Context
+	ctx context.Context //nolint:containedctx
 
 	inventoryRepo *mocks.MockInventoryRepository
 

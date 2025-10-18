@@ -2,8 +2,10 @@ package order
 
 import (
 	"errors"
-	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
+
 	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
 
 func (s *ServiceSuite) TestGetOrder() {

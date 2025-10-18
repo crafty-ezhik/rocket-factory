@@ -2,15 +2,17 @@ package order
 
 import (
 	"context"
+	"testing"
+
+	"github.com/stretchr/testify/suite"
+
 	clientMock "github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc/mocks"
 	repoMock "github.com/crafty-ezhik/rocket-factory/order/internal/repository/mocks"
-	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 type ServiceSuite struct {
 	suite.Suite
-	ctx             context.Context
+	ctx             context.Context //nolint:containedctx
 	repo            *repoMock.MockOrderRepository
 	inventoryClient *clientMock.MockInventoryClient
 	paymentClient   *clientMock.MockPaymentClient

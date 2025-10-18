@@ -2,6 +2,7 @@ package part
 
 import (
 	"errors"
+
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 )
 

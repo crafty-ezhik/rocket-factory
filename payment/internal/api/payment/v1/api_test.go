@@ -3,10 +3,12 @@ package v1
 import (
 	"context"
 	"errors"
-	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
+
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 const ServiceMethod = "PayOrder"

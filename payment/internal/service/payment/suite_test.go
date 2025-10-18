@@ -2,15 +2,17 @@ package payment_test
 
 import (
 	"context"
-	"github.com/crafty-ezhik/rocket-factory/payment/internal/service/mocks"
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
+
+	"github.com/crafty-ezhik/rocket-factory/payment/internal/service/mocks"
 )
 
 type ServiceSuite struct {
 	suite.Suite
 
-	ctx context.Context
+	ctx context.Context //nolint:containedctx
 
 	service *mocks.MockPaymentService
 }
@@ -19,7 +21,6 @@ func (s *ServiceSuite) SetupSuite() {
 	s.ctx = context.Background()
 
 	s.service = mocks.NewMockPaymentService(s.T())
-
 }
 
 func (s *ServiceSuite) TearDownSuite() {}

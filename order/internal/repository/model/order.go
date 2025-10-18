@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
 
 type Order struct {

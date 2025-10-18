@@ -2,15 +2,17 @@ package v1
 
 import (
 	"context"
-	"github.com/crafty-ezhik/rocket-factory/payment/internal/service/mocks"
-	"github.com/stretchr/testify/suite"
 	"testing"
+
+	"github.com/stretchr/testify/suite"
+
+	"github.com/crafty-ezhik/rocket-factory/payment/internal/service/mocks"
 )
 
 type APISuite struct {
 	suite.Suite
 
-	ctx context.Context
+	ctx context.Context //nolint:containedctx
 
 	paymentService *mocks.MockPaymentService
 
