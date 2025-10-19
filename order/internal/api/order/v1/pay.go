@@ -30,6 +30,13 @@ func (a *api) OrderPay(ctx context.Context, req *orderV1.PayOrderRequest, params
 			}, nil
 		}
 
+		if errors.Is(err, model.ErrOrderCannotPay) {
+			return &orderV1.ConflictError{
+				Code:    http.StatusConflict,
+				Message: err.Error(),
+			}, nil
+		}
+
 		if errors.Is(err, context.DeadlineExceeded) {
 			return &orderV1.RequestTimeoutError{
 				Code:    http.StatusRequestTimeout,
