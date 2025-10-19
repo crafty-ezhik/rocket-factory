@@ -38,6 +38,9 @@ func PartToProto(part serviceModel.Part) *inventoryV1.Part {
 
 // PartsFilterToServiceModel - Конвертация inventoryV1.PartFilters в serviceModel
 func PartsFilterToServiceModel(filters *inventoryV1.PartsFilter) serviceModel.PartsFilter {
+	if filters == nil {
+		return serviceModel.PartsFilter{}
+	}
 	return serviceModel.PartsFilter{
 		UUIDs:               filters.GetUuids(),
 		Names:               filters.GetNames(),
@@ -49,6 +52,9 @@ func PartsFilterToServiceModel(filters *inventoryV1.PartsFilter) serviceModel.Pa
 
 // dimensionsToProto - Конвертация serviceModel.Dimensions в inventoryV1.Dimensions
 func dimensionsToProto(dim *serviceModel.Dimensions) *inventoryV1.Dimensions {
+	if dim == nil {
+		return &inventoryV1.Dimensions{}
+	}
 	return &inventoryV1.Dimensions{
 		Length: dim.Length,
 		Width:  dim.Width,
@@ -59,6 +65,9 @@ func dimensionsToProto(dim *serviceModel.Dimensions) *inventoryV1.Dimensions {
 
 // Конвертация serviceModel.Manufacturer в inventoryV1.Manufacturer
 func manufacturerToProto(man *serviceModel.Manufacturer) *inventoryV1.Manufacturer {
+	if man == nil {
+		return &inventoryV1.Manufacturer{}
+	}
 	return &inventoryV1.Manufacturer{
 		Name:    man.Name,
 		Country: man.Country,
