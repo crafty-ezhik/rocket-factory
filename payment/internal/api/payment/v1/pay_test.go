@@ -11,8 +11,6 @@ import (
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
-const ServiceMethod = "PayOrder"
-
 func (s *APISuite) TestPayOrder() {
 	validOrderUUID := uuid.New()
 	validUserUUID := uuid.New()
@@ -34,7 +32,7 @@ func (s *APISuite) TestPayOrder() {
 				PaymentMethod: paymentV1.PaymentMethod_CARD,
 			},
 			setupMock: func() {
-				s.paymentService.On(ServiceMethod, s.ctx, validOrderUUID, validUserUUID, "CARD").
+				s.paymentService.On("PayOrder", s.ctx, validOrderUUID, validUserUUID, "CARD").
 					Return(validTransactionUUID, nil).Once()
 			},
 			expectedResponse: &paymentV1.PayOrderResponse{
@@ -75,7 +73,7 @@ func (s *APISuite) TestPayOrder() {
 				PaymentMethod: paymentV1.PaymentMethod_CARD,
 			},
 			setupMock: func() {
-				s.paymentService.On(ServiceMethod, s.ctx, validOrderUUID, validUserUUID, "CARD").
+				s.paymentService.On("PayOrder", s.ctx, validOrderUUID, validUserUUID, "CARD").
 					Return("", context.DeadlineExceeded).Once()
 			},
 			expectedResponse: nil,
@@ -90,7 +88,7 @@ func (s *APISuite) TestPayOrder() {
 				PaymentMethod: paymentV1.PaymentMethod_CARD,
 			},
 			setupMock: func() {
-				s.paymentService.On(ServiceMethod, s.ctx, validOrderUUID, validUserUUID, "CARD").
+				s.paymentService.On("PayOrder", s.ctx, validOrderUUID, validUserUUID, "CARD").
 					Return("", context.Canceled).Once()
 			},
 			expectedResponse: nil,
@@ -98,7 +96,7 @@ func (s *APISuite) TestPayOrder() {
 			wantServiceCall:  true,
 		},
 		{
-			name: "Service canceled",
+			name: "internal error",
 			req: &paymentV1.PayOrderRequest{
 				OrderUuid:     validOrderUUID.String(),
 				UserUuid:      validUserUUID.String(),
@@ -106,7 +104,7 @@ func (s *APISuite) TestPayOrder() {
 			},
 			setupMock: func() {
 				err := errors.New("db error")
-				s.paymentService.On(ServiceMethod, s.ctx, validOrderUUID, validUserUUID, "CARD").
+				s.paymentService.On("PayOrder", s.ctx, validOrderUUID, validUserUUID, "CARD").
 					Return("", err).Once()
 			},
 			expectedResponse: nil,
@@ -130,7 +128,7 @@ func (s *APISuite) TestPayOrder() {
 			}
 
 			if tt.wantServiceCall {
-				s.paymentService.AssertNotCalled(s.T(), ServiceMethod)
+				s.paymentService.AssertNotCalled(s.T(), "PayOrder")
 			}
 		})
 	}
