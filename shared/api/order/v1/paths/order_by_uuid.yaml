@@ -43,6 +43,13 @@ get:
           schema:
             $ref: ../components/errors/forbidden_error.yaml
 
+    '408':
+      description: Превышено время ожидания
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/request_timeout_error.yaml
+
     '429':
       description: Превышено количество запросов к серверу
       content:

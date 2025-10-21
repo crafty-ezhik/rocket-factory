@@ -1,0 +1,27 @@
+dir: '{{.InterfaceDir}}/mocks'
+structname: '{{.Mock}}{{.InterfaceName}}'
+filename: "mock_{{ .InterfaceName | snakecase }}.go"
+pkgname: mocks
+template: testify
+template-data:
+  boilerplate-file: .mockery_boilerplate_text.txt
+  unroll-variadic: true
+packages:
+  github.com/crafty-ezhik/rocket-factory/inventory/internal/repository:
+    config:
+      include-interface-regex: .*Repository
+  github.com/crafty-ezhik/rocket-factory/inventory/internal/service:
+    config:
+      include-interface-regex: .*Service
+  github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc:
+    config:
+      include-interface-regex: .*Client
+  github.com/crafty-ezhik/rocket-factory/order/internal/repository:
+    config:
+      include-interface-regex: .*Repository
+  github.com/crafty-ezhik/rocket-factory/order/internal/service:
+    config:
+      include-interface-regex: .*Service
+  github.com/crafty-ezhik/rocket-factory/payment/internal/service:
+    config:
+      include-interface-regex: .*Service

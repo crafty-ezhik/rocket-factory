@@ -72,6 +72,19 @@ func encodeOrderCancelResponse(response OrderCancelRes, w http.ResponseWriter, s
 
 		return nil
 
+	case *RequestTimeoutError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(408)
+		span.SetStatus(codes.Error, http.StatusText(408))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
 	case *ConflictError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(409)
@@ -174,6 +187,19 @@ func encodeOrderCreateResponse(response OrderCreateRes, w http.ResponseWriter, s
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *RequestTimeoutError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(408)
+		span.SetStatus(codes.Error, http.StatusText(408))
 
 		e := new(jx.Encoder)
 		response.Encode(e)
@@ -307,6 +333,19 @@ func encodeOrderGetResponse(response OrderGetRes, w http.ResponseWriter, span tr
 
 		return nil
 
+	case *RequestTimeoutError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(408)
+		span.SetStatus(codes.Error, http.StatusText(408))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
 	case *RateLimitError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(429)
@@ -422,6 +461,19 @@ func encodeOrderPayResponse(response OrderPayRes, w http.ResponseWriter, span tr
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *RequestTimeoutError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(408)
+		span.SetStatus(codes.Error, http.StatusText(408))
 
 		e := new(jx.Encoder)
 		response.Encode(e)

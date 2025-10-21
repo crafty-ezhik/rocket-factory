@@ -1,0 +1,2 @@
+// Code generated for crafty-ezhik service
+// © Crafty-ezhik 2025.

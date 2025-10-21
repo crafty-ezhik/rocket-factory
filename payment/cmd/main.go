@@ -12,13 +12,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
+	paymentV1API "github.com/crafty-ezhik/rocket-factory/payment/internal/api/payment/v1"
 	"github.com/crafty-ezhik/rocket-factory/payment/internal/interceptor"
+	paymentService "github.com/crafty-ezhik/rocket-factory/payment/internal/service/payment"
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
@@ -28,21 +29,6 @@ const (
 	grpcPort      = 50051
 	httpPort      = 8081
 )
-
-// paymentService - реализует gRPC сервис для работы с оплатами
-type paymentService struct {
-	paymentV1.UnimplementedPaymentServiceServer
-}
-
-// PayOrder - обрабатывает команду на оплату и возвращает transaction_uuid
-func (ps *paymentService) PayOrder(ctx context.Context, req *paymentV1.PayOrderRequest) (*paymentV1.PayOrderResponse, error) {
-	transactionUUID := uuid.NewString()
-	log.Printf("Оплата прошла успешно, transaction_uuid: %s\n", transactionUUID)
-
-	return &paymentV1.PayOrderResponse{
-		TransactionUuid: transactionUUID,
-	}, nil
-}
 
 func main() {
 	// Открываем для прослушивания tcp соединение на порту grpcPort
@@ -68,8 +54,10 @@ func main() {
 	)
 
 	// Регистрируем наш сервис paymentService
-	service := &paymentService{}
-	paymentV1.RegisterPaymentServiceServer(grpcServer, service)
+	service := paymentService.NewService()
+	api := paymentV1API.NewAPI(service)
+
+	paymentV1.RegisterPaymentServiceServer(grpcServer, api)
 
 	// Включаем рефлексию для откладки, чтобы клиент мог видеть доступные методы
 	reflection.Register(grpcServer)

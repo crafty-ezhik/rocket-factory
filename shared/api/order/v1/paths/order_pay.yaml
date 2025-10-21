@@ -49,6 +49,13 @@ post:
           schema:
             $ref: ../components/errors/forbidden_error.yaml
 
+    '408':
+      description: Превышено время ожидания
+      content:
+        application/json:
+          schema:
+            $ref: ../components/errors/request_timeout_error.yaml
+
     '409':
       description: Невозможно оплатить отмененный или уже оплаченный заказ
       content:
