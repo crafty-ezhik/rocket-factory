@@ -4,13 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	repoModel "github.com/crafty-ezhik/rocket-factory/order/internal/repository/model"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/order/internal/repository/converter"
+	repoModel "github.com/crafty-ezhik/rocket-factory/order/internal/repository/model"
 )
 
 func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.Order, error) {

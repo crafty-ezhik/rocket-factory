@@ -1,8 +1,9 @@
 package converter
 
 import (
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
