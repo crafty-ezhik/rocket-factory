@@ -4,6 +4,7 @@ package order_v1
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/go-faster/errors"
 	"github.com/google/uuid"
@@ -364,6 +365,52 @@ func (*NotFoundError) orderCancelRes() {}
 func (*NotFoundError) orderGetRes()    {}
 func (*NotFoundError) orderPayRes()    {}
 
+// NewOptDateTime returns new OptDateTime with value set to v.
+func NewOptDateTime(v time.Time) OptDateTime {
+	return OptDateTime{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDateTime is optional time.Time.
+type OptDateTime struct {
+	Value time.Time
+	Set   bool
+}
+
+// IsSet returns true if OptDateTime was set.
+func (o OptDateTime) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDateTime) Reset() {
+	var v time.Time
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDateTime) SetTo(v time.Time) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDateTime) Get() (v time.Time, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDateTime) Or(d time.Time) time.Time {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilPaymentMethod returns new OptNilPaymentMethod with value set to v.
 func NewOptNilPaymentMethod(v PaymentMethod) OptNilPaymentMethod {
 	return OptNilPaymentMethod{
@@ -509,6 +556,10 @@ type OrderDto struct {
 	TransactionUUID OptNilUUID          `json:"transaction_uuid"`
 	PaymentMethod   OptNilPaymentMethod `json:"payment_method"`
 	Status          OrderStatus         `json:"status"`
+	// Время создания заказа.
+	CreatedAt OptDateTime `json:"created_at"`
+	// Время последнего обновления данных по заказу.
+	UpdatedAt OptDateTime `json:"updated_at"`
 }
 
 // GetOrderUUID returns the value of OrderUUID.
@@ -546,6 +597,16 @@ func (s *OrderDto) GetStatus() OrderStatus {
 	return s.Status
 }
 
+// GetCreatedAt returns the value of CreatedAt.
+func (s *OrderDto) GetCreatedAt() OptDateTime {
+	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *OrderDto) GetUpdatedAt() OptDateTime {
+	return s.UpdatedAt
+}
+
 // SetOrderUUID sets the value of OrderUUID.
 func (s *OrderDto) SetOrderUUID(val uuid.UUID) {
 	s.OrderUUID = val
@@ -579,6 +640,16 @@ func (s *OrderDto) SetPaymentMethod(val OptNilPaymentMethod) {
 // SetStatus sets the value of Status.
 func (s *OrderDto) SetStatus(val OrderStatus) {
 	s.Status = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *OrderDto) SetCreatedAt(val OptDateTime) {
+	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *OrderDto) SetUpdatedAt(val OptDateTime) {
+	s.UpdatedAt = val
 }
 
 func (*OrderDto) orderGetRes() {}

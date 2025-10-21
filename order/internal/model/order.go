@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"time"
 )
 
 type OrderUpdateKind string
@@ -19,6 +20,8 @@ type Order struct {
 	TransactionUUID uuid.UUID
 	PaymentMethod   PaymentMethod
 	Status          OrderStatus
+	CreatedAt       time.Time
+	UpdatedAt       *time.Time
 }
 
 type UpdateOrderInfo struct {

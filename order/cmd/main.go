@@ -115,7 +115,7 @@ func main() {
 	paymentClient := paymentV1GRPC.NewPaymentClient(gRPCPayment)
 
 	// Создаем обработчик для API
-	repo := orderRepo.NewRepository()
+	repo := orderRepo.NewRepository(pool)
 	service := orderService.NewService(repo, inventoryClient, paymentClient)
 	api := orderAPI.NewAPI(service)
 
