@@ -9,9 +9,5 @@ import (
 )
 
 func (s *service) Get(ctx context.Context, orderID uuid.UUID) (model.Order, error) {
-	order, err := s.orderRepo.Get(ctx, orderID)
-	if err != nil {
-		return model.Order{}, err
-	}
-	return order, nil
+	return s.orderRepo.Get(ctx, orderID)
 }

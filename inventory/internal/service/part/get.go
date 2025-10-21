@@ -9,9 +9,5 @@ import (
 )
 
 func (s *service) Get(ctx context.Context, partID uuid.UUID) (serviceModel.Part, error) {
-	part, err := s.inventoryRepo.Get(ctx, partID)
-	if err != nil {
-		return serviceModel.Part{}, err
-	}
-	return part, nil
+	return s.inventoryRepo.Get(ctx, partID)
 }

@@ -21,6 +21,13 @@ func (a *api) OrderPay(ctx context.Context, req *orderV1.PayOrderRequest, params
 		}, nil
 	}
 
+	if req.PaymentMethod.Value == orderV1.PaymentMethodUNKNOWN {
+		return &orderV1.BadRequestError{
+			Code:    http.StatusBadRequest,
+			Message: "unknown payment method",
+		}, nil
+	}
+
 	transactionUUID, err := a.orderService.Pay(ctx, orderUUID, converter.PaymentMethodToService(req.PaymentMethod))
 	if err != nil {
 		if errors.Is(err, model.ErrOrderNotFound) {

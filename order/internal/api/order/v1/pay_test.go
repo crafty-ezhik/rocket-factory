@@ -81,6 +81,20 @@ func (s *ApiSuite) TestPayOrderFailure() {
 			setupMock: func(paymentMethod orderV1.NilPaymentMethod) {},
 		},
 		{
+			name: "unknown payment method",
+			req: &orderV1.PayOrderRequest{
+				PaymentMethod: orderV1.NilPaymentMethod{Value: orderV1.PaymentMethodUNKNOWN},
+			},
+			params: orderV1.OrderPayParams{
+				OrderUUID: orderUUID.String(),
+			},
+			expectedRes: &orderV1.BadRequestError{
+				Code:    http.StatusBadRequest,
+				Message: "unknown payment method",
+			},
+			setupMock: func(paymentMethod orderV1.NilPaymentMethod) {},
+		},
+		{
 			name: "order not found",
 			req: &orderV1.PayOrderRequest{
 				PaymentMethod: orderV1.NilPaymentMethod{Value: orderV1.PaymentMethodCREDITCARD},
