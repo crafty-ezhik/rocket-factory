@@ -1,0 +1,14 @@
+services:
+  placeholder:
+    image: alpine
+    command:
+      ["sh", "-c", "echo 'This is a placeholder service' && sleep infinity"]
+    networks:
+      - microservices-net
+
+# В данном файле мы создаем сеть, поэтому указываем external: false
+# другие docker-compose файлы будут подключаться к этой сети с external: true
+networks:
+  microservices-net:
+    name: microservices-net
+    external: false
