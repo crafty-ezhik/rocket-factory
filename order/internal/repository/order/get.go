@@ -36,6 +36,7 @@ func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.O
 	for row.Next() {
 		err = row.Scan(
 			&order.UUID,
+			&order.UserUUID,
 			&order.PartUUIDs,
 			&order.TotalPrice,
 			&order.TransactionUUID,
@@ -47,6 +48,10 @@ func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.O
 		if err != nil {
 			return serviceModel.Order{}, err
 		}
+	}
+
+	if order.UUID == uuid.Nil {
+		return serviceModel.Order{}, serviceModel.ErrOrderNotFound
 	}
 
 	return converter.OrderToServiceModel(order), nil

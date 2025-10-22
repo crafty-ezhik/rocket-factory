@@ -19,7 +19,7 @@ type OrderStatus string
 const (
 	OrderStatusPENDINGPAYMENT OrderStatus = "PENDING_PAYMENT"
 	OrderStatusPAID           OrderStatus = "PAID"
-	OrderStatusCANCELLED      OrderStatus = "CANCELED"
+	OrderStatusCANCELLED      OrderStatus = "CANCELLED"
 )
 
 func (s OrderStatus) String() string {

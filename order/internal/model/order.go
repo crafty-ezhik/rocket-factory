@@ -6,13 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type OrderUpdateKind string
-
-const (
-	OrderUpdateCANCEL     OrderUpdateKind = "cancel"
-	OrderUpdateUPDATEINFO OrderUpdateKind = "update_info"
-)
-
 type Order struct {
 	UUID            uuid.UUID
 	UserUUID        uuid.UUID

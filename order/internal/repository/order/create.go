@@ -15,8 +15,8 @@ func (r *repository) Create(ctx context.Context, order serviceModel.Order) (uuid
 
 	builderInsert := sq.Insert("orders").
 		PlaceholderFormat(sq.Dollar).
-		Columns("part_uuids", "total_price").
-		Values(repoOrder.PartUUIDs, repoOrder.TotalPrice).
+		Columns("user_uuid", "part_uuids", "total_price").
+		Values(repoOrder.UserUUID, repoOrder.PartUUIDs, repoOrder.TotalPrice).
 		Suffix("RETURNING order_uuid")
 
 	query, args, err := builderInsert.ToSql()
