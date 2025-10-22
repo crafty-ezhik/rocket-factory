@@ -11,5 +11,5 @@ import (
 type OrderRepository interface {
 	Create(ctx context.Context, order serviceModel.Order) (uuid.UUID, error)
 	Get(ctx context.Context, orderID uuid.UUID) (serviceModel.Order, error)
-	Update(ctx context.Context, data serviceModel.UpdateOrderInfo, kind serviceModel.OrderUpdateKind) error
+	Update(ctx context.Context, order serviceModel.Order) error
 }

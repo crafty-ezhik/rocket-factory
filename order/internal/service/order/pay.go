@@ -34,12 +34,11 @@ func (s *service) Pay(ctx context.Context, orderID uuid.UUID, paymentMethod mode
 	}
 
 	// Обновляем данные по заказу
-	orderInfo := model.UpdateOrderInfo{
-		UUID:            orderID,
-		TransactionUUID: transactionUUID,
-		PaymentMethod:   paymentMethod,
-	}
-	err = s.orderRepo.Update(ctx, orderInfo, model.OrderUpdateUPDATEINFO)
+	order.Status = model.OrderStatusPAID
+	order.PaymentMethod = paymentMethod
+	order.TransactionUUID = transactionUUID
+
+	err = s.orderRepo.Update(ctx, order)
 	if err != nil {
 		return uuid.Nil, err
 	}
