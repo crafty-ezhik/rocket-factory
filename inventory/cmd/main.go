@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net"
 	"net/http"
@@ -32,6 +35,37 @@ const (
 )
 
 func main() {
+	// Загружаем переменные окружения
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Printf("❌ Ошибка загрузки .env файла: %v\n", err)
+		return
+	}
+
+	ctx := context.Background()
+	mongoURI := os.Getenv("INVENTORY_MONGO_URI")
+
+	// Создаем клиент MongoDB
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
+	if err != nil {
+		log.Fatalf("❌ Ошибка подключения к Mongo: %v\n", err)
+		return
+	}
+	defer func() {
+		if err := client.Disconnect(ctx); err != nil {
+			log.Printf("❌ Ошибка закрытия соединения с Mongo: %v\n", err)
+			return
+		}
+	}()
+
+	// Проверяем соединение
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Printf("❌ MongoDB недоступна: %v\n", err)
+	}
+
+	// Получаем базу MongoDB
+	_ = client.Database(os.Getenv("INVENTORY_MONGO_DB"))
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v\n", err)
