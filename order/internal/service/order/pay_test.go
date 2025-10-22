@@ -2,7 +2,6 @@ package order
 
 import (
 	"errors"
-
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 
@@ -18,18 +17,26 @@ func (s *ServiceSuite) TestPayOrderSuccess() {
 	tests := []struct {
 		name           string
 		orderID        uuid.UUID
+		order          model.Order
 		paymentMethod  model.PaymentMethod
 		expectedResult uuid.UUID
 		expectedErr    error
-		setupMock      func()
+		setupMock      func(order model.Order)
 	}{
 		{
-			name:           "success",
-			orderID:        orderId,
+			name:    "success",
+			orderID: orderId,
+			order: model.Order{
+				UUID:            orderId,
+				UserUUID:        userId,
+				Status:          model.OrderStatusPAID,
+				TransactionUUID: transactionUUID,
+				PaymentMethod:   paymentMethod,
+			},
 			paymentMethod:  paymentMethod,
 			expectedResult: transactionUUID,
 			expectedErr:    nil,
-			setupMock: func() {
+			setupMock: func(order model.Order) {
 				s.repo.On("Get", s.ctx, orderId).
 					Return(model.Order{UUID: orderId, UserUUID: userId, Status: model.OrderStatusPENDINGPAYMENT}, nil).
 					Once()
@@ -38,13 +45,7 @@ func (s *ServiceSuite) TestPayOrderSuccess() {
 					Return(transactionUUID.String(), nil).
 					Once()
 
-				s.repo.On("Update", s.ctx, model.UpdateOrderInfo{
-					UUID:            orderId,
-					TransactionUUID: transactionUUID,
-					PaymentMethod:   paymentMethod,
-				},
-					model.OrderUpdateUPDATEINFO,
-				).
+				s.repo.On("Update", s.ctx, order).
 					Return(nil).
 					Once()
 			},
@@ -53,7 +54,7 @@ func (s *ServiceSuite) TestPayOrderSuccess() {
 
 	for _, tt := range tests {
 		s.Run(tt.name, func() {
-			tt.setupMock()
+			tt.setupMock(tt.order)
 
 			resp, err := s.service.Pay(s.ctx, tt.orderID, tt.paymentMethod)
 
@@ -76,10 +77,11 @@ func (s *ServiceSuite) TestPayOrderFail() {
 	tests := []struct {
 		name           string
 		orderID        uuid.UUID
+		order          model.Order
 		paymentMethod  model.PaymentMethod
 		expectedResult uuid.UUID
 		expectedErr    error
-		setupMock      func()
+		setupMock      func(order model.Order)
 	}{
 		{
 			name:           "order not found",
@@ -87,7 +89,7 @@ func (s *ServiceSuite) TestPayOrderFail() {
 			paymentMethod:  paymentMethod,
 			expectedResult: uuid.Nil,
 			expectedErr:    model.ErrOrderNotFound,
-			setupMock: func() {
+			setupMock: func(order model.Order) {
 				s.repo.On("Get", s.ctx, orderId).
 					Return(model.Order{}, model.ErrOrderNotFound).Once()
 			},
@@ -98,7 +100,7 @@ func (s *ServiceSuite) TestPayOrderFail() {
 			paymentMethod:  paymentMethod,
 			expectedResult: uuid.Nil,
 			expectedErr:    model.ErrOrderCannotPay,
-			setupMock: func() {
+			setupMock: func(order model.Order) {
 				s.repo.On("Get", s.ctx, orderId).
 					Return(model.Order{UUID: orderId, Status: model.OrderStatusPAID}, nil).
 					Once()
@@ -110,7 +112,7 @@ func (s *ServiceSuite) TestPayOrderFail() {
 			paymentMethod:  paymentMethod,
 			expectedResult: uuid.Nil,
 			expectedErr:    model.ErrOrderCannotPay,
-			setupMock: func() {
+			setupMock: func(order model.Order) {
 				s.repo.On("Get", s.ctx, orderId).
 					Return(model.Order{UUID: orderId, Status: model.OrderStatusCANCELLED}, nil).
 					Once()
@@ -122,7 +124,7 @@ func (s *ServiceSuite) TestPayOrderFail() {
 			paymentMethod:  paymentMethod,
 			expectedResult: uuid.Nil,
 			expectedErr:    clientErr,
-			setupMock: func() {
+			setupMock: func(order model.Order) {
 				s.repo.On("Get", s.ctx, orderId).
 					Return(model.Order{UUID: orderId, UserUUID: userId, Status: model.OrderStatusPENDINGPAYMENT}, nil).
 					Once()
@@ -138,7 +140,7 @@ func (s *ServiceSuite) TestPayOrderFail() {
 			paymentMethod:  paymentMethod,
 			expectedResult: uuid.Nil,
 			expectedErr:    uuidValidErr,
-			setupMock: func() {
+			setupMock: func(order model.Order) {
 				s.repo.On("Get", s.ctx, orderId).
 					Return(model.Order{UUID: orderId, UserUUID: userId, Status: model.OrderStatusPENDINGPAYMENT}, nil).
 					Once()
@@ -149,12 +151,19 @@ func (s *ServiceSuite) TestPayOrderFail() {
 			},
 		},
 		{
-			name:           "db error",
-			orderID:        orderId,
+			name:    "db error",
+			orderID: orderId,
+			order: model.Order{
+				UUID:            orderId,
+				UserUUID:        userId,
+				Status:          model.OrderStatusPAID,
+				TransactionUUID: transactionUUID,
+				PaymentMethod:   paymentMethod,
+			},
 			paymentMethod:  paymentMethod,
 			expectedResult: uuid.Nil,
 			expectedErr:    dbErr,
-			setupMock: func() {
+			setupMock: func(order model.Order) {
 				s.repo.On("Get", s.ctx, orderId).
 					Return(model.Order{UUID: orderId, UserUUID: userId, Status: model.OrderStatusPENDINGPAYMENT}, nil).
 					Once()
@@ -163,13 +172,7 @@ func (s *ServiceSuite) TestPayOrderFail() {
 					Return(transactionUUID.String(), nil).
 					Once()
 
-				s.repo.On("Update", s.ctx, model.UpdateOrderInfo{
-					UUID:            orderId,
-					TransactionUUID: transactionUUID,
-					PaymentMethod:   paymentMethod,
-				},
-					model.OrderUpdateUPDATEINFO,
-				).
+				s.repo.On("Update", s.ctx, order).
 					Return(dbErr).
 					Once()
 			},
@@ -178,7 +181,7 @@ func (s *ServiceSuite) TestPayOrderFail() {
 
 	for _, tt := range tests {
 		s.Run(tt.name, func() {
-			tt.setupMock()
+			tt.setupMock(tt.order)
 
 			resp, err := s.service.Pay(s.ctx, tt.orderID, tt.paymentMethod)
 

@@ -2,6 +2,7 @@ package order
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -28,23 +29,29 @@ func (s *ServiceSuite) TestCancelOrder() {
 	tests := []struct {
 		name        string
 		orderUUID   uuid.UUID
-		updateInfo  model.UpdateOrderInfo
-		setupMock   func(orderID uuid.UUID, updateInfo model.UpdateOrderInfo, err error)
+		order       model.Order
+		setupMock   func(orderID uuid.UUID, order model.Order, err error)
 		expectedErr error
 	}{
 		{
 			name:      "success",
 			orderUUID: orderUUID,
-			updateInfo: model.UpdateOrderInfo{
-				UUID:        orderUUID,
-				OrderStatus: model.OrderStatusCANCELLED,
+			order: model.Order{
+				UUID:            orderUUID,
+				UserUUID:        uuid.UUID{},
+				PartUUIDs:       nil,
+				TotalPrice:      0,
+				TransactionUUID: uuid.UUID{},
+				Status:          model.OrderStatusCANCELLED,
+				CreatedAt:       time.Time{},
+				UpdatedAt:       nil,
 			},
 			expectedErr: nil,
-			setupMock: func(orderID uuid.UUID, updateInfo model.UpdateOrderInfo, err error) {
+			setupMock: func(orderID uuid.UUID, order model.Order, err error) {
 				s.repo.On("Get", s.ctx, orderID).
 					Return(model.Order{UUID: orderUUID, Status: model.OrderStatusPENDINGPAYMENT}, nil).Once()
 
-				s.repo.On("Update", s.ctx, updateInfo, model.OrderUpdateCANCEL).
+				s.repo.On("Update", s.ctx, order).
 					Return(nil).Once()
 			},
 		},
@@ -52,7 +59,7 @@ func (s *ServiceSuite) TestCancelOrder() {
 			name:        "order not found",
 			orderUUID:   orderUUID,
 			expectedErr: model.ErrOrderNotFound,
-			setupMock: func(orderID uuid.UUID, updateInfo model.UpdateOrderInfo, err error) {
+			setupMock: func(orderID uuid.UUID, order model.Order, err error) {
 				s.repo.On("Get", s.ctx, orderID).
 					Return(model.Order{}, model.ErrOrderNotFound).Once()
 			},
@@ -61,7 +68,7 @@ func (s *ServiceSuite) TestCancelOrder() {
 			name:        "order already cancelled",
 			orderUUID:   orderUUID,
 			expectedErr: model.ErrOrderIsCancel,
-			setupMock: func(orderID uuid.UUID, updateInfo model.UpdateOrderInfo, err error) {
+			setupMock: func(orderID uuid.UUID, order model.Order, err error) {
 				s.repo.On("Get", s.ctx, orderID).
 					Return(model.Order{UUID: orderUUID, Status: model.OrderStatusCANCELLED}, nil).Once()
 			},
@@ -70,31 +77,28 @@ func (s *ServiceSuite) TestCancelOrder() {
 			name:        "paid order cannot be cancelled",
 			orderUUID:   orderUUID,
 			expectedErr: model.ErrOrderIsPaid,
-			setupMock: func(orderID uuid.UUID, updateInfo model.UpdateOrderInfo, err error) {
+			setupMock: func(orderID uuid.UUID, order model.Order, err error) {
 				s.repo.On("Get", s.ctx, orderID).
 					Return(model.Order{UUID: orderUUID, Status: model.OrderStatusPAID}, nil).Once()
 			},
 		},
 		{
-			name:      "db error",
-			orderUUID: orderUUID,
-			updateInfo: model.UpdateOrderInfo{
-				UUID:        orderUUID,
-				OrderStatus: model.OrderStatusCANCELLED,
-			},
+			name:        "db error",
+			orderUUID:   orderUUID,
+			order:       model.Order{UUID: orderUUID},
 			expectedErr: dbErr,
-			setupMock: func(orderID uuid.UUID, updateInfo model.UpdateOrderInfo, err error) {
+			setupMock: func(orderID uuid.UUID, order model.Order, err error) {
 				s.repo.On("Get", s.ctx, orderID).
 					Return(model.Order{UUID: orderUUID}, nil).Once()
 
-				s.repo.On("Update", s.ctx, updateInfo, model.OrderUpdateCANCEL).
+				s.repo.On("Update", s.ctx, order).
 					Return(dbErr).Once()
 			},
 		},
 	}
 	for _, tt := range tests {
 		s.Run(tt.name, func() {
-			tt.setupMock(tt.orderUUID, tt.updateInfo, tt.expectedErr)
+			tt.setupMock(tt.orderUUID, tt.order, tt.expectedErr)
 
 			err := s.service.Cancel(s.ctx, tt.orderUUID)
 
