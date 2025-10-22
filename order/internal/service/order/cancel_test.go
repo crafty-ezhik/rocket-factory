@@ -85,7 +85,7 @@ func (s *ServiceSuite) TestCancelOrder() {
 		{
 			name:        "db error",
 			orderUUID:   orderUUID,
-			order:       model.Order{UUID: orderUUID},
+			order:       model.Order{UUID: orderUUID, Status: model.OrderStatusCANCELLED},
 			expectedErr: dbErr,
 			setupMock: func(orderID uuid.UUID, order model.Order, err error) {
 				s.repo.On("Get", s.ctx, orderID).

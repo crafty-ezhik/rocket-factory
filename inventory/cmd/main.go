@@ -4,9 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net"
 	"net/http"
@@ -16,6 +13,9 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -59,22 +59,22 @@ func main() {
 	}()
 
 	// Проверяем соединение
-	if err := client.Ping(ctx, nil); err != nil {
+	if err = client.Ping(ctx, nil); err != nil {
 		log.Printf("❌ MongoDB недоступна: %v\n", err)
 	}
 
 	// Получаем базу MongoDB
-	_ = client.Database(os.Getenv("INVENTORY_MONGO_DB"))
+	db := client.Database(os.Getenv("INVENTORY_MONGO_DB"))
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
-		log.Fatalf("failed to listen: %v\n", err)
+		log.Printf("failed to listen: %v\n", err)
 		return
 	}
 
 	defer func() {
 		if err := lis.Close(); err != nil {
-			log.Fatalf("failed to close listener: %v\n", err)
+			log.Printf("failed to close listener: %v\n", err)
 		}
 	}()
 
@@ -87,12 +87,12 @@ func main() {
 	)
 
 	// Регистрируем сервис inventoryService
-	repo := inventoryRepository.NewRepository()
+	repo := inventoryRepository.NewRepository(db)
 	service := inventoryService.NewService(repo)
 	api := inventoryV1API.NewAPI(service)
 
-	// Добавляем случайные детали
-	repo.Init(10)
+	// Добавляем детали
+	// repo.Init()
 
 	inventoryV1.RegisterInventoryServiceServer(grpcServer, api)
 
