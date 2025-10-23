@@ -3,9 +3,9 @@ package v1
 import (
 	"context"
 	"errors"
-	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	"net/http"
 
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
 )
 

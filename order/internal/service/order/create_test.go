@@ -73,7 +73,7 @@ func (s *ServiceSuite) TestCreateOrder() {
 	}
 
 	clientErr := errors.New("client error")
-	dbErr := errors.New("db error")
+	dbErr := errors.New("something went wrong")
 
 	tests := []struct {
 		name               string
