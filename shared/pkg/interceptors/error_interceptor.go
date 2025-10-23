@@ -13,13 +13,13 @@ func UnaryErrorInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		resp, err := handler(ctx, req)
 		if err != nil {
-			return resp, ConvertError(err)
+			return resp, convertError(err)
 		}
 		return resp, nil
 	}
 }
 
-func ConvertError(err error) error {
+func convertError(err error) error {
 	if businessErr := businessErrs.GetBusinessError(err); businessErr != nil {
 		return businessErrs.BusinessErrorToGRPCStatus(businessErr).Err()
 	}
