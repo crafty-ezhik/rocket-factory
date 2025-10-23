@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/converter"
+	"github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 	"github.com/google/uuid"
 )
@@ -10,7 +11,7 @@ import (
 func (a *api) GetPart(ctx context.Context, req *inventoryV1.GetPartRequest) (*inventoryV1.GetPartResponse, error) {
 	partID, err := uuid.Parse(req.GetUuid())
 	if err != nil {
-		return nil, err
+		return nil, model.ErrInvalidUUID
 	}
 
 	part, err := a.inventoryService.Get(ctx, partID)
