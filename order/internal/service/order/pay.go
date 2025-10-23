@@ -25,7 +25,7 @@ func (s *service) Pay(ctx context.Context, orderID uuid.UUID, paymentMethod mode
 	// Оплачиваем заказ
 	strTransactionUUID, err := s.paymentClient.PayOrder(ctxReq, order.UUID, order.UserUUID, paymentMethod)
 	if err != nil {
-		return uuid.Nil, err
+		return uuid.Nil, context.DeadlineExceeded
 	}
 
 	transactionUUID, err := uuid.Parse(strTransactionUUID)

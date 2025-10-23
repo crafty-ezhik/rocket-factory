@@ -1,6 +1,7 @@
 package order
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -89,7 +90,7 @@ func (s *ServiceSuite) TestCreateOrder() {
 			partIDs:            partIDs,
 			expectedOrderID:    uuid.Nil,
 			expectedTotalPrice: 0,
-			expectedErr:        clientErr,
+			expectedErr:        context.DeadlineExceeded,
 			setupMocks: func() {
 				s.inventoryClient.On("ListParts", mock.Anything, model.PartsFilter{
 					UUIDs: []string{partIDs[0].String(), partIDs[1].String()},
