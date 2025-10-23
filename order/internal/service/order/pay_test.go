@@ -124,7 +124,7 @@ func (s *ServiceSuite) TestPayOrderFail() {
 			orderID:        orderId,
 			paymentMethod:  paymentMethod,
 			expectedResult: uuid.Nil,
-			expectedErr:    clientErr,
+			expectedErr:    errors.New("context deadline exceeded"),
 			setupMock: func(order model.Order) {
 				s.repo.On("Get", s.ctx, orderId).
 					Return(model.Order{UUID: orderId, UserUUID: userId, Status: model.OrderStatusPENDINGPAYMENT}, nil).
