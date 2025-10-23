@@ -5,10 +5,11 @@ import (
 	"errors"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/converter"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
-	"github.com/google/uuid"
 )
 
 func (s *ApiSuite) TestGetOrderSuccess() {

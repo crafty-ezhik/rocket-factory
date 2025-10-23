@@ -2,10 +2,12 @@ package v1
 
 import (
 	"context"
+
+	"github.com/google/uuid"
+
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/converter"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
-	"github.com/google/uuid"
 )
 
 func (a *api) GetPart(ctx context.Context, req *inventoryV1.GetPartRequest) (*inventoryV1.GetPartResponse, error) {

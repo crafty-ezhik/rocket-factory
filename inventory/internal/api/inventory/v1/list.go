@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/converter"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
