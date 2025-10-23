@@ -24,6 +24,7 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/interceptor"
 	inventoryRepository "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/part"
 	inventoryService "github.com/crafty-ezhik/rocket-factory/inventory/internal/service/part"
+	sharedIns "github.com/crafty-ezhik/rocket-factory/shared/pkg/interceptors"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 
@@ -82,6 +83,7 @@ func main() {
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			interceptor.LoggerInterceptor(),
+			sharedIns.UnaryErrorInterceptor(),
 			interceptor.ValidatorInterceptor(),
 		),
 	)
