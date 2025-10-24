@@ -2,11 +2,8 @@ package v1
 
 import (
 	"context"
-	"errors"
 
 	"github.com/google/uuid"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/converter"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
@@ -16,21 +13,12 @@ import (
 func (a *api) GetPart(ctx context.Context, req *inventoryV1.GetPartRequest) (*inventoryV1.GetPartResponse, error) {
 	partID, err := uuid.Parse(req.GetUuid())
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid UUID")
+		return nil, model.ErrInvalidUUID
 	}
 
 	part, err := a.inventoryService.Get(ctx, partID)
 	if err != nil {
-		if errors.Is(err, model.ErrPartNotFound) {
-			return nil, status.Error(codes.NotFound, "part not found")
-		}
-		if errors.Is(err, context.DeadlineExceeded) {
-			return nil, status.Error(codes.DeadlineExceeded, "request timeout exceeded")
-		}
-		if errors.Is(err, context.Canceled) {
-			return nil, status.Error(codes.Canceled, "request canceled by client")
-		}
-		return nil, status.Errorf(codes.Internal, "something went wrong")
+		return nil, err
 	}
 
 	return &inventoryV1.GetPartResponse{

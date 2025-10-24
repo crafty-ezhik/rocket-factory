@@ -14,6 +14,8 @@ func OrderToServiceModel(order repoModel.Order) serviceModel.Order {
 		TransactionUUID: order.TransactionUUID,
 		PaymentMethod:   order.PaymentMethod,
 		Status:          order.Status,
+		CreatedAt:       order.CreatedAt,
+		UpdatedAt:       order.UpdatedAt,
 	}
 }
 
@@ -26,5 +28,7 @@ func OrderToRepoModel(order serviceModel.Order) repoModel.Order {
 		TransactionUUID: order.TransactionUUID,
 		PaymentMethod:   order.PaymentMethod,
 		Status:          order.Status,
+		CreatedAt:       order.CreatedAt,
+		UpdatedAt:       order.UpdatedAt,
 	}
 }

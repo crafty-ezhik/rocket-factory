@@ -21,12 +21,9 @@ func (s *service) Cancel(ctx context.Context, orderID uuid.UUID) error {
 		return model.ErrOrderIsPaid
 	}
 
-	updatedInfo := model.UpdateOrderInfo{
-		UUID:        orderID,
-		OrderStatus: model.OrderStatusCANCELLED,
-	}
+	order.Status = model.OrderStatusCANCELLED
 
-	err = s.orderRepo.Update(ctx, updatedInfo, model.OrderUpdateCANCEL)
+	err = s.orderRepo.Update(ctx, order)
 	if err != nil {
 		return err
 	}

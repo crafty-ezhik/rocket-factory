@@ -18,7 +18,7 @@ func (s *service) Create(ctx context.Context, userID uuid.UUID, partsIDs []uuid.
 
 	parts, err := s.inventoryClient.ListParts(ctxReq, model.PartsFilter{UUIDs: partStrUUIDs})
 	if err != nil {
-		return uuid.Nil, 0, err
+		return uuid.Nil, 0, context.DeadlineExceeded
 	}
 
 	totalPrice, err := checkPartsAndCountTotalPrice(partStrUUIDs, parts)
@@ -62,7 +62,7 @@ func checkPartsAndCountTotalPrice(partsUUID []string, parts []model.Part) (float
 			}
 		}
 		if !exist {
-			return 0, fmt.Errorf("part with uuid %s not found", UUID)
+			return 0, fmt.Errorf("%w: part with uuid %s not found", model.ErrOrderPartNotFound, UUID)
 		}
 	}
 	return totalPrice, nil

@@ -4,9 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/converter"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
@@ -99,12 +96,12 @@ func (s *ApiSuite) TestListPartsFailure() {
 	dbErr := errors.New("something went wrong")
 
 	tests := []struct {
-		name         string
-		req          *inventoryV1.ListPartsRequest
-		filters      *inventoryV1.PartsFilter
-		expectedResp *inventoryV1.ListPartsResponse
-		expectedErr  error
-		setupMock    func(filters *inventoryV1.PartsFilter)
+		name           string
+		req            *inventoryV1.ListPartsRequest
+		filters        *inventoryV1.PartsFilter
+		expectedResp   *inventoryV1.ListPartsResponse
+		expectedErrMsg string
+		setupMock      func(filters *inventoryV1.PartsFilter)
 	}{
 		{
 			name: "failure service timeout",
@@ -116,8 +113,8 @@ func (s *ApiSuite) TestListPartsFailure() {
 			filters: &inventoryV1.PartsFilter{
 				Names: []string{"B57D30"},
 			},
-			expectedResp: nil,
-			expectedErr:  status.Error(codes.DeadlineExceeded, "request timeout exceeded"),
+			expectedResp:   nil,
+			expectedErrMsg: "context deadline exceeded",
 			setupMock: func(filters *inventoryV1.PartsFilter) {
 				s.inventoryService.On("List", s.ctx, converter.PartsFilterToServiceModel(filters)).
 					Return([]model.Part{}, context.DeadlineExceeded).
@@ -134,8 +131,8 @@ func (s *ApiSuite) TestListPartsFailure() {
 			filters: &inventoryV1.PartsFilter{
 				Names: []string{"B57D30"},
 			},
-			expectedResp: nil,
-			expectedErr:  status.Error(codes.Canceled, "request canceled by client"),
+			expectedResp:   nil,
+			expectedErrMsg: "context canceled",
 			setupMock: func(filters *inventoryV1.PartsFilter) {
 				s.inventoryService.On("List", s.ctx, converter.PartsFilterToServiceModel(filters)).
 					Return([]model.Part{}, context.Canceled).
@@ -152,8 +149,8 @@ func (s *ApiSuite) TestListPartsFailure() {
 			filters: &inventoryV1.PartsFilter{
 				Names: []string{"B57D30"},
 			},
-			expectedResp: nil,
-			expectedErr:  status.Errorf(codes.Internal, "something went wrong"),
+			expectedResp:   nil,
+			expectedErrMsg: "something went wrong",
 			setupMock: func(filters *inventoryV1.PartsFilter) {
 				s.inventoryService.On("List", s.ctx, converter.PartsFilterToServiceModel(filters)).
 					Return([]model.Part{}, dbErr).
@@ -165,10 +162,11 @@ func (s *ApiSuite) TestListPartsFailure() {
 	for _, tt := range tests {
 		s.Run(tt.name, func() {
 			tt.setupMock(tt.filters)
-			_, err := s.api.ListParts(s.ctx, tt.req)
+			res, err := s.api.ListParts(s.ctx, tt.req)
 
+			s.Require().Nil(res)
 			s.Require().Error(err)
-			s.Require().ErrorIs(err, tt.expectedErr)
+			s.Require().Contains(err.Error(), tt.expectedErrMsg)
 		})
 	}
 }

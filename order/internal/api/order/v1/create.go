@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
 )
 
@@ -30,9 +31,15 @@ func (a *api) OrderCreate(ctx context.Context, req *orderV1.CreateOrderRequest) 
 				Message: "request cancelled",
 			}, nil
 		}
+		if errors.Is(err, model.ErrOrderPartNotFound) {
+			return &orderV1.BadRequestError{
+				Code:    http.StatusBadRequest,
+				Message: err.Error(),
+			}, nil
+		}
 		return &orderV1.InternalServerError{
 			Code:    http.StatusInternalServerError,
-			Message: "something went wrong",
+			Message: err.Error(),
 		}, nil
 	}
 

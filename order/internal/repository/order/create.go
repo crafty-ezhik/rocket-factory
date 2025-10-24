@@ -3,19 +3,32 @@ package order
 import (
 	"context"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/order/internal/repository/converter"
 )
 
-func (r *repository) Create(_ context.Context, order serviceModel.Order) (uuid.UUID, error) {
-	order.UUID = uuid.New()
+func (r *repository) Create(ctx context.Context, order serviceModel.Order) (uuid.UUID, error) {
 	repoOrder := converter.OrderToRepoModel(order)
 
-	r.mu.Lock()
-	r.data[repoOrder.UUID] = repoOrder
-	r.mu.Unlock()
+	builderInsert := sq.Insert("orders").
+		PlaceholderFormat(sq.Dollar).
+		Columns("user_uuid", "part_uuids", "total_price").
+		Values(repoOrder.UserUUID, repoOrder.PartUUIDs, repoOrder.TotalPrice).
+		Suffix("RETURNING order_uuid")
 
-	return repoOrder.UUID, nil
+	query, args, err := builderInsert.ToSql()
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	var orderUUID uuid.UUID
+	err = r.pool.QueryRow(ctx, query, args...).Scan(&orderUUID)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	return orderUUID, nil
 }

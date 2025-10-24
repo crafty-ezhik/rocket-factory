@@ -41,3 +41,11 @@ type PartsFilter struct {
 	ManufacturerCountry []string
 	Tags                []string
 }
+
+func (pf *PartsFilter) IsEmpty() bool {
+	return pf.UUIDs == nil &&
+		pf.Names == nil &&
+		pf.Categories == nil &&
+		pf.ManufacturerCountry == nil &&
+		pf.Tags == nil
+}

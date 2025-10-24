@@ -13,12 +13,16 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
 	orderAPI "github.com/crafty-ezhik/rocket-factory/order/internal/api/order/v1"
 	inventoryV1GRPC "github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc/inventory/v1"
 	paymentV1GRPC "github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc/payment/v1"
+	"github.com/crafty-ezhik/rocket-factory/order/internal/migrator"
 	orderRepo "github.com/crafty-ezhik/rocket-factory/order/internal/repository/order"
 	orderService "github.com/crafty-ezhik/rocket-factory/order/internal/service/order"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
@@ -35,19 +39,54 @@ const (
 )
 
 func main() {
+	// Загружаем переменные окружения
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Printf("❌ Ошибка загрузки .env файла: %v\n", err)
+		return
+	}
+
+	// Создаем пул соединений с базой
+	ctx := context.Background()
+	dbURI := os.Getenv("ORDER_POSTGRES_URI")
+	pool, err := pgxpool.New(ctx, dbURI)
+	if err != nil {
+		log.Fatalf("❌ Ошибка подключения к базе данных: %v\n", err)
+		return
+	}
+
+	defer pool.Close()
+
+	// Проверяем, что соединение с базой установлено
+	err = pool.Ping(ctx)
+	if err != nil {
+		log.Printf("❌ База данных недоступна: %v\n", err)
+		return
+	}
+
+	// Инициализируем мигратор
+	migDir := os.Getenv("MIGRATION_DIR")
+	migRunner := migrator.NewMigrator(stdlib.OpenDB(*pool.Config().ConnConfig.Copy()), migDir)
+
+	err = migRunner.Up()
+	if err != nil {
+		log.Printf("❌ Ошибка миграции базы данных: %v\n", err)
+		return
+	}
+
 	// Создаем gRPC клиента для InventoryService
 	inventoryConn, err := grpc.NewClient(
 		grpcInventoryAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		log.Printf("failed to connect: %v\n", err)
+		log.Printf("❌ Ошибка подключения к InventoryService: %v\n", err)
 		return
 	}
 
 	defer func() {
 		if cerr := inventoryConn.Close(); cerr != nil {
-			log.Printf("failed to close connect: %v", cerr)
+			log.Printf("❌ Ошибка при закрытии подключения с InventoryService: %v", cerr)
 		}
 	}()
 
@@ -59,13 +98,13 @@ func main() {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
-		log.Printf("failed to connect: %v\n", err)
+		log.Printf("❌ Ошибка подключения к PaymentService: %v\n", err)
 		return
 	}
 
 	defer func() {
 		if cerr := paymentConn.Close(); cerr != nil {
-			log.Printf("failed to close connect: %v", cerr)
+			log.Printf("❌ Ошибка при закрытии подключения с PaymentService: %v", cerr)
 		}
 	}()
 
@@ -76,14 +115,14 @@ func main() {
 	paymentClient := paymentV1GRPC.NewPaymentClient(gRPCPayment)
 
 	// Создаем обработчик для API
-	repo := orderRepo.NewRepository()
+	repo := orderRepo.NewRepository(pool)
 	service := orderService.NewService(repo, inventoryClient, paymentClient)
 	api := orderAPI.NewAPI(service)
 
 	// Создаем OpenAPI сервер
 	orderServer, err := orderV1.NewServer(api)
 	if err != nil {
-		log.Printf("ошибка создания сервера OpenAPI: %v", err)
+		log.Printf("❌ Ошибка создания сервера OpenAPI: %v", err)
 		return
 	}
 

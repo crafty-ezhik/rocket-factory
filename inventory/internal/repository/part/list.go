@@ -2,102 +2,87 @@ package part
 
 import (
 	"context"
+	"fmt"
+	"log"
+
+	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/converter"
 	repoModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
 )
 
-type filter func(part repoModel.Part) bool
-
-func (r *repository) List(_ context.Context, filters serviceModel.PartsFilter) ([]serviceModel.Part, error) {
+func (r *repository) List(ctx context.Context, filters serviceModel.PartsFilter) ([]serviceModel.Part, error) {
 	var filteredParts []repoModel.Part
 
-	filtersFn := getFilterFuncs(filters)
-
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-
-	for _, part := range r.data {
-		ok := true
-		for _, filterFn := range filtersFn {
-			if !filterFn(part) {
-				ok = false
-				break
-			}
+	cursor, err := r.collection.Find(ctx, filtersToBson(filters))
+	if err != nil {
+		return nil, fmt.Errorf("error finding parts: %w", err)
+	}
+	defer func() {
+		cerr := cursor.Close(ctx)
+		if cerr != nil {
+			log.Printf("error closing cursor: %v\n", cerr)
 		}
+	}()
 
-		if ok {
-			filteredParts = append(filteredParts, part)
-		}
+	err = cursor.All(ctx, &filteredParts)
+	if err != nil {
+		return nil, fmt.Errorf("error getting parts: %w", err)
 	}
 
 	return converter.SlicePartToServiceModel(filteredParts), nil
 }
 
-// getFilterFuncs - возвращает список фильтрующих функций
-func getFilterFuncs(filterValues serviceModel.PartsFilter) []filter {
-	uuidSet := set(filterValues.UUIDs)
-	nameSet := set(filterValues.Names)
-	catSet := set(filterValues.Categories)
-	countrySet := set(filterValues.ManufacturerCountry)
-	tagSet := set(filterValues.Tags)
-
-	return []filter{
-		func(part repoModel.Part) bool {
-			if len(uuidSet) > 0 {
-				if _, ok := uuidSet[part.UUID.String()]; !ok {
-					return false
-				}
-			}
-			return true
-		},
-		func(part repoModel.Part) bool {
-			if len(nameSet) > 0 {
-				if _, ok := nameSet[part.Name]; !ok {
-					return false
-				}
-			}
-			return true
-		},
-		func(part repoModel.Part) bool {
-			if len(catSet) > 0 {
-				if _, ok := catSet[part.Category]; !ok {
-					return false
-				}
-			}
-			return true
-		},
-		func(part repoModel.Part) bool {
-			if len(countrySet) > 0 {
-				if _, ok := countrySet[part.Manufacturer.Country]; !ok {
-					return false
-				}
-			}
-			return true
-		},
-		func(part repoModel.Part) bool {
-			if len(tagSet) > 0 {
-				exist := false
-				for _, partTag := range part.Tags {
-					if _, ok := tagSet[partTag]; ok {
-						exist = true
-					}
-				}
-				if !exist {
-					return false
-				}
-			}
-			return true
-		},
+func filtersToBson(filters serviceModel.PartsFilter) bson.M {
+	if filters.IsEmpty() {
+		return bson.M{}
 	}
+
+	var conditions bson.A
+	if len(filters.UUIDs) > 0 {
+		conditions = append(conditions, bson.M{
+			"part_uuid": bson.M{"$in": uuidToBsonA(filters.UUIDs)},
+		})
+	}
+	if len(filters.Names) > 0 {
+		if len(filters.Names) == 1 {
+			conditions = append(conditions, bson.M{
+				"name": bson.M{"$regex": filters.Names[0], "$options": "i"},
+			})
+		} else {
+			conditions = append(conditions, bson.M{
+				"name": bson.M{"$in": filters.Names},
+			})
+		}
+	}
+	if len(filters.Categories) > 0 {
+		conditions = append(conditions, bson.M{
+			"category": bson.M{"$in": filters.Categories},
+		})
+	}
+	if len(filters.ManufacturerCountry) > 0 {
+		conditions = append(conditions, bson.M{
+			"manufacturer.country": bson.M{"$in": filters.ManufacturerCountry},
+		})
+	}
+	if len(filters.Tags) > 0 {
+		conditions = append(conditions, bson.M{
+			"tags": bson.M{"$in": filters.Tags},
+		})
+	}
+
+	return bson.M{"$and": conditions}
 }
 
-// set - преобразует слайс в множество
-func set(data []string) map[string]struct{} {
-	m := make(map[string]struct{})
-	for _, v := range data {
-		m[v] = struct{}{}
+func uuidToBsonA(uuids []string) bson.A {
+	arr := bson.A{}
+	for _, v := range uuids {
+		if uuidV, err := uuid.Parse(v); err == nil {
+			arr = append(arr, primitive.Binary{Subtype: 0x00, Data: uuidV[:]})
+		}
 	}
-	return m
+	return arr
 }

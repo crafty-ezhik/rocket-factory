@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -42,6 +43,7 @@ func (a *api) OrderGet(ctx context.Context, req orderV1.OrderGetParams) (orderV1
 				Message: "request cancelled",
 			}, nil
 		}
+		log.Println(err)
 		return &orderV1.InternalServerError{
 			Code:    http.StatusInternalServerError,
 			Message: "something went wrong",

@@ -177,16 +177,16 @@ func (_c *MockOrderRepository_Get_Call) RunAndReturn(run func(ctx context.Contex
 }
 
 // Update provides a mock function for the type MockOrderRepository
-func (_mock *MockOrderRepository) Update(ctx context.Context, data model.UpdateOrderInfo, kind model.OrderUpdateKind) error {
-	ret := _mock.Called(ctx, data, kind)
+func (_mock *MockOrderRepository) Update(ctx context.Context, order model.Order) error {
+	ret := _mock.Called(ctx, order)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Update")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, model.UpdateOrderInfo, model.OrderUpdateKind) error); ok {
-		r0 = returnFunc(ctx, data, kind)
+	if returnFunc, ok := ret.Get(0).(func(context.Context, model.Order) error); ok {
+		r0 = returnFunc(ctx, order)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -200,30 +200,24 @@ type MockOrderRepository_Update_Call struct {
 
 // Update is a helper method to define mock.On call
 //   - ctx context.Context
-//   - data model.UpdateOrderInfo
-//   - kind model.OrderUpdateKind
-func (_e *MockOrderRepository_Expecter) Update(ctx interface{}, data interface{}, kind interface{}) *MockOrderRepository_Update_Call {
-	return &MockOrderRepository_Update_Call{Call: _e.mock.On("Update", ctx, data, kind)}
+//   - order model.Order
+func (_e *MockOrderRepository_Expecter) Update(ctx interface{}, order interface{}) *MockOrderRepository_Update_Call {
+	return &MockOrderRepository_Update_Call{Call: _e.mock.On("Update", ctx, order)}
 }
 
-func (_c *MockOrderRepository_Update_Call) Run(run func(ctx context.Context, data model.UpdateOrderInfo, kind model.OrderUpdateKind)) *MockOrderRepository_Update_Call {
+func (_c *MockOrderRepository_Update_Call) Run(run func(ctx context.Context, order model.Order)) *MockOrderRepository_Update_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 model.UpdateOrderInfo
+		var arg1 model.Order
 		if args[1] != nil {
-			arg1 = args[1].(model.UpdateOrderInfo)
-		}
-		var arg2 model.OrderUpdateKind
-		if args[2] != nil {
-			arg2 = args[2].(model.OrderUpdateKind)
+			arg1 = args[1].(model.Order)
 		}
 		run(
 			arg0,
 			arg1,
-			arg2,
 		)
 	})
 	return _c
@@ -234,7 +228,7 @@ func (_c *MockOrderRepository_Update_Call) Return(err error) *MockOrderRepositor
 	return _c
 }
 
-func (_c *MockOrderRepository_Update_Call) RunAndReturn(run func(ctx context.Context, data model.UpdateOrderInfo, kind model.OrderUpdateKind) error) *MockOrderRepository_Update_Call {
+func (_c *MockOrderRepository_Update_Call) RunAndReturn(run func(ctx context.Context, order model.Order) error) *MockOrderRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

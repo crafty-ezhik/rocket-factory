@@ -62,7 +62,7 @@ func (s *ApiSuite) TestCreateOrderFailure() {
 		uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 		uuid.MustParse("00000000-0000-0000-0000-000000000003"),
 	}
-	dbErr := errors.New("db error")
+	dbErr := errors.New("something went wrong")
 
 	tests := []struct {
 		name        string

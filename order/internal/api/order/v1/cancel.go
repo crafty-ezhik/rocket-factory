@@ -56,7 +56,6 @@ func (a *api) OrderCancel(ctx context.Context, req orderV1.OrderCancelParams) (o
 				Message: "request cancelled",
 			}, nil
 		}
-
 		return &orderV1.InternalServerError{
 			Code:    http.StatusInternalServerError,
 			Message: "something went wrong",

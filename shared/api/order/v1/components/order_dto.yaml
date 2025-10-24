@@ -46,3 +46,15 @@ properties:
 
   status:
     $ref: ./enums/order_status.yaml
+
+  created_at:
+    type: string
+    format: date-time
+    description: Время создания заказа
+    example: "2023-05-15T10:30:00Z"
+
+  updated_at:
+    type: string
+    format: date-time
+    description: Время последнего обновления данных по заказу
+    example: "2023-05-15T10:30:00Z"
