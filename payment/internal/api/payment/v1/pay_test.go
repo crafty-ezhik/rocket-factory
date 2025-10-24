@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 
-	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 	"github.com/google/uuid"
+
+	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
 func (s *APISuite) TestPayOrder() {
