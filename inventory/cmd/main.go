@@ -166,6 +166,7 @@ func main() {
 		// Запускаем HTTP сервер
 		log.Printf("🌐 HTTP server with gRPC-Gateway and Swagger UI listening on %d\n", httpPort)
 		err = gwServer.ListenAndServe()
+
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("Failed to serve HTTP: %v\n", err)
 			return

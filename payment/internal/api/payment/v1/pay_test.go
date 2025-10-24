@@ -4,11 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/google/uuid"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
+	"github.com/google/uuid"
 )
 
 func (s *APISuite) TestPayOrder() {
@@ -21,7 +18,7 @@ func (s *APISuite) TestPayOrder() {
 		req              *paymentV1.PayOrderRequest
 		setupMock        func()
 		expectedResponse *paymentV1.PayOrderResponse
-		expectedErr      error // ожидаемая gRPC ошибка
+		expectedErrMsg   string // ожидаемая gRPC ошибка
 		wantServiceCall  bool
 	}{
 		{
@@ -38,7 +35,7 @@ func (s *APISuite) TestPayOrder() {
 			expectedResponse: &paymentV1.PayOrderResponse{
 				TransactionUuid: validTransactionUUID,
 			},
-			expectedErr:     nil,
+			expectedErrMsg:  "",
 			wantServiceCall: true,
 		},
 		{
@@ -50,7 +47,7 @@ func (s *APISuite) TestPayOrder() {
 			},
 			setupMock:        func() {},
 			expectedResponse: nil,
-			expectedErr:      status.Error(codes.InvalidArgument, "order uuid is not valid"),
+			expectedErrMsg:   "invalid order UUID",
 			wantServiceCall:  false,
 		},
 		{
@@ -62,7 +59,7 @@ func (s *APISuite) TestPayOrder() {
 			},
 			setupMock:        func() {},
 			expectedResponse: nil,
-			expectedErr:      status.Error(codes.InvalidArgument, "user uuid is not valid"),
+			expectedErrMsg:   "invalid user UUID",
 			wantServiceCall:  false,
 		},
 		{
@@ -77,7 +74,7 @@ func (s *APISuite) TestPayOrder() {
 					Return("", context.DeadlineExceeded).Once()
 			},
 			expectedResponse: nil,
-			expectedErr:      status.Error(codes.DeadlineExceeded, "request timeout exceeded"),
+			expectedErrMsg:   "context deadline exceeded",
 			wantServiceCall:  true,
 		},
 		{
@@ -92,7 +89,7 @@ func (s *APISuite) TestPayOrder() {
 					Return("", context.Canceled).Once()
 			},
 			expectedResponse: nil,
-			expectedErr:      status.Error(codes.Canceled, "request canceled by client"),
+			expectedErrMsg:   "context canceled",
 			wantServiceCall:  true,
 		},
 		{
@@ -103,12 +100,12 @@ func (s *APISuite) TestPayOrder() {
 				PaymentMethod: paymentV1.PaymentMethod_CARD,
 			},
 			setupMock: func() {
-				err := errors.New("db error")
+				err := errors.New("something went wrong")
 				s.paymentService.On("PayOrder", s.ctx, validOrderUUID, validUserUUID, "CARD").
 					Return("", err).Once()
 			},
 			expectedResponse: nil,
-			expectedErr:      status.Error(codes.Internal, "db error"),
+			expectedErrMsg:   "something went wrong",
 			wantServiceCall:  true,
 		},
 	}
@@ -119,8 +116,8 @@ func (s *APISuite) TestPayOrder() {
 
 			res, err := s.api.PayOrder(context.Background(), tt.req)
 
-			if tt.expectedErr != nil {
-				s.Equal(tt.expectedErr, err)
+			if tt.expectedErrMsg != "" {
+				s.Contains(err.Error(), tt.expectedErrMsg)
 				s.Nil(tt.expectedResponse, res)
 			} else {
 				s.NoError(err)

@@ -20,6 +20,7 @@ import (
 	paymentV1API "github.com/crafty-ezhik/rocket-factory/payment/internal/api/payment/v1"
 	"github.com/crafty-ezhik/rocket-factory/payment/internal/interceptor"
 	paymentService "github.com/crafty-ezhik/rocket-factory/payment/internal/service/payment"
+	sharedIns "github.com/crafty-ezhik/rocket-factory/shared/pkg/interceptors"
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
@@ -49,6 +50,7 @@ func main() {
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			interceptor.LoggerInterceptor(),
+			sharedIns.UnaryErrorInterceptor(),
 			interceptor.ValidatorInterceptor(),
 		),
 	)

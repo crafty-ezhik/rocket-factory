@@ -19,6 +19,7 @@ const (
 	TooManyRequestsErrCode
 	InternalServiceErrCode
 	ServiceUnavailableErrCode
+	CanceledErrCode
 )
 
 // businessError - структура ошибки
@@ -76,6 +77,8 @@ func errCodeToGRPCCode(code ErrorCode) codes.Code {
 		return codes.Internal
 	case ServiceUnavailableErrCode:
 		return codes.Unavailable
+	case CanceledErrCode:
+		return codes.Canceled
 	default:
 		return codes.Unknown
 	}
