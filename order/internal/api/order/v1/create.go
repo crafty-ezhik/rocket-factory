@@ -39,7 +39,7 @@ func (a *api) OrderCreate(ctx context.Context, req *orderV1.CreateOrderRequest) 
 		}
 		return &orderV1.InternalServerError{
 			Code:    http.StatusInternalServerError,
-			Message: err.Error(),
+			Message: "something went wrong",
 		}, nil
 	}
 

@@ -24,34 +24,23 @@ func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.O
 		return serviceModel.Order{}, err
 	}
 
-	row, err := r.pool.Query(ctx, query, args...)
+	var order repoModel.Order
+	err = r.pool.QueryRow(ctx, query, args...).Scan(
+		&order.UUID,
+		&order.UserUUID,
+		&order.PartUUIDs,
+		&order.TotalPrice,
+		&order.TransactionUUID,
+		&order.PaymentMethod,
+		&order.Status,
+		&order.CreatedAt,
+		&order.UpdatedAt,
+	)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return serviceModel.Order{}, serviceModel.ErrOrderNotFound
 		}
 		return serviceModel.Order{}, err
-	}
-	var order repoModel.Order
-
-	for row.Next() {
-		err = row.Scan(
-			&order.UUID,
-			&order.UserUUID,
-			&order.PartUUIDs,
-			&order.TotalPrice,
-			&order.TransactionUUID,
-			&order.PaymentMethod,
-			&order.Status,
-			&order.CreatedAt,
-			&order.UpdatedAt,
-		)
-		if err != nil {
-			return serviceModel.Order{}, err
-		}
-	}
-
-	if order.UUID == uuid.Nil {
-		return serviceModel.Order{}, serviceModel.ErrOrderNotFound
 	}
 
 	return converter.OrderToServiceModel(order), nil
