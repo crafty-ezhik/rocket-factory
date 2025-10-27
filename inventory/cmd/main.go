@@ -13,6 +13,9 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -21,6 +24,7 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/interceptor"
 	inventoryRepository "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/part"
 	inventoryService "github.com/crafty-ezhik/rocket-factory/inventory/internal/service/part"
+	sharedIns "github.com/crafty-ezhik/rocket-factory/shared/pkg/interceptors"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 
@@ -32,15 +36,46 @@ const (
 )
 
 func main() {
+	// Загружаем переменные окружения
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Printf("❌ Ошибка загрузки .env файла: %v\n", err)
+		return
+	}
+
+	ctx := context.Background()
+	mongoURI := os.Getenv("INVENTORY_MONGO_URI")
+
+	// Создаем клиент MongoDB
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
+	if err != nil {
+		log.Fatalf("❌ Ошибка подключения к Mongo: %v\n", err)
+		return
+	}
+	defer func() {
+		if err := client.Disconnect(ctx); err != nil {
+			log.Printf("❌ Ошибка закрытия соединения с Mongo: %v\n", err)
+			return
+		}
+	}()
+
+	// Проверяем соединение
+	if err = client.Ping(ctx, nil); err != nil {
+		log.Printf("❌ MongoDB недоступна: %v\n", err)
+	}
+
+	// Получаем базу MongoDB
+	db := client.Database(os.Getenv("INVENTORY_MONGO_DB"))
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
 	if err != nil {
-		log.Fatalf("failed to listen: %v\n", err)
+		log.Printf("failed to listen: %v\n", err)
 		return
 	}
 
 	defer func() {
 		if err := lis.Close(); err != nil {
-			log.Fatalf("failed to close listener: %v\n", err)
+			log.Printf("failed to close listener: %v\n", err)
 		}
 	}()
 
@@ -48,17 +83,18 @@ func main() {
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			interceptor.LoggerInterceptor(),
+			sharedIns.UnaryErrorInterceptor(),
 			interceptor.ValidatorInterceptor(),
 		),
 	)
 
 	// Регистрируем сервис inventoryService
-	repo := inventoryRepository.NewRepository()
+	repo := inventoryRepository.NewRepository(db)
 	service := inventoryService.NewService(repo)
 	api := inventoryV1API.NewAPI(service)
 
-	// Добавляем случайные детали
-	repo.Init(10)
+	// Добавляем детали
+	// repo.Init()
 
 	inventoryV1.RegisterInventoryServiceServer(grpcServer, api)
 
@@ -130,6 +166,7 @@ func main() {
 		// Запускаем HTTP сервер
 		log.Printf("🌐 HTTP server with gRPC-Gateway and Swagger UI listening on %d\n", httpPort)
 		err = gwServer.ListenAndServe()
+
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("Failed to serve HTTP: %v\n", err)
 			return

@@ -109,8 +109,8 @@ func (_c *MockInventoryRepository_Get_Call) RunAndReturn(run func(ctx context.Co
 }
 
 // Init provides a mock function for the type MockInventoryRepository
-func (_mock *MockInventoryRepository) Init(n int) {
-	_mock.Called(n)
+func (_mock *MockInventoryRepository) Init() {
+	_mock.Called()
 	return
 }
 
@@ -120,20 +120,13 @@ type MockInventoryRepository_Init_Call struct {
 }
 
 // Init is a helper method to define mock.On call
-//   - n int
-func (_e *MockInventoryRepository_Expecter) Init(n interface{}) *MockInventoryRepository_Init_Call {
-	return &MockInventoryRepository_Init_Call{Call: _e.mock.On("Init", n)}
+func (_e *MockInventoryRepository_Expecter) Init() *MockInventoryRepository_Init_Call {
+	return &MockInventoryRepository_Init_Call{Call: _e.mock.On("Init")}
 }
 
-func (_c *MockInventoryRepository_Init_Call) Run(run func(n int)) *MockInventoryRepository_Init_Call {
+func (_c *MockInventoryRepository_Init_Call) Run(run func()) *MockInventoryRepository_Init_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 int
-		if args[0] != nil {
-			arg0 = args[0].(int)
-		}
-		run(
-			arg0,
-		)
+		run()
 	})
 	return _c
 }
@@ -143,7 +136,7 @@ func (_c *MockInventoryRepository_Init_Call) Return() *MockInventoryRepository_I
 	return _c
 }
 
-func (_c *MockInventoryRepository_Init_Call) RunAndReturn(run func(n int)) *MockInventoryRepository_Init_Call {
+func (_c *MockInventoryRepository_Init_Call) RunAndReturn(run func()) *MockInventoryRepository_Init_Call {
 	_c.Run(run)
 	return _c
 }

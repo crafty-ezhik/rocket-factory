@@ -11,5 +11,5 @@ import (
 type InventoryRepository interface {
 	Get(ctx context.Context, partID uuid.UUID) (serviceModel.Part, error)
 	List(ctx context.Context, filters serviceModel.PartsFilter) ([]serviceModel.Part, error)
-	Init(n int)
+	Init()
 }

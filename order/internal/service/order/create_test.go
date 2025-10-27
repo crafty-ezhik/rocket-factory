@@ -1,6 +1,7 @@
 package order
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -72,7 +73,7 @@ func (s *ServiceSuite) TestCreateOrder() {
 	}
 
 	clientErr := errors.New("client error")
-	dbErr := errors.New("db error")
+	dbErr := errors.New("something went wrong")
 
 	tests := []struct {
 		name               string
@@ -89,7 +90,7 @@ func (s *ServiceSuite) TestCreateOrder() {
 			partIDs:            partIDs,
 			expectedOrderID:    uuid.Nil,
 			expectedTotalPrice: 0,
-			expectedErr:        clientErr,
+			expectedErr:        context.DeadlineExceeded,
 			setupMocks: func() {
 				s.inventoryClient.On("ListParts", mock.Anything, model.PartsFilter{
 					UUIDs: []string{partIDs[0].String(), partIDs[1].String()},
@@ -127,7 +128,7 @@ func (s *ServiceSuite) TestCreateOrder() {
 			partIDs:            partIDs,
 			expectedOrderID:    uuid.Nil,
 			expectedTotalPrice: 0,
-			expectedErr:        fmt.Errorf("part with uuid a79178c5-a082-4884-b214-ee69e3972840 not found"),
+			expectedErr:        fmt.Errorf("part not found: part with uuid a79178c5-a082-4884-b214-ee69e3972840 not found"),
 			setupMocks: func() {
 				s.inventoryClient.On("ListParts", mock.Anything, model.PartsFilter{
 					UUIDs: []string{partIDs[0].String(), partIDs[1].String()},
