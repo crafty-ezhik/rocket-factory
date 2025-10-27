@@ -14,12 +14,7 @@ import (
 )
 
 func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.Order, error) {
-	builderSelect := sq.Select("*").
-		From("orders").
-		PlaceholderFormat(sq.Dollar).
-		Where(sq.Eq{"order_uuid": orderID})
-
-	query, args, err := builderSelect.ToSql()
+	query, args, err := buildSelectOrderQuery(orderID).ToSql()
 	if err != nil {
 		return serviceModel.Order{}, err
 	}
@@ -44,4 +39,23 @@ func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.O
 	}
 
 	return converter.OrderToServiceModel(order), nil
+}
+
+func buildSelectOrderQuery(orderID uuid.UUID) sq.SelectBuilder {
+	builderSelect := sq.Select(
+		"order_uuid",
+		"user_uuid",
+		"part_uuids",
+		"total_price",
+		"transaction_uuid",
+		"payment_method",
+		"status",
+		"created_at",
+		"updated_at",
+	).
+		From("orders").
+		Where(sq.Eq{"order_uuid": orderID}).
+		PlaceholderFormat(sq.Dollar)
+
+	return builderSelect
 }
