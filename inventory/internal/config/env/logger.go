@@ -4,7 +4,7 @@ import "github.com/caarlos0/env/v11"
 
 type loggerEnvConfig struct {
 	Level  string `env:"LOGGER_LEVEL,required"`
-	AsJSON bool   `env:"LOGGER_LEVEL,required"`
+	AsJSON bool   `env:"LOGGER_AS_JSON,required"`
 }
 
 type loggerConfig struct {
