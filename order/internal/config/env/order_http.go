@@ -1,9 +1,10 @@
 package env
 
 import (
-	"github.com/caarlos0/env/v11"
 	"net"
 	"time"
+
+	"github.com/caarlos0/env/v11"
 )
 
 type orderHTTPEnvConfig struct {

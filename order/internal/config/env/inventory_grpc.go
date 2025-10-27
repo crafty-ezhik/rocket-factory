@@ -1,8 +1,9 @@
 package env
 
 import (
-	"github.com/caarlos0/env/v11"
 	"net"
+
+	"github.com/caarlos0/env/v11"
 )
 
 type inventoryGRPCEnvConfig struct {

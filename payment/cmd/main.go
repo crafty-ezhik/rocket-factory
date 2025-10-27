@@ -18,6 +18,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	paymentV1API "github.com/crafty-ezhik/rocket-factory/payment/internal/api/payment/v1"
+	"github.com/crafty-ezhik/rocket-factory/payment/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/payment/internal/interceptor"
 	paymentService "github.com/crafty-ezhik/rocket-factory/payment/internal/service/payment"
 	sharedIns "github.com/crafty-ezhik/rocket-factory/shared/pkg/interceptors"
@@ -25,15 +26,19 @@ import (
 )
 
 const (
-	HOST          = "localhost"
 	PathToSwagger = "./shared/pkg/swagger/payment/v1"
-	grpcPort      = 50051
-	httpPort      = 8081
+	configPath    = "../deploy/compose/payment/.env"
 )
 
 func main() {
+	// Загружаем конфиг
+	err := config.Load(configPath)
+	if err != nil {
+		panic(fmt.Errorf("❌ Ошибка загрузки конфига: %w", err))
+	}
+
 	// Открываем для прослушивания tcp соединение на порту grpcPort
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	lis, err := net.Listen("tcp", config.AppConfig().PaymentGRPC.Address())
 	if err != nil {
 		log.Fatalf("failed to listen: %v\n", err)
 		return
@@ -66,7 +71,7 @@ func main() {
 
 	// Запускаем сервер
 	go func() {
-		log.Printf("🚀 gRPC server listening on %d\n", grpcPort)
+		log.Printf("🚀 gRPC server listening on %s\n", config.AppConfig().PaymentGRPC.Address())
 		err = grpcServer.Serve(lis)
 		if err != nil {
 			log.Printf("failed to serve: %v\n", err)
@@ -90,7 +95,7 @@ func main() {
 		err = paymentV1.RegisterPaymentServiceHandlerFromEndpoint(
 			ctx,
 			mux,
-			fmt.Sprintf("%s:%d", HOST, grpcPort),
+			config.AppConfig().PaymentGRPC.Address(),
 			opts,
 		)
 		if err != nil {
@@ -122,13 +127,13 @@ func main() {
 
 		// Создаем HTTP сервер
 		gwServer = &http.Server{
-			Addr:              fmt.Sprintf(":%d", httpPort),
+			Addr:              config.AppConfig().PaymentHTTP.Address(),
 			Handler:           httpMux,
 			ReadHeaderTimeout: 10 * time.Second,
 		}
 
 		// Запускаем HTTP сервер
-		log.Printf("🌐 HTTP server with gRPC-Gateway and Swagger UI listening on %d\n", httpPort)
+		log.Printf("🌐 HTTP server with gRPC-Gateway and Swagger UI listening on %s\n", config.AppConfig().PaymentHTTP.Address())
 		err = gwServer.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("Failed to serve HTTP: %v\n", err)
