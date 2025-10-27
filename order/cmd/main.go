@@ -3,21 +3,19 @@ package main
 import (
 	"context"
 	"errors"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
+	"fmt"
+	"github.com/crafty-ezhik/rocket-factory/order/internal/config"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
-	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	orderAPI "github.com/crafty-ezhik/rocket-factory/order/internal/api/order/v1"
 	inventoryV1GRPC "github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc/inventory/v1"
@@ -30,26 +28,18 @@ import (
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 
-const (
-	httpPort          = "8080"
-	readHeaderTimeout = 5 * time.Second
-	shutdownTimeout   = 10 * time.Second
-	grpcInventoryAddr = "localhost:50052"
-	grpcPaymentAddr   = "localhost:50051"
-)
+const configPath = "../deploy/compose/order/.env"
 
 func main() {
-	// Загружаем переменные окружения
-	err := godotenv.Load("../.env")
+	// Загружаем конфиг
+	err := config.Load(configPath)
 	if err != nil {
-		log.Printf("❌ Ошибка загрузки .env файла: %v\n", err)
-		return
+		panic(fmt.Errorf("❌ Ошибка загрузки конфига: %w", err))
 	}
 
 	// Создаем пул соединений с базой
 	ctx := context.Background()
-	dbURI := os.Getenv("ORDER_POSTGRES_URI")
-	pool, err := pgxpool.New(ctx, dbURI)
+	pool, err := pgxpool.New(ctx, config.AppConfig().Postgres.URI())
 	if err != nil {
 		log.Fatalf("❌ Ошибка подключения к базе данных: %v\n", err)
 		return
@@ -65,8 +55,10 @@ func main() {
 	}
 
 	// Инициализируем мигратор
-	migDir := os.Getenv("MIGRATION_DIR")
-	migRunner := migrator.NewMigrator(stdlib.OpenDB(*pool.Config().ConnConfig.Copy()), migDir)
+	migRunner := migrator.NewMigrator(stdlib.OpenDB(
+		*pool.Config().ConnConfig.Copy()),
+		config.AppConfig().Postgres.MigrationsDir(),
+	)
 
 	err = migRunner.Up()
 	if err != nil {
@@ -76,7 +68,7 @@ func main() {
 
 	// Создаем gRPC клиента для InventoryService
 	inventoryConn, err := grpc.NewClient(
-		grpcInventoryAddr,
+		config.AppConfig().InventoryGRPC.Address(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -94,7 +86,7 @@ func main() {
 
 	// Создаем gRPC клиента для PaymentService
 	paymentConn, err := grpc.NewClient(
-		grpcPaymentAddr,
+		config.AppConfig().PaymentGRPC.Address(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -132,21 +124,21 @@ func main() {
 	// Добавляем middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.Timeout(10 * time.Second))
+	r.Use(middleware.Timeout(config.AppConfig().OrderHTTP.ReadTimeout()))
 
 	// Монтируем обработчик OpenAPI к нашему серверу
 	r.Mount("/", orderServer)
 
 	// Создаем HTTP-сервер
 	server := &http.Server{
-		Addr:              net.JoinHostPort("0.0.0.0", httpPort),
+		Addr:              config.AppConfig().OrderHTTP.Address(),
 		Handler:           r,
-		ReadHeaderTimeout: readHeaderTimeout,
+		ReadHeaderTimeout: config.AppConfig().OrderHTTP.ReadTimeout(),
 	}
 
 	// Запускаем сервер
 	go func() {
-		log.Printf("🚀 HTTP-сервер запущен на порту %s\n", httpPort)
+		log.Printf("🚀 HTTP-сервер запущен на порту %s\n", config.AppConfig().OrderHTTP.Address())
 		err = server.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Printf("❌ Ошибка запуска сервера: %v\n", err)
@@ -160,10 +152,10 @@ func main() {
 
 	log.Println("🛑 Завершение работы сервера...")
 
-	ctx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), config.AppConfig().OrderHTTP.ShutdownTimeout())
 	defer cancel()
 
-	if err := server.Shutdown(ctx); err != nil {
+	if err = server.Shutdown(ctx); err != nil {
 		log.Printf("❌ Ошибка при остановке сервера: %v\n", err)
 	}
 

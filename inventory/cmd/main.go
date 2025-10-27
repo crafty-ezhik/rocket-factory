@@ -37,7 +37,7 @@ func main() {
 	// Загружаем конфиг
 	err := config.Load(configPath)
 	if err != nil {
-		panic(fmt.Errorf("❌ failed to load config: %w", err))
+		panic(fmt.Errorf("❌ Ошибка загрузки конфига: %w", err))
 	}
 
 	// Создаем клиент MongoDB
