@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
@@ -21,6 +20,7 @@ import (
 	"google.golang.org/grpc/reflection"
 
 	inventoryV1API "github.com/crafty-ezhik/rocket-factory/inventory/internal/api/inventory/v1"
+	"github.com/crafty-ezhik/rocket-factory/inventory/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/interceptor"
 	inventoryRepository "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/part"
 	inventoryService "github.com/crafty-ezhik/rocket-factory/inventory/internal/service/part"
@@ -29,25 +29,20 @@ import (
 )
 
 const (
-	HOST          = "localhost"
 	PathToSwagger = "./shared/pkg/swagger/inventory/v1"
-	grpcPort      = 50052
-	httpPort      = 8082
+	configPath    = "../deploy/compose/inventory/.env"
 )
 
 func main() {
-	// Загружаем переменные окружения
-	err := godotenv.Load("../.env")
+	// Загружаем конфиг
+	err := config.Load(configPath)
 	if err != nil {
-		log.Printf("❌ Ошибка загрузки .env файла: %v\n", err)
-		return
+		panic(fmt.Errorf("❌ failed to load config: %w", err))
 	}
 
-	ctx := context.Background()
-	mongoURI := os.Getenv("INVENTORY_MONGO_URI")
-
 	// Создаем клиент MongoDB
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
+	ctx := context.Background()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.AppConfig().Mongo.URI()))
 	if err != nil {
 		log.Fatalf("❌ Ошибка подключения к Mongo: %v\n", err)
 		return
@@ -65,9 +60,9 @@ func main() {
 	}
 
 	// Получаем базу MongoDB
-	db := client.Database(os.Getenv("INVENTORY_MONGO_DB"))
+	db := client.Database(config.AppConfig().Mongo.DatabaseName())
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	lis, err := net.Listen("tcp", config.AppConfig().InventoryGRPC.Address())
 	if err != nil {
 		log.Printf("failed to listen: %v\n", err)
 		return
@@ -103,7 +98,7 @@ func main() {
 
 	// Запускаем сервер
 	go func() {
-		log.Printf("🚀 gRPC server listening on %d\n", grpcPort)
+		log.Printf("🚀 gRPC server listening on %s\n", config.AppConfig().InventoryGRPC.Address())
 		err = grpcServer.Serve(lis)
 		if err != nil {
 			log.Printf("failed to serve: %v\n", err)
@@ -127,7 +122,7 @@ func main() {
 		err = inventoryV1.RegisterInventoryServiceHandlerFromEndpoint(
 			ctx,
 			mux,
-			fmt.Sprintf("%s:%d", HOST, grpcPort),
+			config.AppConfig().InventoryGRPC.Address(),
 			opts)
 		if err != nil {
 			log.Printf("failed to register gateway: %v\n", err)
@@ -158,13 +153,13 @@ func main() {
 
 		// Создаем HTTP сервер
 		gwServer = &http.Server{
-			Addr:              fmt.Sprintf(":%d", httpPort),
+			Addr:              config.AppConfig().InventoryHTTP.Address(),
 			Handler:           httpMux,
 			ReadHeaderTimeout: 10 * time.Second,
 		}
 
 		// Запускаем HTTP сервер
-		log.Printf("🌐 HTTP server with gRPC-Gateway and Swagger UI listening on %d\n", httpPort)
+		log.Printf("🌐 HTTP server with gRPC-Gateway and Swagger UI listening on %s\n", config.AppConfig().InventoryHTTP.Address())
 		err = gwServer.ListenAndServe()
 
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
