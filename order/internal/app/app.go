@@ -98,6 +98,7 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 	// Добавляем middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	r.Use(middleware.Heartbeat("/api/v1/orders/ping"))
 	r.Use(middleware.Timeout(config.AppConfig().OrderHTTP.ReadTimeout()))
 
 	// Монтируем обработчик OpenAPI к нашему серверу
