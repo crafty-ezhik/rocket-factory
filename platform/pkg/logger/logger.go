@@ -2,11 +2,12 @@ package logger
 
 import (
 	"context"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"os"
 	"strings"
 	"sync"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Key string
@@ -29,6 +30,7 @@ type logger struct {
 }
 
 // Init - производит инициализацию логгера.
+//
 //	levelStr - уровень логирования
 //	asJSON - требуется ли формат логов в JSON
 func Init(levelStr string, asJSON bool) error {
@@ -82,6 +84,7 @@ func buildProductionEncoderConfig() zapcore.EncoderConfig {
 }
 
 // SetLevel - позволяет динамически изменять уровень логирования.
+//
 //	Для использования, можно сделать отдельный endpoint
 func SetLevel(levelStr string) {
 	if dynamicLevel == (zap.AtomicLevel{}) {
@@ -97,6 +100,7 @@ func Logger() *logger {
 }
 
 // SetNopLogger - устанавливает глобальный логгер в no-op режим
+//
 //	Полезно использовать при unit-тестах
 func SetNopLogger() {
 	globalLogger = &logger{
