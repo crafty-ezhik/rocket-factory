@@ -3,6 +3,7 @@ module github.com/crafty-ezhik/rocket-factory/order
 go 1.24.5
 
 replace github.com/crafty-ezhik/rocket-factory/shared => ../shared
+replace github.com/crafty-ezhik/rocket-factory/platform => ../platform
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

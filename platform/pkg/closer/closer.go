@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
-	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"sync"
 	"time"
+
+	"go.uber.org/zap"
+
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
 
 // shutdownTimeout - время на завершение по умолчанию
@@ -53,7 +55,8 @@ func SetLogger(l Logger) {
 }
 
 // Configure настраивает глобальный closer для обработки системных сигналов
-//  Пример: Configure(syscall.SIGINT, syscall.SIGTERM)
+//
+//	Пример: Configure(syscall.SIGINT, syscall.SIGTERM)
 func Configure(signals ...os.Signal) {
 	go globalCloser.handleSignals(signals...)
 }

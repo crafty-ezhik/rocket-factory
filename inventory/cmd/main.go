@@ -24,7 +24,7 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/interceptor"
 	inventoryRepository "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/part"
 	inventoryService "github.com/crafty-ezhik/rocket-factory/inventory/internal/service/part"
-	sharedIns "github.com/crafty-ezhik/rocket-factory/shared/pkg/interceptors"
+	sharedIns "github.com/crafty-ezhik/rocket-factory/platform/pkg/grpc/interceptors"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 

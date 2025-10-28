@@ -4,6 +4,8 @@ go 1.24.5
 
 replace github.com/crafty-ezhik/rocket-factory/shared => ../shared
 
+replace github.com/crafty-ezhik/rocket-factory/platform => ../platform
+
 require (
 	github.com/brianvoe/gofakeit/v7 v7.7.3
 	github.com/caarlos0/env/v11 v11.3.1
