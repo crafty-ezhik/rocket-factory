@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/migrator/pg"
 	"log"
 	"net/http"
 	"os"
@@ -21,7 +22,6 @@ import (
 	inventoryV1GRPC "github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc/inventory/v1"
 	paymentV1GRPC "github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc/payment/v1"
 	"github.com/crafty-ezhik/rocket-factory/order/internal/config"
-	"github.com/crafty-ezhik/rocket-factory/order/internal/migrator"
 	orderRepo "github.com/crafty-ezhik/rocket-factory/order/internal/repository/order"
 	orderService "github.com/crafty-ezhik/rocket-factory/order/internal/service/order"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
@@ -56,7 +56,7 @@ func main() {
 	}
 
 	// Инициализируем мигратор
-	migRunner := migrator.NewMigrator(stdlib.OpenDB(
+	migRunner := pg.NewPgMigrator(stdlib.OpenDB(
 		*pool.Config().ConnConfig.Copy()),
 		config.AppConfig().Postgres.MigrationsDir(),
 	)
