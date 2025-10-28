@@ -1,18 +1,20 @@
 module github.com/crafty-ezhik/rocket-factory/order
 
-go 1.24.5
+go 1.24.8
 
 replace github.com/crafty-ezhik/rocket-factory/shared => ../shared
+
 replace github.com/crafty-ezhik/rocket-factory/platform => ../platform
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/caarlos0/env/v11 v11.3.1
+	github.com/crafty-ezhik/rocket-factory/platform v0.0.0-00010101000000-000000000000
 	github.com/crafty-ezhik/rocket-factory/shared v0.0.0-00010101000000-000000000000
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/joho/godotenv v1.5.1
-	github.com/pressly/goose/v3 v3.26.0
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/grpc v1.76.0
 )
@@ -39,6 +41,7 @@ require (
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/ogen-go/ogen v1.16.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/pressly/goose/v3 v3.26.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
