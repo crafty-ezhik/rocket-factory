@@ -1,14 +1,18 @@
 module github.com/crafty-ezhik/rocket-factory/payment
 
-go 1.24.5
+go 1.24.8
 
 replace github.com/crafty-ezhik/rocket-factory/shared => ../shared
+
 replace github.com/crafty-ezhik/rocket-factory/platform => ../platform
 
 require (
+	github.com/caarlos0/env/v11 v11.3.1
+	github.com/crafty-ezhik/rocket-factory/platform v0.0.0-00010101000000-000000000000
 	github.com/crafty-ezhik/rocket-factory/shared v0.0.0-00010101000000-000000000000
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3
+	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/grpc v1.76.0
 )
