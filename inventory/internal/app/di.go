@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -66,7 +67,10 @@ func (d *diContainer) MongoDBClient(ctx context.Context) *mongo.Client {
 			panic(fmt.Sprintf("failed to connect to MongoDB: %s\n", err.Error()))
 		}
 
-		err = client.Ping(ctx, readpref.Primary())
+		pingCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+		defer cancel()
+
+		err = client.Ping(pingCtx, readpref.Primary())
 		if err != nil {
 			panic(fmt.Sprintf("failed to ping MongoDB: %v\n", err))
 		}
