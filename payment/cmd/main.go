@@ -21,7 +21,7 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/payment/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/payment/internal/interceptor"
 	paymentService "github.com/crafty-ezhik/rocket-factory/payment/internal/service/payment"
-	sharedIns "github.com/crafty-ezhik/rocket-factory/shared/pkg/interceptors"
+	sharedIns "github.com/crafty-ezhik/rocket-factory/platform/pkg/grpc/interceptors"
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
 

@@ -3,6 +3,7 @@ module github.com/crafty-ezhik/rocket-factory/payment
 go 1.24.5
 
 replace github.com/crafty-ezhik/rocket-factory/shared => ../shared
+replace github.com/crafty-ezhik/rocket-factory/platform => ../platform
 
 require (
 	github.com/crafty-ezhik/rocket-factory/shared v0.0.0-00010101000000-000000000000
