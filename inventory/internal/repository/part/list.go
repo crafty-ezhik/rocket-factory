@@ -3,15 +3,16 @@ package part
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.uber.org/zap"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/converter"
 	repoModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
 
 func (r *repository) List(ctx context.Context, filters serviceModel.PartsFilter) ([]serviceModel.Part, error) {
@@ -19,17 +20,19 @@ func (r *repository) List(ctx context.Context, filters serviceModel.PartsFilter)
 
 	cursor, err := r.collection.Find(ctx, filtersToBson(filters))
 	if err != nil {
+		logger.Error(ctx, "Ошибка при поиске деталей", zap.Error(err))
 		return nil, fmt.Errorf("error finding parts: %w", err)
 	}
 	defer func() {
 		cerr := cursor.Close(ctx)
 		if cerr != nil {
-			log.Printf("error closing cursor: %v\n", cerr)
+			logger.Error(ctx, "error closing cursor", zap.Error(cerr))
 		}
 	}()
 
 	err = cursor.All(ctx, &filteredParts)
 	if err != nil {
+		logger.Error(ctx, "Ошибка получения деталей", zap.Error(err))
 		return nil, fmt.Errorf("error getting parts: %w", err)
 	}
 

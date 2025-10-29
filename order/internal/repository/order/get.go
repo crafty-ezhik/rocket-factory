@@ -7,15 +7,18 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/order/internal/repository/converter"
 	repoModel "github.com/crafty-ezhik/rocket-factory/order/internal/repository/model"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
 
 func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.Order, error) {
 	query, args, err := buildSelectOrderQuery(orderID).ToSql()
 	if err != nil {
+		logger.Error(ctx, "Ошибка при преобразовании запроса к SQL", zap.Error(err))
 		return serviceModel.Order{}, err
 	}
 
@@ -35,6 +38,7 @@ func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.O
 		if errors.Is(err, sql.ErrNoRows) {
 			return serviceModel.Order{}, serviceModel.ErrOrderNotFound
 		}
+		logger.Error(ctx, "Ошибка при получении заказа", zap.Error(err))
 		return serviceModel.Order{}, err
 	}
 
