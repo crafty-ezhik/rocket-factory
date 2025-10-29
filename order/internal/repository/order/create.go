@@ -2,6 +2,7 @@ package order
 
 import (
 	"context"
+	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/google/uuid"
@@ -13,11 +14,11 @@ import (
 func (r *repository) Create(ctx context.Context, order serviceModel.Order) (uuid.UUID, error) {
 	repoOrder := converter.OrderToRepoModel(order)
 
-	builderInsert := sq.Insert("orders").
+	builderInsert := sq.Insert(ordersTable).
 		PlaceholderFormat(sq.Dollar).
-		Columns("user_uuid", "part_uuids", "total_price").
+		Columns(orderFieldUserUUID, orderFieldPartUuids, orderFieldTotalPrice).
 		Values(repoOrder.UserUUID, repoOrder.PartUUIDs, repoOrder.TotalPrice).
-		Suffix("RETURNING order_uuid")
+		Suffix(fmt.Sprintf("RETURNING %s", orderFieldOrderUUID))
 
 	query, args, err := builderInsert.ToSql()
 	if err != nil {
