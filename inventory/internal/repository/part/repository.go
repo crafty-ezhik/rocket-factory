@@ -12,17 +12,27 @@ import (
 
 var _ def.InventoryRepository = (*repository)(nil)
 
+const (
+	partsCollection = "parts"
+
+	partFieldPartUUID            = "part_uuid"
+	partFieldName                = "name"
+	partFieldCategory            = "category"
+	partFieldTags                = "tags"
+	partFieldManufacturerCountry = "manufacturer.country"
+)
+
 type repository struct {
 	collection *mongo.Collection
 }
 
 func NewRepository(ctx context.Context, db *mongo.Database) *repository {
-	collection := db.Collection("parts")
+	collection := db.Collection(partsCollection)
 
 	// Добавляем индексы
 	indexModels := []mongo.IndexModel{
 		{
-			Keys:    bson.D{{Key: "part_uuid", Value: 1}},
+			Keys:    bson.D{{Key: partFieldPartUUID, Value: 1}},
 			Options: options.Index().SetUnique(true),
 		},
 	}
