@@ -43,18 +43,18 @@ func (r *repository) Get(ctx context.Context, orderID uuid.UUID) (serviceModel.O
 
 func buildSelectOrderQuery(orderID uuid.UUID) sq.SelectBuilder {
 	builderSelect := sq.Select(
-		"order_uuid",
-		"user_uuid",
-		"part_uuids",
-		"total_price",
-		"transaction_uuid",
-		"payment_method",
-		"status",
-		"created_at",
-		"updated_at",
+		orderFieldOrderUUID,
+		orderFieldUserUUID,
+		orderFieldPartUuids,
+		orderFieldTotalPrice,
+		orderFieldTransactionUUID,
+		orderFieldPaymentMethod,
+		orderFieldStatus,
+		orderFieldCreatedAt,
+		orderFieldUpdatedAt,
 	).
-		From("orders").
-		Where(sq.Eq{"order_uuid": orderID}).
+		From(ordersTable).
+		Where(sq.Eq{orderFieldOrderUUID: orderID}).
 		PlaceholderFormat(sq.Dollar)
 
 	return builderSelect

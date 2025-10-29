@@ -44,33 +44,33 @@ func filtersToBson(filters serviceModel.PartsFilter) bson.M {
 	var conditions bson.A
 	if len(filters.UUIDs) > 0 {
 		conditions = append(conditions, bson.M{
-			"part_uuid": bson.M{"$in": uuidToBsonA(filters.UUIDs)},
+			partFieldPartUUID: bson.M{"$in": uuidToBsonA(filters.UUIDs)},
 		})
 	}
 	if len(filters.Names) > 0 {
 		if len(filters.Names) == 1 {
 			conditions = append(conditions, bson.M{
-				"name": bson.M{"$regex": filters.Names[0], "$options": "i"},
+				partFieldName: bson.M{"$regex": filters.Names[0], "$options": "i"},
 			})
 		} else {
 			conditions = append(conditions, bson.M{
-				"name": bson.M{"$in": filters.Names},
+				partFieldName: bson.M{"$in": filters.Names},
 			})
 		}
 	}
 	if len(filters.Categories) > 0 {
 		conditions = append(conditions, bson.M{
-			"category": bson.M{"$in": filters.Categories},
+			partFieldCategory: bson.M{"$in": filters.Categories},
 		})
 	}
 	if len(filters.ManufacturerCountry) > 0 {
 		conditions = append(conditions, bson.M{
-			"manufacturer.country": bson.M{"$in": filters.ManufacturerCountry},
+			partFieldManufacturerCountry: bson.M{"$in": filters.ManufacturerCountry},
 		})
 	}
 	if len(filters.Tags) > 0 {
 		conditions = append(conditions, bson.M{
-			"tags": bson.M{"$in": filters.Tags},
+			partFieldTags: bson.M{"$in": filters.Tags},
 		})
 	}
 
