@@ -64,7 +64,7 @@ COPY --from=builder /app/app-inventory .
 COPY --from=builder /app/grpc-health-probe /bin/grpc-health-probe
 
 # Экспонируем порт gRPC-сервиса Inventory
-EXPOSE 50051
+EXPOSE 50052
 
 # Устанавливаем команду запуска — запускаем наш бинарь
 ENTRYPOINT ["./app-inventory"]

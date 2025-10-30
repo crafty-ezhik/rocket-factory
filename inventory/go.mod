@@ -11,6 +11,7 @@ require (
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/crafty-ezhik/rocket-factory/platform v0.0.0-00010101000000-000000000000
 	github.com/crafty-ezhik/rocket-factory/shared v0.0.0-00010101000000-000000000000
+	github.com/docker/go-connections v0.6.0
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3
 	github.com/joho/godotenv v1.5.1
@@ -38,7 +39,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/docker v28.3.3+incompatible // indirect
-	github.com/docker/go-connections v0.6.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/ebitengine/purego v0.8.4 // indirect
 	github.com/envoyproxy/protoc-gen-validate v1.2.1 // indirect

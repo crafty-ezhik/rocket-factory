@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/testcontainers/testcontainers-go"
@@ -41,6 +42,7 @@ func NewContainer(ctx context.Context, opts ...Option) (*Container, error) {
 	}()
 
 	cfg.Host, cfg.Port, err = getContainerHostPort(ctx, container)
+	log.Println("Хост и порт монги: ", cfg.Host, cfg.Port)
 	if err != nil {
 		return nil, err
 	}

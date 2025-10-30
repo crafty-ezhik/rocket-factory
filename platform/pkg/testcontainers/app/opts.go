@@ -21,6 +21,12 @@ func WithDockerfile(dir, file string) Option {
 	}
 }
 
+func WithImage(image string) Option {
+	return func(c *Config) {
+		c.Image = image
+	}
+}
+
 func WithPort(port string) Option {
 	return func(c *Config) {
 		c.Port = port

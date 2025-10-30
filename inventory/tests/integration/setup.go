@@ -7,7 +7,9 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/app"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/mongo"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/network"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/path"
+	"github.com/docker/go-connections/nat"
+
+	//"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/path"
 	//"github.com/docker/go-connections/nat"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"go.uber.org/zap"
@@ -25,7 +27,7 @@ const (
 
 	// Значение переменных окружения
 	loggerLevelValue = "info"
-	startupTimeout   = 6 * time.Minute
+	startupTimeout   = 3 * time.Minute
 )
 
 // TestEnvironment — структура для хранения ресурсов тестового окружения
@@ -49,6 +51,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	mongoPassword := getEnvWithLogging(ctx, testcontainers.MongoPasswordKey)
 	mongoImageName := getEnvWithLogging(ctx, testcontainers.MongoImageNameKey)
 	mongoDatabase := getEnvWithLogging(ctx, testcontainers.MongoDatabaseKey)
+	mongoAuthDb := getEnvWithLogging(ctx, testcontainers.MongoAuthDBKey)
 
 	// Получаем порт gRPC для waitStrategy
 	grpcPort := getEnvWithLogging(ctx, grpcPortKey)
@@ -61,6 +64,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 		mongo.WithDatabase(mongoDatabase),
 		mongo.WithAuth(mongoUsername, mongoPassword),
 		mongo.WithLogger(logger.Logger()),
+		mongo.WithAuthDB(mongoAuthDb),
 	)
 	if err != nil {
 		cleanupTestEnvironment(ctx, &TestEnvironment{Network: generatedNetwork})
@@ -69,22 +73,21 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	logger.Info(ctx, "✅ Контейнер MongoDB успешно запущен")
 
 	// Шаг 3: Запускаем контейнер с приложением
-	projectRoot := path.GetProjectRoot()
+	//projectRoot := path.GetProjectRoot()
 
 	appEnv := map[string]string{
 		// Переопределяем хост MongoDB для подключения к контейнеру из testcontainers
-		testcontainers.MongoHostKey: generatedMongo.Config().ContainerName,
+		testcontainers.MongoHostKey: "mongo-test",
 	}
 
 	// Создаем настраиваемую стратегию ожидания с увеличенным таймаутом
-	waitStrategy := wait.ForLog("Server is running").
-		WithStartupTimeout(startupTimeout).
-		WithPollInterval(100 * time.Millisecond)
+	waitStrategy := wait.ForListeningPort(nat.Port(grpcPort + "/tcp")).WithStartupTimeout(10 * time.Second)
 
 	appContainer, err := app.NewContainer(ctx,
 		app.WithName(inventoryAppName),
 		app.WithPort(grpcPort),
 		//app.WithDockerfile(projectRoot, inventoryDockerfile),
+		app.WithImage("inventory-service:latest"),
 		app.WithNetwork(generatedNetwork.Name()),
 		app.WithEnv(appEnv),
 		app.WithLogOutput(os.Stdout),

@@ -31,6 +31,7 @@ type Config struct {
 	Name          string
 	DockerfileDir string
 	Dockerfile    string
+	Image         string
 	Port          string
 	Env           map[string]string
 	Networks      []string
@@ -51,6 +52,7 @@ func NewContainer(ctx context.Context, opts ...Option) (*Container, error) {
 		Name:          defaultAppName,
 		Port:          defaultAppPort,
 		Dockerfile:    "Dockerfile",
+		Image:         "inventory-service",
 		DockerfileDir: ".",
 		LogOutput:     io.Discard,
 		StartupWait:   wait.ForListeningPort(defaultAppPort + "/tcp").WithStartupTimeout(defaultStartupTimeout),
@@ -63,11 +65,12 @@ func NewContainer(ctx context.Context, opts ...Option) (*Container, error) {
 
 	req := testcontainers.ContainerRequest{
 		Name: cfg.Name,
-		FromDockerfile: testcontainers.FromDockerfile{
-			Context:        cfg.DockerfileDir,
-			Dockerfile:     cfg.Dockerfile,
-			BuildLogWriter: cfg.LogOutput,
-		},
+		//FromDockerfile: testcontainers.FromDockerfile{
+		//	Context:        cfg.DockerfileDir,
+		//	Dockerfile:     cfg.Dockerfile,
+		//	BuildLogWriter: cfg.LogOutput,
+		//},
+		Image:              cfg.Image,
 		Networks:           cfg.Networks,
 		Env:                cfg.Env,
 		WaitingFor:         cfg.StartupWait,
