@@ -1,5 +1,3 @@
-//go:build integration
-
 package integration
 
 import (
@@ -39,7 +37,7 @@ var _ = ginkgo.BeforeSuite(func() {
 	suiteCtx, suiteCancel = context.WithTimeout(context.Background(), testsTimeout)
 
 	// Загружаем .env и устанавливаем переменные в окружение
-	envVars, err := godotenv.Read(filepath.Join("..", "..", "deploy", "compose", "inventory", ".env"))
+	envVars, err := godotenv.Read(filepath.Join("..", "..", "..", "deploy", "compose", "inventory", ".env"))
 	if err != nil {
 		logger.Fatal(suiteCtx, "❌ Не удалось загрузить .env файл", zap.Error(err))
 	}

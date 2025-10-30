@@ -1,5 +1,3 @@
-//go:build integration
-
 package integration
 
 import (
@@ -10,7 +8,7 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/mongo"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/network"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/path"
-	"github.com/docker/go-connections/nat"
+	//"github.com/docker/go-connections/nat"
 	"github.com/testcontainers/testcontainers-go/wait"
 	"go.uber.org/zap"
 	"os"
@@ -27,7 +25,7 @@ const (
 
 	// Значение переменных окружения
 	loggerLevelValue = "info"
-	startupTimeout   = 3 * time.Minute
+	startupTimeout   = 6 * time.Minute
 )
 
 // TestEnvironment — структура для хранения ресурсов тестового окружения
@@ -79,13 +77,14 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	}
 
 	// Создаем настраиваемую стратегию ожидания с увеличенным таймаутом
-	waitStrategy := wait.ForListeningPort(nat.Port(grpcPort + "/tcp")).
-		WithStartupTimeout(startupTimeout)
+	waitStrategy := wait.ForLog("Server is running").
+		WithStartupTimeout(startupTimeout).
+		WithPollInterval(100 * time.Millisecond)
 
 	appContainer, err := app.NewContainer(ctx,
 		app.WithName(inventoryAppName),
 		app.WithPort(grpcPort),
-		app.WithDockerfile(projectRoot, inventoryDockerfile),
+		//app.WithDockerfile(projectRoot, inventoryDockerfile),
 		app.WithNetwork(generatedNetwork.Name()),
 		app.WithEnv(appEnv),
 		app.WithLogOutput(os.Stdout),

@@ -4,11 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
-	"go.uber.org/zap"
-
 	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
+	"github.com/google/uuid"
 )
 
 func (s *service) Pay(ctx context.Context, orderID uuid.UUID, paymentMethod model.PaymentMethod) (uuid.UUID, error) {
@@ -27,7 +24,7 @@ func (s *service) Pay(ctx context.Context, orderID uuid.UUID, paymentMethod mode
 	// Оплачиваем заказ
 	strTransactionUUID, err := s.paymentClient.PayOrder(ctxReq, order.UUID, order.UserUUID, paymentMethod)
 	if err != nil {
-		logger.Error(ctx, "Превышено время запроса к InventoryService", zap.Error(err))
+		//logger.Error(ctx, "Превышено время запроса к InventoryService", zap.Error(err))
 		return uuid.Nil, context.DeadlineExceeded
 	}
 

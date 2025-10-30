@@ -419,7 +419,7 @@ tasks:
         for mod in {{.MODULES}}; do
           if [ -d "$mod" ]; then
             echo "🧪 Тестируем модуль $mod (только юнит-тесты)"
-            go test -v -tags="!integration" $(go list ./$mod/... | grep -v -E '(/integration|/tests/integration|/integrationtests)') || ERR=1
+            go test -v -tags="!integration" $(go list ./$mod/... | grep -v -E '(/integration|/tests/integration|/integrationtests|/tests/e2e)') || ERR=1
           fi
         done
         exit $ERR
@@ -824,3 +824,11 @@ tasks:
           fi
         done
         exit $ERR
+
+  integration:test:inventory:
+      desc: "Запускает integration тесты для Inventory сервиса"
+      dir: inventory/tests/integration
+      cmds:
+        - echo "🚀 Запуск integration тестов UFO сервиса..."
+        - cd ../../ && go mod tidy
+        - go test -tags=integration -v ./...
