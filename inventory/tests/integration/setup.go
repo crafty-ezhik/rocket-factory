@@ -45,8 +45,6 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 		logger.Fatal(ctx, "❌ Не удалось создать общую сеть", zap.Error(err))
 	}
 
-	logger.Info(ctx, "🔥 Название сети:", zap.String("networkName", generatedNetwork.Name())) // critical: Удалить потом
-
 	// Получаем переменные окружения для MongoDB с проверкой на наличие
 	mongoUsername := getEnvWithLogging(ctx, testcontainers.MongoUsernameKey)
 	mongoPassword := getEnvWithLogging(ctx, testcontainers.MongoPasswordKey)
@@ -54,25 +52,8 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	mongoDatabase := getEnvWithLogging(ctx, testcontainers.MongoDatabaseKey)
 	mongoAuthDb := getEnvWithLogging(ctx, testcontainers.MongoAuthDBKey)
 
-	logger.Info(ctx, "🔥 Переменные окружения MongoDB", // critical: Удалить потом
-		zap.String("username", mongoUsername),
-		zap.String("password", mongoPassword),
-		zap.String("database", mongoDatabase),
-		zap.String("image", mongoImageName),
-		zap.String("authdbname", mongoAuthDb),
-	)
-
 	// Получаем порт gRPC для waitStrategy
 	grpcPort := getEnvWithLogging(ctx, grpcPortKey)
-
-	logger.Info(ctx, "🔥 Параметры запуска Mongo", // critical: Удалить потом
-		zap.String("network", generatedNetwork.Name()),
-		zap.String("containerName", testcontainers.MongoContainerName),
-		zap.String("containerImage", mongoImageName),
-		zap.String("database", mongoDatabase),
-		zap.String("username", mongoUsername),
-		zap.String("password", mongoPassword),
-	)
 
 	// Шаг 2: Запускаем контейнер с MongoDB
 	generatedMongo, err := mongo.NewContainer(ctx,
@@ -91,10 +72,6 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	logger.Info(ctx, "✅ Контейнер MongoDB успешно запущен")
 
 	// Шаг 3: Запускаем контейнер с приложением
-	// projectRoot := path.GetProjectRoot()
-
-	logger.Info(ctx, "🔥 Имя контейнера MongoDB", zap.String("containerName", generatedMongo.Config().ContainerName)) // critical: Удалить потом
-
 	appEnv := map[string]string{
 		// Переопределяем хост MongoDB для подключения к контейнеру из testcontainers
 		testcontainers.MongoHostKey: generatedMongo.Config().ContainerName,
@@ -104,14 +81,6 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	waitStrategy := wait.ForLog("=== INVENTORY SERVICE STARTED ===").
 		WithStartupTimeout(90 * time.Second).
 		WithPollInterval(500 * time.Millisecond)
-
-	logger.Info(ctx, "🔥 Параметры запуска контейнера с приложением", // critical: Удалить потом
-		zap.String("name", inventoryAppName),
-		zap.String("port", grpcPort),
-		zap.String("image", inventoryImageName),
-		zap.String("networkName", generatedNetwork.Name()),
-		zap.Any("env", appEnv),
-	)
 
 	appContainer, err := app.NewContainer(ctx,
 		app.WithName(inventoryAppName),
