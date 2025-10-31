@@ -67,7 +67,7 @@ func (d *diContainer) MongoDBClient(ctx context.Context) *mongo.Client {
 			panic(fmt.Sprintf("failed to connect to MongoDB: %s\n", err.Error()))
 		}
 
-		pingCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+		pingCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
 		defer cancel()
 
 		err = client.Ping(pingCtx, readpref.Primary())

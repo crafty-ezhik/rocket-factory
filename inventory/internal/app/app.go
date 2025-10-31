@@ -199,6 +199,7 @@ func (a *App) initHTTPGateway(ctx context.Context) error {
 
 func (a *App) runGRPCServer(ctx context.Context) error {
 	logger.Info(ctx, fmt.Sprintf("🚀 gRPC InventoryService server listening on %s", config.AppConfig().InventoryGRPC.Address()))
+	logger.Info(ctx, "=== INVENTORY SERVICE STARTED ===")
 	if err := a.grpcServer.Serve(a.listener); err != nil {
 		return err
 	}

@@ -18,7 +18,7 @@ import (
 
 const (
 	defaultAppName        = "app"
-	defaultAppPort        = "50051"
+	defaultAppPort        = "50052"
 	defaultStartupTimeout = 1 * time.Minute
 )
 

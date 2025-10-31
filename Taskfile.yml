@@ -829,6 +829,6 @@ tasks:
       desc: "Запускает integration тесты для Inventory сервиса"
       dir: inventory/tests/integration
       cmds:
-        - echo "🚀 Запуск integration тестов UFO сервиса..."
+        - echo "🚀 Запуск integration тестов Inventory сервиса..."
         - cd ../../ && go mod tidy
         - go test -tags=integration -v ./...

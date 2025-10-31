@@ -25,7 +25,7 @@ func (env *TestEnvironment) InsertTestPart(ctx context.Context) (string, error) 
 		Description:   gofakeit.Phrase(),
 		Price:         gofakeit.Float64Range(0, 1000),
 		StockQuantity: int64(gofakeit.IntN(100)),
-		Category:      gofakeit.Word(),
+		Category:      "FUEL",
 		Dimensions: &model.Dimensions{
 			Length: gofakeit.Float64Range(0, 1000),
 			Width:  gofakeit.Float64Range(0, 1000),
