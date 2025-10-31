@@ -2,8 +2,10 @@ package integration
 
 import (
 	"context"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
+
 	"go.uber.org/zap"
+
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
 
 // teardownTestEnvironment — освобождает все ресурсы тестового окружения
@@ -24,7 +26,6 @@ func cleanupTestEnvironment(ctx context.Context, env *TestEnvironment) {
 		} else {
 			logger.Info(ctx, "🛑 Контейнер приложения остановлен")
 		}
-
 	}
 
 	if env.Mongo != nil {
@@ -41,6 +42,5 @@ func cleanupTestEnvironment(ctx context.Context, env *TestEnvironment) {
 		} else {
 			logger.Info(ctx, "🛑 Сеть удалена")
 		}
-
 	}
 }

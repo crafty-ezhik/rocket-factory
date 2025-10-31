@@ -2,17 +2,17 @@ package integration
 
 import (
 	"context"
+	"os"
+	"time"
+
+	"github.com/testcontainers/testcontainers-go/wait"
+	"go.uber.org/zap"
+
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/app"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/mongo"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/network"
-	//"github.com/crafty-ezhik/rocket-factory/platform/pkg/testcontainers/path"
-	//"github.com/docker/go-connections/nat"
-	"github.com/testcontainers/testcontainers-go/wait"
-	"go.uber.org/zap"
-	"os"
-	"time"
 )
 
 const (
@@ -91,7 +91,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	logger.Info(ctx, "✅ Контейнер MongoDB успешно запущен")
 
 	// Шаг 3: Запускаем контейнер с приложением
-	//projectRoot := path.GetProjectRoot()
+	// projectRoot := path.GetProjectRoot()
 
 	logger.Info(ctx, "🔥 Имя контейнера MongoDB", zap.String("containerName", generatedMongo.Config().ContainerName)) // critical: Удалить потом
 
@@ -116,7 +116,7 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	appContainer, err := app.NewContainer(ctx,
 		app.WithName(inventoryAppName),
 		app.WithPort(grpcPort),
-		//app.WithDockerfile(projectRoot, inventoryDockerfile),
+		// app.WithDockerfile(projectRoot, inventoryDockerfile),
 		app.WithImage(inventoryImageName),
 		app.WithNetwork(generatedNetwork.Name()),
 		app.WithEnv(appEnv),

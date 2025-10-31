@@ -65,11 +65,11 @@ func NewContainer(ctx context.Context, opts ...Option) (*Container, error) {
 
 	req := testcontainers.ContainerRequest{
 		Name: cfg.Name,
-		//FromDockerfile: testcontainers.FromDockerfile{
+		// FromDockerfile: testcontainers.FromDockerfile{
 		//	Context:        cfg.DockerfileDir,
 		//	Dockerfile:     cfg.Dockerfile,
 		//	BuildLogWriter: cfg.LogOutput,
-		//},
+		// },
 		Image:              cfg.Image,
 		Networks:           cfg.Networks,
 		Env:                cfg.Env,

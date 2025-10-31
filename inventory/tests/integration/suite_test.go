@@ -3,15 +3,17 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
-	"github.com/joho/godotenv"
-	"github.com/onsi/ginkgo/v2"
-	"github.com/onsi/gomega"
-	"go.uber.org/zap"
 	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/onsi/ginkgo/v2"
+	"github.com/onsi/gomega"
+	"go.uber.org/zap"
+
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
 
 const testsTimeout = 5 * time.Minute

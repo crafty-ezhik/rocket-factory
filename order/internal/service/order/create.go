@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
 
 func (s *service) Create(ctx context.Context, userID uuid.UUID, partsIDs []uuid.UUID) (uuid.UUID, float64, error) {
@@ -17,7 +18,7 @@ func (s *service) Create(ctx context.Context, userID uuid.UUID, partsIDs []uuid.
 
 	parts, err := s.inventoryClient.ListParts(ctxReq, model.PartsFilter{UUIDs: partStrUUIDs})
 	if err != nil {
-		//logger.Error(ctx, "Превышено время запроса к InventoryService", zap.Error(err))
+		// logger.Error(ctx, "Превышено время запроса к InventoryService", zap.Error(err))
 		return uuid.Nil, 0, context.DeadlineExceeded
 	}
 

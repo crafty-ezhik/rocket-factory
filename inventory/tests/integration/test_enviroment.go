@@ -2,15 +2,17 @@ package integration
 
 import (
 	"context"
+	"os"
+	"time"
+
 	"github.com/brianvoe/gofakeit/v7"
-	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
-	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"os"
-	"time"
+
+	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
+	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 
 // InsertTestPart - вставляет тестовую деталь в коллекцию Mongo и возвращает ее UUID
