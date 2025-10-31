@@ -54,7 +54,7 @@ jobs:
         run: |
           echo "🐳 Build inventory service app image "
           docker system prune -a --volumes -f
-          docker build --no-cache -t inventory-app:latest -f inventory/inventory.Dockerfile .
+          docker build --no-cache -t inventory-app:latest -f inventory/Dockerfile .
 
       - name: 🧪 Run integration tests via Taskfile
         env:
