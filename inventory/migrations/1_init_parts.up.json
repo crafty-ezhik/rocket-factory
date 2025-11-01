@@ -1,0 +1,15 @@
+[
+  {
+    "create": "parts"
+  },
+  {
+    "createIndexes": "parts",
+    "indexes": [
+      {
+        "key": { "part_uuid": 1 },
+        "name": "idx_part_uuid_unique",
+        "unique": true
+      }
+    ]
+  }
+]

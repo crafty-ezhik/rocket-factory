@@ -1,0 +1,9 @@
+[
+  {
+    "dropIndexes": "parts",
+    "index": "idx_part_uuid_unique"
+  },
+  {
+    "drop": "parts"
+  }
+]

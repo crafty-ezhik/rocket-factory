@@ -18,7 +18,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_user_uuid ON orders (user_uuid);
 
 
 -- +goose Down
-DROP TABLE orders
+DROP TABLE orders;
 
 -- удаляем таблицу заказов
 DROP TABLE IF EXISTS orders;
