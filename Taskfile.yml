@@ -2,6 +2,7 @@ version: '3'
 
 # Глобальные переменные проекта
 vars:
+  # Версии утилит
   GO_VERSION: '1.24'
   GOLANGCI_LINT_VERSION: 'v2.1.5'
   GCI_VERSION: 'v0.13.6'
@@ -16,7 +17,9 @@ vars:
   YQ_VERSION: 'v4.45.2'
   GRPCURL_VERSION: 'v1.9.3'
   MOCKERY_VERSION: 'v3.5.5'
+  ENVSUBST_VERSION: 'v1.4.3'
 
+  # Пусть до утилит
   BIN_DIR: '{{.ROOT_DIR}}/bin'
   GOLANGCI_LINT: '{{.BIN_DIR}}/golangci-lint'
   GCI: '{{.BIN_DIR}}/gci'
@@ -31,20 +34,26 @@ vars:
   PROTOC_GEN_OPENAPIV2: '{{.BIN_DIR}}/protoc-gen-openapiv2'
   GRPCURL: '{{.BIN_DIR}}/grpcurl'
   MOCKERY: "{{.BIN_DIR}}/mockery"
+  ENVSUBST: '{{.BIN_DIR}}/envsubst'
+  ENVDIR: '{{.ROOT_DIR}}/deploy/env'
 
+  # Путь до утилит для генерации OpenAPI декларации
   NODE_MODULES_DIR: '{{.ROOT_DIR}}/node_modules/.bin'
   REDOCLY: '{{.NODE_MODULES_DIR}}/redocly'
 
+  # Пути для частичной и полной OpenAPI декларации
   OPEN_API_ORDER_V1_BASE: '{{.ROOT_DIR}}/shared/api/order/v1/order.openapi.yaml'
   OPEN_API_ORDER_V1_BUNDLE: '{{.ROOT_DIR}}/shared/api/bundles/order.openapi.v1.bundle.yaml'
 
+  # Путь для сохранения сгенерированной openAPI декларации
   OPEN_API_FILES: '{{.ROOT_DIR}}/shared/api/bundles'
+
+  # Путь для файлов, связанный с покрытием кода тестами
   COVERAGE_DIR: '{{.ROOT_DIR}}/coverage'
   COVERAGE_FILE: total.out
 
-  ENV_FILE: '{{.ROOT_DIR}}/.env'
-
   MODULES: assembly inventory order payment platform iam notification
+  SERVICES: core,assembly,inventory,order,payment,iam,notification
 
 tasks:
   install-formatters:
@@ -402,13 +411,15 @@ tasks:
     summary: |
       Запускает юнит-тесты для указанных модулей проекта.
       Можно указать конкретные модули через переменную MODULES.
+      Исключаются интеграционные тесты в директориях integration и tests/integration.
+      Также исключаются тесты с тегом "integration".
     cmds:
       - |
         ERR=0
         for mod in {{.MODULES}}; do
           if [ -d "$mod" ]; then
-            echo "🧪 Тестируем модуль $mod"
-            go test -v ./$mod/... || ERR=1
+            echo "🧪 Тестируем модуль $mod (только юнит-тесты)"
+            go test -v -tags="!integration" $(go list ./$mod/... | grep -v -E '(/integration|/tests/integration|/integrationtests|/tests/e2e)') || ERR=1
           fi
         done
         exit $ERR
@@ -432,28 +443,28 @@ tasks:
     dir: deploy/compose/inventory
     cmds:
       - echo "[task] 📦 Поднимаем Inventory с зависимостями"
-      - docker compose --env-file {{.ENV_FILE}} up --build --detach
+      - docker compose up --build --detach
 
   down-inventory:
     desc: Остановить и удалить Inventory сервис и все его зависимости
     dir: deploy/compose/inventory
     cmds:
       - echo "[task] 🛑 Останавливаем Inventory с зависимостями"
-      - docker compose --env-file {{.ENV_FILE}} down --volumes
+      - docker compose down --volumes
 
   up-order:
     desc: Поднять Order сервис и все его зависимости
     dir: deploy/compose/order
     cmds:
       - echo "[task] 📦 Поднимаем Order с зависимостями"
-      - docker compose --env-file {{.ENV_FILE}} up --build --detach
+      - docker compose up --build --detach
 
   down-order:
     desc: Остановить и удалить Order сервис и все его зависимости
     dir: deploy/compose/order
     cmds:
       - echo "[task] 🛑 Останавливаем Order с зависимостями"
-      - docker compose --env-file {{.ENV_FILE}} down --volumes
+      - docker compose  down --volumes
 
   up-all:
     desc: Поднять все сервисы по очереди вместе с зависимостями
@@ -468,6 +479,41 @@ tasks:
       - task down-core
       - task down-inventory
       - task down-order
+
+  env:install-envsubst:
+    desc: "Устанавливает envsubst в bin/"
+    cmds:
+      - |
+        [ -f {{.ENVSUBST}} ] || {
+          echo "📦 Устанавливаем envsubst версии {{.ENVSUBST_VERSION}}..."
+          GOBIN={{.BIN_DIR}} go install github.com/a8m/envsubst/cmd/envsubst@{{.ENVSUBST_VERSION}}
+        }
+        echo "✅ envsubst установлен: {{.ENVSUBST}}"
+
+  env:generate:
+    desc: "Генерирует .env файлы для всех сервисов из шаблонов и единого файла конфигурации"
+    deps: [ env:install-envsubst ]
+    cmds:
+      - |
+        ENV_FILE="{{.ENVDIR}}/.env"
+        TEMPLATE_FILE="{{.ENVDIR}}/.env.template"
+        SCRIPT="{{.ENVDIR}}/generate-env.sh"
+
+        if [ ! -f "$ENV_FILE" ]; then
+          if [ -f "$TEMPLATE_FILE" ]; then
+            echo "🔄 Файл $ENV_FILE не найден, создаем из шаблона $TEMPLATE_FILE"
+            cp "$TEMPLATE_FILE" "$ENV_FILE"
+            echo "✅ Создан файл $ENV_FILE. Проверьте и отредактируйте значения переменных при необходимости."
+          else
+            echo "❌ Шаблон $TEMPLATE_FILE не найден!"
+            exit 1
+          fi
+        fi
+
+        chmod +x "$SCRIPT"
+        # Передаем список сервисов в виде строки с разделителями-запятыми
+        export SERVICES="{{.SERVICES}}"
+        ENV_SUBST={{.ENVSUBST}} "$SCRIPT"
 
   test-api:
     desc: "🧪 Запуск тестов для проверки API микросервисов"
@@ -750,3 +796,39 @@ tasks:
         
         echo
         echo "🎉 Все тесты API успешно выполнены!"
+
+
+  test-integration:
+    desc: "Запускает интеграционные тесты для указанных модулей"
+    summary: |
+      Запускает интеграционные тесты для модулей, указанных через переменную MODULES.
+      Использует тег "integration" для идентификации интеграционных тестов.
+    cmds:
+      - |
+        ERR=0
+        echo "🚀 Запуск интеграционных тестов (по тегу integration) для модулей: {{.MODULES}}"
+        for mod in {{.MODULES}}; do
+          if [ -d "$mod" ]; then
+            echo "🧪 Проверка модуля $mod на наличие интеграционных тестов"
+        
+            # Проверяем наличие файлов с тегом integration
+            HAS_TESTS=$(grep -r "//go:build integration" $mod --include="*.go" | wc -l)
+        
+            if [ "$HAS_TESTS" -eq 0 ]; then
+              echo "⚠️ Модуль $mod не содержит интеграционных тестов (с тегом integration), пропускаем"
+              continue
+            fi
+        
+            echo "▶️ Запуск интеграционных тестов для $mod"
+            go test -v -tags=integration ./$mod/... || ERR=1
+          fi
+        done
+        exit $ERR
+
+  integration:test:inventory:
+      desc: "Запускает integration тесты для Inventory сервиса"
+      dir: inventory/tests/integration
+      cmds:
+        - echo "🚀 Запуск integration тестов Inventory сервиса..."
+        - cd ../../ && go mod tidy
+        - go test -tags=integration -v ./...

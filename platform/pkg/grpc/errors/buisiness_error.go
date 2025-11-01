@@ -2,9 +2,9 @@ package errors
 
 import (
 	"errors"
+
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"net/http"
 )
 
 type ErrorCode int64
@@ -81,30 +81,5 @@ func errCodeToGRPCCode(code ErrorCode) codes.Code {
 		return codes.Canceled
 	default:
 		return codes.Unknown
-	}
-}
-
-func errCodeToHTTPCode(code ErrorCode) int {
-	switch code {
-	case BadRequestErrCode:
-		return http.StatusBadRequest
-	case UnauthorizedErrCode:
-		return http.StatusUnauthorized
-	case ForbiddenErrCode:
-		return http.StatusForbidden
-	case NotFoundErrCode:
-		return http.StatusNotFound
-	case MethodNotAllowedErrCode:
-		return http.StatusMethodNotAllowed
-	case RequestTimeoutErrCode:
-		return http.StatusRequestTimeout
-	case TooManyRequestsErrCode:
-		return http.StatusTooManyRequests
-	case InternalServiceErrCode:
-		return http.StatusInternalServerError
-	case ServiceUnavailableErrCode:
-		return http.StatusServiceUnavailable
-	default:
-		return http.StatusInternalServerError
 	}
 }

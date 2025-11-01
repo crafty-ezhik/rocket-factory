@@ -1,4 +1,4 @@
-package migrator
+package pg
 
 import (
 	"database/sql"
@@ -11,7 +11,7 @@ type Migrator struct {
 	migrationsDir string
 }
 
-func NewMigrator(db *sql.DB, migrationsDir string) *Migrator {
+func NewPgMigrator(db *sql.DB, migrationsDir string) *Migrator {
 	return &Migrator{
 		db:            db,
 		migrationsDir: migrationsDir,

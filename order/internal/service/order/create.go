@@ -18,6 +18,7 @@ func (s *service) Create(ctx context.Context, userID uuid.UUID, partsIDs []uuid.
 
 	parts, err := s.inventoryClient.ListParts(ctxReq, model.PartsFilter{UUIDs: partStrUUIDs})
 	if err != nil {
+		// logger.Error(ctx, "Превышено время запроса к InventoryService", zap.Error(err))
 		return uuid.Nil, 0, context.DeadlineExceeded
 	}
 

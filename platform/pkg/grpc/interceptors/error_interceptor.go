@@ -3,10 +3,12 @@ package interceptors
 import (
 	"context"
 	"errors"
-	businessErrs "github.com/crafty-ezhik/rocket-factory/shared/pkg/errors"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	businessErrs "github.com/crafty-ezhik/rocket-factory/platform/pkg/grpc/errors"
 )
 
 func UnaryErrorInterceptor() grpc.UnaryServerInterceptor {
