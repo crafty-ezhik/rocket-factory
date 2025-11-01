@@ -41,10 +41,36 @@ services: # Здесь описываются контейнеры, необхо
       - microservices-net
       # Подключаем контейнер к общей сети всех микросервисов, чтобы они могли взаимодействовать между собой по имени
 
+  migrator:
+    build:
+      context: ../../docker/db_migrator
+      dockerfile: Dockerfile
+
+    env_file:
+      - .env
+
+    depends_on:
+        - mongo-inventory
+
+    command: [
+        "-path", "/migrations",
+        "-database", "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo-inventory:${MONGO_PORT}/${MONGO_DATABASE}?authSource=${MONGO_AUTH_DB}",
+        "up"
+      ]
+
+    volumes:
+      # Прокидываем директорию с файлами миграции MongoDB в контейнер
+      - ../../../inventory/migrations:/migrations
+
+    networks:
+      - microservices-net
+
 volumes: # Раздел с томами — определяем хранилище, которое создаст Docker
   mongo_inventory_data:
   # Именованный том, в котором будут храниться данные MongoDB для Inventory-сервиса
   # Он живёт отдельно от контейнера и сохраняется даже после удаления контейнера
+
+
 
 networks: # Определение используемой сети
   microservices-net:
