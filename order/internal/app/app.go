@@ -8,14 +8,12 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/jackc/pgx/v5/stdlib"
 	"go.uber.org/zap"
 
 	"github.com/crafty-ezhik/rocket-factory/order/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/closer"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/migrator"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/migrator/pg"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
 )
 
@@ -36,9 +34,6 @@ func New(ctx context.Context) (*App, error) {
 }
 
 func (a *App) Run(ctx context.Context) error {
-	if err := a.runMigrator(ctx); err != nil {
-		return err
-	}
 	return a.runHTTPServer(ctx)
 }
 
@@ -48,7 +43,6 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initLogger,
 		a.initCloser,
 		a.initHTTPServer,
-		a.initMigrator,
 	}
 
 	for _, f := range inits {
@@ -73,15 +67,6 @@ func (a *App) initLogger(_ context.Context) error {
 
 func (a *App) initCloser(_ context.Context) error {
 	closer.SetLogger(logger.Logger())
-	return nil
-}
-
-func (a *App) initMigrator(_ context.Context) error {
-	a.migrator = pg.NewPgMigrator(stdlib.OpenDB(
-		*a.diContainer.pgConnPool.Config().ConnConfig.Copy()),
-		config.AppConfig().Postgres.MigrationsDir(),
-	)
-
 	return nil
 }
 
@@ -131,13 +116,5 @@ func (a *App) runHTTPServer(ctx context.Context) error {
 		return err
 	}
 
-	return nil
-}
-
-func (a *App) runMigrator(ctx context.Context) error {
-	if err := a.migrator.Up(); err != nil {
-		logger.Error(ctx, "❌ Ошибка миграции базы данных", zap.Error(err))
-		return err
-	}
 	return nil
 }
