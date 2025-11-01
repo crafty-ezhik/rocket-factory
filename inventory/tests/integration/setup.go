@@ -55,6 +55,15 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	// Получаем порт gRPC для waitStrategy
 	grpcPort := getEnvWithLogging(ctx, grpcPortKey)
 
+	logger.Info(ctx, "🔥 Параметры запуска Mongo",
+		zap.String("network", generatedNetwork.Name()),
+		zap.String("containerName", testcontainers.MongoContainerName),
+		zap.String("containerImage", mongoImageName),
+		zap.String("database", mongoDatabase),
+		zap.String("username", mongoUsername),
+		zap.String("password", mongoPassword),
+	)
+
 	// Шаг 2: Запускаем контейнер с MongoDB
 	generatedMongo, err := mongo.NewContainer(ctx,
 		mongo.WithNetworkName(generatedNetwork.Name()),
@@ -71,12 +80,24 @@ func setupTestEnvironment(ctx context.Context) *TestEnvironment {
 	}
 	logger.Info(ctx, "✅ Контейнер MongoDB успешно запущен")
 
+	logger.Info(ctx, "🔥 Имя контейнера MongoDB", zap.String("containerName", generatedMongo.Config().ContainerName))
+	logger.Info(ctx, "🔥 Имя контейнера MongoDB", zap.String("containerName", generatedMongo.Config().ContainerName))
+	logger.Info(ctx, "🔥 Имя контейнера MongoDB", zap.String("containerName", generatedMongo.Config().ContainerName))
+
 	// Шаг 3: Запускаем контейнер с приложением
 	appEnv := map[string]string{
 		// Переопределяем хост MongoDB для подключения к контейнеру из testcontainers
 		testcontainers.MongoHostKey: generatedMongo.Config().ContainerName,
-		"EXTERNAL_MONGO_PORT":       generatedMongo.Config().Port,
+		"EXTERNAL_MONGO_PORT":       testcontainers.MongoPort,
 	}
+
+	logger.Info(ctx, "🔥 Параметры запуска контейнера с приложением",
+		zap.String("name", inventoryAppName),
+		zap.String("port", grpcPort),
+		zap.String("image", inventoryImageName),
+		zap.String("networkName", generatedNetwork.Name()),
+		zap.Any("env", appEnv),
+	)
 
 	// Создаем настраиваемую стратегию ожидания с увеличенным таймаутом
 	waitStrategy := wait.ForLog("=== INVENTORY SERVICE STARTED ===").
