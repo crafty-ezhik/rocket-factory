@@ -3,8 +3,9 @@ package part
 import (
 	"context"
 
-	def "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository"
 	"go.mongodb.org/mongo-driver/mongo"
+
+	def "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository"
 )
 
 var _ def.InventoryRepository = (*repository)(nil)

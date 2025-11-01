@@ -13,14 +13,12 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/order/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/closer"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/migrator"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
 )
 
 type App struct {
 	diContainer *diContainer
 	httpServer  *http.Server
-	migrator    migrator.PostgresMigrator
 }
 
 func New(ctx context.Context) (*App, error) {
