@@ -3,15 +3,16 @@ package part
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.uber.org/zap"
 
 	serviceModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/converter"
 	repoModel "github.com/crafty-ezhik/rocket-factory/inventory/internal/repository/model"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
 
 func (r *repository) List(ctx context.Context, filters serviceModel.PartsFilter) ([]serviceModel.Part, error) {
@@ -19,17 +20,19 @@ func (r *repository) List(ctx context.Context, filters serviceModel.PartsFilter)
 
 	cursor, err := r.collection.Find(ctx, filtersToBson(filters))
 	if err != nil {
+		logger.Error(ctx, "Ошибка при поиске деталей", zap.Error(err))
 		return nil, fmt.Errorf("error finding parts: %w", err)
 	}
 	defer func() {
 		cerr := cursor.Close(ctx)
 		if cerr != nil {
-			log.Printf("error closing cursor: %v\n", cerr)
+			logger.Error(ctx, "error closing cursor", zap.Error(cerr))
 		}
 	}()
 
 	err = cursor.All(ctx, &filteredParts)
 	if err != nil {
+		logger.Error(ctx, "Ошибка получения деталей", zap.Error(err))
 		return nil, fmt.Errorf("error getting parts: %w", err)
 	}
 
@@ -44,33 +47,33 @@ func filtersToBson(filters serviceModel.PartsFilter) bson.M {
 	var conditions bson.A
 	if len(filters.UUIDs) > 0 {
 		conditions = append(conditions, bson.M{
-			"part_uuid": bson.M{"$in": uuidToBsonA(filters.UUIDs)},
+			partFieldPartUUID: bson.M{"$in": uuidToBsonA(filters.UUIDs)},
 		})
 	}
 	if len(filters.Names) > 0 {
 		if len(filters.Names) == 1 {
 			conditions = append(conditions, bson.M{
-				"name": bson.M{"$regex": filters.Names[0], "$options": "i"},
+				partFieldName: bson.M{"$regex": filters.Names[0], "$options": "i"},
 			})
 		} else {
 			conditions = append(conditions, bson.M{
-				"name": bson.M{"$in": filters.Names},
+				partFieldName: bson.M{"$in": filters.Names},
 			})
 		}
 	}
 	if len(filters.Categories) > 0 {
 		conditions = append(conditions, bson.M{
-			"category": bson.M{"$in": filters.Categories},
+			partFieldCategory: bson.M{"$in": filters.Categories},
 		})
 	}
 	if len(filters.ManufacturerCountry) > 0 {
 		conditions = append(conditions, bson.M{
-			"manufacturer.country": bson.M{"$in": filters.ManufacturerCountry},
+			partFieldManufacturerCountry: bson.M{"$in": filters.ManufacturerCountry},
 		})
 	}
 	if len(filters.Tags) > 0 {
 		conditions = append(conditions, bson.M{
-			"tags": bson.M{"$in": filters.Tags},
+			partFieldTags: bson.M{"$in": filters.Tags},
 		})
 	}
 
