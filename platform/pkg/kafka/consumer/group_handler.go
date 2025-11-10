@@ -3,11 +3,12 @@ package consumer
 import (
 	"context"
 	"github.com/IBM/sarama"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"
 	"go.uber.org/zap"
 )
 
 // MessageHandler — обработчик сообщений.
-type MessageHandler func(ctx context.Context, msg Message) error
+type MessageHandler func(ctx context.Context, msg kafka.Message) error
 
 // Middleware — функция middleware для дополнительной обработки.
 type Middleware func(next MessageHandler) MessageHandler
@@ -44,7 +45,7 @@ func (g *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 			}
 
 			// Преобразуем сообщение из Kafka к нашей универсальной обертке
-			msg := Message{
+			msg := kafka.Message{
 				Key:            message.Key,
 				Value:          message.Value,
 				Topic:          message.Topic,
