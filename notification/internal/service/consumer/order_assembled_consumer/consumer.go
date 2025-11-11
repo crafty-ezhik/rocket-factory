@@ -2,11 +2,13 @@ package order_assembled_consumer
 
 import (
 	"context"
+
+	"go.uber.org/zap"
+
 	kafkaConv "github.com/crafty-ezhik/rocket-factory/notification/internal/converter/kafka"
 	def "github.com/crafty-ezhik/rocket-factory/notification/internal/service"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
-	"go.uber.org/zap"
 )
 
 type service struct {

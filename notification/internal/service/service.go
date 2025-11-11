@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+
 	"github.com/crafty-ezhik/rocket-factory/notification/internal/model"
 )
 
