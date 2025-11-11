@@ -87,7 +87,7 @@ func (d *diContainer) OrderConsumerService(ctx context.Context) service.Consumer
 	if d.orderConsumerService == nil {
 		d.orderConsumerService = order_consumer.NewService(d.OrderAssembledConsumer(), d.PartRepository(ctx), d.OrderAssembledDecoder())
 	}
-	return nil
+	return d.orderConsumerService
 }
 
 func (d *diContainer) PartRepository(ctx context.Context) repository.OrderRepository {
@@ -234,7 +234,7 @@ func (d *diContainer) SyncProducer() sarama.SyncProducer {
 	if d.syncProducer == nil {
 		p, err := sarama.NewSyncProducer(
 			config.AppConfig().Kafka.Brokers(),
-			config.AppConfig().OrderAssembledConsumer.Config(),
+			config.AppConfig().OrderPaidProducer.Config(),
 		)
 		if err != nil {
 			panic(fmt.Sprintf("❌ Ошибка создания sync producer: %s\n", err.Error()))

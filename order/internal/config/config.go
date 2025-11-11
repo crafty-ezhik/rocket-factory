@@ -57,6 +57,11 @@ func Load(path ...string) error {
 		return err
 	}
 
+	kafkaConfig, err := env.NewKafkaConfig()
+	if err != nil {
+		return err
+	}
+
 	loggerConfig, err := env.NewLoggerConfig()
 	if err != nil {
 		return err
@@ -69,6 +74,7 @@ func Load(path ...string) error {
 		PaymentGRPC:            paymentGRPCConfig,
 		OrderAssembledConsumer: orderAssembledConsumerConfig,
 		OrderPaidProducer:      orderPaidProducerConfig,
+		Kafka:                  kafkaConfig,
 		Logger:                 loggerConfig,
 	}
 	return nil

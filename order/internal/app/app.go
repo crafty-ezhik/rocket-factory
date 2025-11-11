@@ -151,7 +151,7 @@ func (a *App) runHTTPServer(ctx context.Context) error {
 func (a *App) runConsumer(ctx context.Context) error {
 	logger.Info(ctx, "🚀 OrderPaid Kafka consumer запущен")
 
-	err := a.diContainer.orderConsumerService.RunConsumer(ctx)
+	err := a.diContainer.OrderConsumerService(ctx).RunConsumer(ctx)
 	if err != nil {
 		return err
 	}
