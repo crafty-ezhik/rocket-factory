@@ -23,6 +23,6 @@ func (cfg *loggerConfig) Level() string {
 	return cfg.raw.Level
 }
 
-func (cfg *loggerConfig) AsJson() bool {
+func (cfg *loggerConfig) AsJSON() bool {
 	return cfg.raw.AsJson
 }

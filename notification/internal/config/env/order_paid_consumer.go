@@ -25,9 +25,11 @@ func NewOrderPaidConsumerConfig() (*orderPaidConsumerConfig, error) {
 func (cfg *orderPaidConsumerConfig) Topic() string {
 	return cfg.raw.TopicName
 }
+
 func (cfg *orderPaidConsumerConfig) GroupID() string {
 	return cfg.raw.GroupID
 }
+
 func (cfg *orderPaidConsumerConfig) Config() *sarama.Config {
 	config := sarama.NewConfig()
 	config.Version = sarama.V4_0_0_0
