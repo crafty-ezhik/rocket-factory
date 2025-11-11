@@ -12,7 +12,7 @@ import (
 
 type decoder struct{}
 
-func NewOrderAssemblerDecoder() *decoder { return &decoder{} }
+func NewOrderAssembledDecoder() *decoder { return &decoder{} }
 
 func (d *decoder) Decode(data []byte) (model.OrderAssembledEvent, error) {
 	var pb eventsV1.ShipAssembled

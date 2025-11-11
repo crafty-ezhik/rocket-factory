@@ -224,7 +224,7 @@ func (d *diContainer) OrderAssembledConsumer() wrapperKafka.Consumer {
 // OrderAssembledDecoder - Создается декодер для входящих событий
 func (d *diContainer) OrderAssembledDecoder() kafkaConv.OrderAssembledDecoder {
 	if d.orderAssembledDecoder == nil {
-		d.orderAssembledDecoder = decoder.NewOrderAssemblerDecoder()
+		d.orderAssembledDecoder = decoder.NewOrderAssembledDecoder()
 	}
 	return d.orderAssembledDecoder
 }
