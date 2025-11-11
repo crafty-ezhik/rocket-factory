@@ -48,3 +48,16 @@ packages:
   github.com/crafty-ezhik/rocket-factory/assembly/internal/config:
     config:
       include-interface-regex: .*Config
+
+  # === Notification Service ===
+  github.com/crafty-ezhik/rocket-factory/notification/internal/service:
+    config:
+      include-interface-regex: .*Service
+
+  github.com/crafty-ezhik/rocket-factory/notification/internal/config:
+    config:
+      include-interface-regex: .*Config
+
+  github.com/crafty-ezhik/rocket-factory/notification/internal/client/grpc:
+    config:
+      include-interface-regex: .*Client
