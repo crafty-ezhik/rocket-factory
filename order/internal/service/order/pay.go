@@ -2,9 +2,8 @@ package order
 
 import (
 	"context"
-	"time"
-
 	"github.com/google/uuid"
+	"time"
 
 	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 )
@@ -30,6 +29,18 @@ func (s *service) Pay(ctx context.Context, orderID uuid.UUID, paymentMethod mode
 	}
 
 	transactionUUID, err := uuid.Parse(strTransactionUUID)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	// Отправляем сообщение в Kafka для сборки заказа в Assembly Service
+	err = s.orderPaidProducer.ProduceOrderPaid(ctx, model.OrderPaidEvent{
+		EventUUID:       uuid.New(),
+		OrderUUID:       order.UUID,
+		UserUUID:        order.UserUUID,
+		PaymentMethod:   paymentMethod.String(),
+		TransactionUUID: transactionUUID,
+	})
 	if err != nil {
 		return uuid.Nil, err
 	}
