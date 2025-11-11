@@ -7,12 +7,18 @@ template-data:
   boilerplate-file: .mockery_boilerplate_text.txt
   unroll-variadic: true
 packages:
+  # === Inventory Service ===
   github.com/crafty-ezhik/rocket-factory/inventory/internal/repository:
     config:
       include-interface-regex: .*Repository
   github.com/crafty-ezhik/rocket-factory/inventory/internal/service:
     config:
       include-interface-regex: .*Service
+  github.com/crafty-ezhik/rocket-factory/inventory/internal/config:
+    config:
+      include-interface-regex: .*Config
+
+  # === Order Service ===
   github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc:
     config:
       include-interface-regex: .*Client
@@ -22,6 +28,23 @@ packages:
   github.com/crafty-ezhik/rocket-factory/order/internal/service:
     config:
       include-interface-regex: .*Service
+  github.com/crafty-ezhik/rocket-factory/order/internal/config:
+    config:
+      include-interface-regex: .*Config
+
+  # === Payment Service ===
   github.com/crafty-ezhik/rocket-factory/payment/internal/service:
     config:
       include-interface-regex: .*Service
+  github.com/crafty-ezhik/rocket-factory/payment/internal/config:
+    config:
+      include-interface-regex: .*Config
+
+  # === Assembly Service ===
+  github.com/crafty-ezhik/rocket-factory/assembly/internal/service:
+    config:
+      include-interface-regex: .*Service
+
+  github.com/crafty-ezhik/rocket-factory/assembly/internal/config:
+    config:
+      include-interface-regex: .*Config
