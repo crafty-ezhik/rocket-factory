@@ -2,10 +2,12 @@ package decoder
 
 import (
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
-	eventsV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/events/v1"
+
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
+	eventsV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/events/v1"
 )
 
 type decoder struct{}
@@ -41,5 +43,4 @@ func (d *decoder) Decode(data []byte) (model.OrderAssembledEvent, error) {
 	event.BuildTimeSec = int(pb.BuildTimeSec)
 
 	return event, nil
-
 }

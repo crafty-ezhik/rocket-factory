@@ -2,10 +2,12 @@ package order_consumer
 
 import (
 	"context"
+
+	"go.uber.org/zap"
+
 	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
-	"go.uber.org/zap"
 )
 
 func (s *service) OrderAssembledHandler(ctx context.Context, msg kafka.Message) error {

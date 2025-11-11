@@ -2,12 +2,14 @@ package order_producer
 
 import (
 	"context"
+
+	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
+
 	"github.com/crafty-ezhik/rocket-factory/order/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 	eventsV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/events/v1"
-	"go.uber.org/zap"
-	"google.golang.org/protobuf/proto"
 )
 
 type service struct {

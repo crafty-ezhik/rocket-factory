@@ -1,8 +1,9 @@
 package config
 
 import (
-	"github.com/IBM/sarama"
 	"time"
+
+	"github.com/IBM/sarama"
 )
 
 type PaymentGRPCConfig interface {

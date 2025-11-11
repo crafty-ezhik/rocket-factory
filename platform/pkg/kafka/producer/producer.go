@@ -2,6 +2,7 @@ package producer
 
 import (
 	"context"
+
 	"github.com/IBM/sarama"
 	"go.uber.org/zap"
 )
@@ -43,6 +44,6 @@ func (p *producer) Send(ctx context.Context, key, value []byte) error {
 		zap.String("key", string(key)),
 		zap.String("value", string(value)),
 	)
-	
+
 	return nil
 }

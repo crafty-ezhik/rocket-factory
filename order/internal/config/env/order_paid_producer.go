@@ -25,6 +25,7 @@ func NewOrderPaidProducerConfig() (*orderPaidProducerConfig, error) {
 func (cfg *orderPaidProducerConfig) Topic() string {
 	return cfg.raw.TopicName
 }
+
 func (cfg *orderPaidProducerConfig) Config() *sarama.Config {
 	config := sarama.NewConfig()
 	config.Version = sarama.V4_0_0_0

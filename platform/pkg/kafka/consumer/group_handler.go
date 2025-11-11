@@ -1,26 +1,23 @@
 package consumer
 
 import (
-	"context"
 	"github.com/IBM/sarama"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"
 	"go.uber.org/zap"
+
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"
 )
 
-// MessageHandler — обработчик сообщений.
-type MessageHandler func(ctx context.Context, msg kafka.Message) error
-
 // Middleware — функция middleware для дополнительной обработки.
-type Middleware func(next MessageHandler) MessageHandler
+type Middleware func(next kafka.MessageHandler) kafka.MessageHandler
 
 // groupHandler — обёртка для sarama.ConsumerGroupHandler
 type groupHandler struct {
-	handler MessageHandler
+	handler kafka.MessageHandler
 	logger  Logger
 }
 
 // NewGroupHandler создаёт новый groupHandler с middleware цепочкой.
-func NewGroupHandler(handler MessageHandler, logger Logger, middlewares ...Middleware) *groupHandler {
+func NewGroupHandler(handler kafka.MessageHandler, logger Logger, middlewares ...Middleware) *groupHandler {
 	// Применяем middleware цепочку
 	for i := len(middlewares) - 1; i >= 0; i-- {
 		handler = middlewares[i](handler)

@@ -32,7 +32,38 @@ func New(ctx context.Context) (*App, error) {
 }
 
 func (a *App) Run(ctx context.Context) error {
-	return a.runHTTPServer(ctx)
+	errCh := make(chan error, 2)
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// Запускаем консьюмер
+	go func() {
+		if err := a.runConsumer(ctx); err != nil {
+			errCh <- fmt.Errorf("consumer error: %w", err)
+		}
+	}()
+
+	// Запускаем HTTP-сервер
+	go func() {
+		if err := a.runHTTPServer(ctx); err != nil {
+			errCh <- fmt.Errorf("http server error: %w", err)
+		}
+	}()
+
+	select {
+	case err := <-errCh:
+		logger.Error(ctx, "❌ Компонент завершился с ошибкой, завершение работы", zap.Error(err))
+		// Триггерим cancel, чтобы остановить второй компонент
+		cancel()
+		// Дождись завершения всех задач (если есть graceful shutdown внутри)
+		<-ctx.Done()
+		return err
+	case <-ctx.Done():
+		logger.Info(ctx, "🔔 Получен сигнал завершения работы")
+	}
+
+	return nil
 }
 
 func (a *App) initDeps(ctx context.Context) error {
@@ -111,6 +142,17 @@ func (a *App) runHTTPServer(ctx context.Context) error {
 	err := a.httpServer.ListenAndServe()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		logger.Error(ctx, "❌ Ошибка запуска сервера", zap.Error(err))
+		return err
+	}
+
+	return nil
+}
+
+func (a *App) runConsumer(ctx context.Context) error {
+	logger.Info(ctx, "🚀 OrderPaid Kafka consumer запущен")
+
+	err := a.diContainer.orderConsumerService.RunConsumer(ctx)
+	if err != nil {
 		return err
 	}
 

@@ -2,12 +2,14 @@ package order_consumer
 
 import (
 	"context"
+
+	"go.uber.org/zap"
+
 	kafkaConv "github.com/crafty-ezhik/rocket-factory/order/internal/converter/kafka"
 	"github.com/crafty-ezhik/rocket-factory/order/internal/repository"
 	def "github.com/crafty-ezhik/rocket-factory/order/internal/service"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
-	"go.uber.org/zap"
 )
 
 var _ def.ConsumerService = (*service)(nil)
