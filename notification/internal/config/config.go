@@ -54,6 +54,6 @@ func Load(path ...string) error {
 	return nil
 }
 
-func (cfg *config) AppConfig() *config {
+func AppConfig() *config {
 	return appConfig
 }
