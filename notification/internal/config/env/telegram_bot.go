@@ -3,7 +3,7 @@ package env
 import "github.com/caarlos0/env/v11"
 
 type telegramBotEnvConfig struct {
-	Token string
+	Token string `env:"TELEGRAM_BOT_TOKEN,required"`
 }
 
 type telegramBotConfig struct {

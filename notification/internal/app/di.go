@@ -20,7 +20,6 @@ import (
 	wrapperKafka "github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"
 	wrapperKafkaConsumer "github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka/consumer"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
-	kafkaMiddleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/kafka"
 )
 
 type diContainer struct {
@@ -78,7 +77,7 @@ func (d *diContainer) OrderPaidConsumer() wrapperKafka.Consumer {
 				config.AppConfig().OrderPaidConsumer.Topic(),
 			},
 			logger.Logger(),
-			kafkaMiddleware.Logging(logger.Logger()),
+			// kafkaMiddleware.Logging(logger.Logger()),
 		)
 	}
 	return d.orderPaidConsumer
@@ -92,7 +91,7 @@ func (d *diContainer) OrderAssembledConsumer() wrapperKafka.Consumer {
 				config.AppConfig().OrderAssembledConsumer.Topic(),
 			},
 			logger.Logger(),
-			kafkaMiddleware.Logging(logger.Logger()),
+			// kafkaMiddleware.Logging(logger.Logger()),
 		)
 	}
 	return d.orderAssembledConsumer

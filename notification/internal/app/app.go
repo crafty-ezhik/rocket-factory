@@ -90,7 +90,8 @@ func (a *App) initCloser(_ context.Context) error {
 func (a *App) runPaidConsumer(ctx context.Context) error {
 	logger.Info(ctx, "🚀 OrderPaid Kafka consumer запущен")
 
-	err := a.diContainer.OrderPaidConsumerService().RunConsumer(ctx)
+	service := a.diContainer.OrderPaidConsumerService()
+	err := service.RunConsumer(ctx)
 	if err != nil {
 		return err
 	}
@@ -100,7 +101,8 @@ func (a *App) runPaidConsumer(ctx context.Context) error {
 func (a *App) runAssembledConsumer(ctx context.Context) error {
 	logger.Info(ctx, "🚀 OrderAssembled Kafka consumer запущен")
 
-	err := a.diContainer.OrderAssembledConsumerService().RunConsumer(ctx)
+	service := a.diContainer.OrderAssembledConsumerService()
+	err := service.RunConsumer(ctx)
 	if err != nil {
 		return err
 	}

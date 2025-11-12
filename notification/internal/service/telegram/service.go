@@ -3,7 +3,6 @@ package telegram
 import (
 	"bytes"
 	"context"
-	"embed"
 	"text/template"
 	"time"
 
@@ -11,14 +10,11 @@ import (
 
 	"github.com/crafty-ezhik/rocket-factory/notification/internal/client/http"
 	"github.com/crafty-ezhik/rocket-factory/notification/internal/model"
+	"github.com/crafty-ezhik/rocket-factory/notification/internal/service/telegram/templates"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
 
-const chatID = 12345678
-
-//go:embed templates/order_paid_notification.tmpl
-//go:embed templates/order_assembled_notification.tmpl
-var templateFS embed.FS
+const chatID = 31351153153
 
 type orderPaidTemplateData struct {
 	OrderUUID       string
@@ -33,8 +29,8 @@ type orderAssembledTemplateData struct {
 }
 
 var (
-	orderPaidTemplate      = template.Must(template.ParseFS(templateFS, "order_paid_notification.tmpl"))
-	orderAssembledTemplate = template.Must(template.ParseFS(templateFS, "order_assembled_notification.tmpl"))
+	orderPaidTemplate      = template.Must(template.ParseFS(templates.FS, "order_paid_notification.tmpl"))
+	orderAssembledTemplate = template.Must(template.ParseFS(templates.FS, "order_assembled_notification.tmpl"))
 )
 
 type service struct {
