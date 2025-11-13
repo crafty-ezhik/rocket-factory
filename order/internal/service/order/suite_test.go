@@ -2,13 +2,13 @@ package order
 
 import (
 	"context"
-	serviceMock "github.com/crafty-ezhik/rocket-factory/order/internal/service/mocks"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 
 	clientMock "github.com/crafty-ezhik/rocket-factory/order/internal/client/grpc/mocks"
 	repoMock "github.com/crafty-ezhik/rocket-factory/order/internal/repository/mocks"
+	serviceMock "github.com/crafty-ezhik/rocket-factory/order/internal/service/mocks"
 )
 
 type ServiceSuite struct {
