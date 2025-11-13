@@ -1,10 +1,10 @@
 package order_consumer
 
 import (
+	"context"
 	"time"
 
 	"go.uber.org/zap"
-	"golang.org/x/net/context"
 
 	"github.com/crafty-ezhik/rocket-factory/assembly/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka"

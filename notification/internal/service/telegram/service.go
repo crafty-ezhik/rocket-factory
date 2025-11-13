@@ -3,13 +3,13 @@ package telegram
 import (
 	"bytes"
 	"context"
-	"github.com/crafty-ezhik/rocket-factory/notification/internal/config"
 	"text/template"
 	"time"
 
 	"go.uber.org/zap"
 
 	"github.com/crafty-ezhik/rocket-factory/notification/internal/client/http"
+	"github.com/crafty-ezhik/rocket-factory/notification/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/notification/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/notification/internal/service/telegram/templates"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
