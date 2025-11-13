@@ -28,7 +28,7 @@ func NewService(orderAssembledConsumer kafka.Consumer, orderAssembledDecoder kaf
 func (s *service) RunConsumer(ctx context.Context) error {
 	logger.Info(ctx, "Starting orderAssembledConsumer service")
 
-	err := s.orderAssembledConsumer.Consume(ctx, nil)
+	err := s.orderAssembledConsumer.Consume(ctx, s.OrderAssembledHandler)
 	if err != nil {
 		logger.Error(ctx, "Consume from order.assembled topic error", zap.Error(err))
 		return err
