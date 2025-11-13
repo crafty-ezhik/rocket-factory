@@ -3,7 +3,8 @@ package env
 import "github.com/caarlos0/env/v11"
 
 type telegramBotEnvConfig struct {
-	Token string `env:"TELEGRAM_BOT_TOKEN,required"`
+	Token  string `env:"TELEGRAM_BOT_TOKEN,required"`
+	ChatID int64  `env:"CHAT_ID,required"`
 }
 
 type telegramBotConfig struct {
@@ -20,4 +21,8 @@ func NewTelegramBotConfig() (*telegramBotConfig, error) {
 
 func (cfg *telegramBotConfig) Token() string {
 	return cfg.raw.Token
+}
+
+func (cfg *telegramBotConfig) ChatID() int64 {
+	return cfg.raw.ChatID
 }

@@ -9,6 +9,7 @@ type LoggerConfig interface {
 
 type TelegramBotConfig interface {
 	Token() string
+	ChatID() int64
 }
 
 type OrderConsumerConfig interface {

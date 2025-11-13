@@ -3,6 +3,7 @@ package telegram
 import (
 	"bytes"
 	"context"
+	"github.com/crafty-ezhik/rocket-factory/notification/internal/config"
 	"text/template"
 	"time"
 
@@ -13,8 +14,6 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/notification/internal/service/telegram/templates"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
-
-const chatID = 31351153153
 
 type orderPaidTemplateData struct {
 	OrderUUID       string
@@ -44,6 +43,7 @@ func NewService(tgClient http.TelegramClient) *service {
 }
 
 func (s *service) SendOrderPaidNotification(ctx context.Context, msg model.OrderPaidEvent) error {
+	chatID := config.AppConfig().TgBot.ChatID()
 	message, err := s.buildPaidMsg(msg)
 	if err != nil {
 		return err
@@ -53,11 +53,13 @@ func (s *service) SendOrderPaidNotification(ctx context.Context, msg model.Order
 	if err != nil {
 		return err
 	}
-	logger.Info(ctx, "Telegram message sent to chat", zap.Int("chat_id", chatID), zap.String("message", message))
+	logger.Info(ctx, "Telegram message sent to chat", zap.Int64("chat_id", chatID), zap.String("message", message))
 	return nil
 }
 
 func (s *service) SendOrderAssembledNotification(ctx context.Context, msg model.OrderAssembledEvent) error {
+	chatID := config.AppConfig().TgBot.ChatID()
+
 	message, err := s.buildAssembledMsg(msg)
 	if err != nil {
 		return err
@@ -67,7 +69,7 @@ func (s *service) SendOrderAssembledNotification(ctx context.Context, msg model.
 		return err
 	}
 
-	logger.Info(ctx, "Telegram message sent to chat", zap.Int("chat_id", chatID), zap.String("message", message))
+	logger.Info(ctx, "Telegram message sent to chat", zap.Int64("chat_id", chatID), zap.String("message", message))
 	return nil
 }
 
