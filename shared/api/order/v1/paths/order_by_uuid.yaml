@@ -1,4 +1,5 @@
 parameters:
+  - $ref: ../headers/session_uuid.yaml
   - $ref: ../params/order_uuid.yaml
 
 get:

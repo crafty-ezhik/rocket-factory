@@ -1,3 +1,6 @@
+parameters:
+  - $ref: ../headers/session_uuid.yaml
+
 post:
   summary: Создание нового заказа
   operationId: OrderCreate

@@ -1,0 +1,7 @@
+name: X-Session-Uuid
+in: header
+required: true
+description: UUID сессии пользователя для аутентификации
+schema:
+  type: string
+  format: uuid

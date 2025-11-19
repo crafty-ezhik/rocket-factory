@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package auth.v1;
+
+import "common/v1/common.proto";
+
+// Описываем, куда будет положены сгенерированные файла и как будет называться пакет в Go
+option go_package = "github.com/crafty-ezhik/rocket-factory/pkg/proto/auth/v1;auth_v1";
+
+
+service AuthService{
+  // Метод для аутентификации пользователя
+  rpc Login(LoginRequest) returns (LoginResponse);
+
+  rpc Whoami(WhoamiRequest) returns (WhoamiResponse);
+}
+
+// Запрос на аутентификацию
+message LoginRequest {
+  string login = 1;
+  string password = 2;
+}
+
+// Ответ на запрос аутентификации
+message LoginResponse {
+  string session_uuid = 1;
+}
+
+// Запрос на получении данных по сессии
+message WhoamiRequest {
+  string session_uuid = 1;
+}
+
+// Ответ на запрос данных по сессии
+message WhoamiResponse {
+  common.v1.Session session = 1; // Указать правильный тип из common
+  common.v1.User user = 2; // Указать правильный тип из common
+}

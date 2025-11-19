@@ -1,0 +1,157 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "auth/v1/auth.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AuthService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1LoginResponse": {
+      "type": "object",
+      "properties": {
+        "session_uuid": {
+          "type": "string"
+        }
+      },
+      "title": "Ответ на запрос аутентификации"
+    },
+    "v1NotificationMethod": {
+      "type": "object",
+      "properties": {
+        "provider_name": {
+          "type": "string",
+          "description": "Провайдер: telegram, email, push и т.д."
+        },
+        "target": {
+          "type": "string",
+          "title": "Адрес/идентификатор назначения (email, чат-id)"
+        }
+      },
+      "title": "Метод уведомлений"
+    },
+    "v1Session": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "title": "UUID сессии"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Время создания"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Время последнего обновления"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Время истечения"
+        }
+      },
+      "title": "Данные сессии"
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string",
+          "title": "UUID пользователя"
+        },
+        "info": {
+          "$ref": "#/definitions/v1UserInfo",
+          "title": "Базовая информация о пользователе"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Время создания"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Время последнего обновления"
+        }
+      },
+      "title": "Данные пользователя"
+    },
+    "v1UserInfo": {
+      "type": "object",
+      "properties": {
+        "login": {
+          "type": "string",
+          "title": "Логин"
+        },
+        "email": {
+          "type": "string",
+          "title": "Email"
+        },
+        "notification_method": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1NotificationMethod"
+          },
+          "title": "Каналы уведомлений"
+        }
+      },
+      "title": "Информация о пользователе"
+    },
+    "v1WhoamiResponse": {
+      "type": "object",
+      "properties": {
+        "session": {
+          "$ref": "#/definitions/v1Session",
+          "title": "Указать правильный тип из common"
+        },
+        "user": {
+          "$ref": "#/definitions/v1User",
+          "title": "Указать правильный тип из common"
+        }
+      },
+      "title": "Ответ на запрос данных по сессии"
+    }
+  }
+}
