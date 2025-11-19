@@ -57,6 +57,31 @@ services: # Раздел, в котором описываются все кон
       - microservices-net
       # Redis подключается к той же общей сети, что и PostgreSQL, и остальные сервисы
 
+  migrator:
+    build:
+      context: ../../docker/db_migrator
+      dockerfile: Dockerfile
+
+    env_file:
+      - .env
+
+    depends_on:
+      postgres-order:
+        condition: service_healthy
+
+    command: [
+      "-path", "/migrations",
+      "-database", "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-order:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=${POSTGRES_SSL_MODE}",
+      "up"
+    ]
+
+    volumes:
+      # Прокидываем директорию с файлами миграции Postgres в контейнер
+      - ../../../iam/migrations:/migrations
+
+    networks:
+      - microservices-net
+
 volumes: # Раздел томов — Docker сам создаст и будет управлять этим хранилищем данных
   postgres_iam_data:
   # Том для хранения данных PostgreSQL (таблицы, индексы и т.д.)
