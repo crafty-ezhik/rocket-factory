@@ -13,6 +13,7 @@ import (
 
 func (r *repository) Create(ctx context.Context, info model.UserRegistrationInfo, hashedPassword string) (uuid.UUID, error) {
 	repoUser := converter.UserRegInfoToRepoModel(info)
+	var userUUID uuid.UUID
 
 	err := pgx.BeginFunc(ctx, r.pool, func(tx pgx.Tx) error {
 		usersStmt, args, err := usersInsertBuilder(repoUser, hashedPassword).ToSql()
@@ -20,7 +21,6 @@ func (r *repository) Create(ctx context.Context, info model.UserRegistrationInfo
 			return fmt.Errorf("build user insert: %w", err)
 		}
 
-		var userUUID uuid.UUID
 		err = tx.QueryRow(ctx, usersStmt, args...).Scan(&userUUID)
 		if err != nil {
 			return fmt.Errorf("insert user: %w", err)
@@ -38,7 +38,7 @@ func (r *repository) Create(ctx context.Context, info model.UserRegistrationInfo
 		return uuid.Nil, err
 	}
 
-	return uuid.Nil, nil
+	return userUUID, nil
 }
 
 func usersInsertBuilder(info repoModel.UserRegistrationInfo, hashedPassword string) squirrel.InsertBuilder {
@@ -51,10 +51,11 @@ func usersInsertBuilder(info repoModel.UserRegistrationInfo, hashedPassword stri
 
 func notificationInsertBuilder(userUUID uuid.UUID, methods []repoModel.NotificationMethod) squirrel.InsertBuilder {
 	builder := squirrel.Insert(notificationMethodsTable).
-		Columns(notificationMethodsFieldUserUUID, notificationMethodsFieldProviderName, notificationMethodsFieldTarget)
+		Columns(notificationMethodsFieldUserUUID, notificationMethodsFieldProviderName, notificationMethodsFieldTarget).
+		PlaceholderFormat(squirrel.Dollar)
 
 	for _, m := range methods {
-		builder.Values(userUUID, m.ProviderName, m.Target)
+		builder = builder.Values(userUUID, m.ProviderName, m.Target)
 	}
-	return builder.PlaceholderFormat(squirrel.Dollar)
+	return builder
 }
