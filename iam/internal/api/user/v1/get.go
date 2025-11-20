@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/converter"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	userV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/user/v1"
 	"github.com/google/uuid"
@@ -17,8 +18,8 @@ func (a *api) GetUser(ctx context.Context, req *userV1.GetUserRequest) (*userV1.
 	if err != nil {
 		return nil, err
 	}
-	_ = user
 
-	// TODO: Добавить конвертор
-	return nil, nil
+	return &userV1.GetUserResponse{
+		User: converter.UserToProto(user),
+	}, nil
 }
