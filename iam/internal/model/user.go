@@ -8,7 +8,7 @@ import (
 type User struct {
 	UUID      uuid.UUID
 	Info      UserInfo
-	CreatedAt *time.Time
+	CreatedAt time.Time
 	UpdatedAt *time.Time
 }
 
