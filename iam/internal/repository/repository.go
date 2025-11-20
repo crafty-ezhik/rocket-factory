@@ -1,1 +1,12 @@
 package repository
+
+import (
+	"context"
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
+	"github.com/google/uuid"
+)
+
+type UserRepository interface {
+	Get(ctx context.Context, userUUID uuid.UUID) (model.User, error)
+	Create(ctx context.Context, info model.UserRegistrationInfo, hashedPassword string) (uuid.UUID, error)
+}
