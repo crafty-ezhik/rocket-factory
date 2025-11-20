@@ -20,6 +20,7 @@ type UserRegistrationInfo struct {
 type UserInfo struct {
 	Login               string
 	Email               string
+	PasswordHash        string
 	NotificationMethods []NotificationMethod
 }
 

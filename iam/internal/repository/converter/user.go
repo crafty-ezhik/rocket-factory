@@ -11,6 +11,7 @@ func UserToServiceModel(user repoModel.User) serviceModel.User {
 		Info: serviceModel.UserInfo{
 			Login:               user.Info.Login,
 			Email:               user.Info.Email,
+			PasswordHash:        user.Info.PasswordHash,
 			NotificationMethods: notificationMethodsToModel(user.Info.NotificationMethods),
 		},
 		CreatedAt: user.CreatedAt,

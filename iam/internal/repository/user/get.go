@@ -25,6 +25,7 @@ func (r *repository) Get(ctx context.Context, userUUID uuid.UUID) (serviceModel.
 		err = tx.QueryRow(ctx, userQuery, args...).Scan(
 			&user.UUID,
 			&user.Info.Login,
+			&user.Info.PasswordHash,
 			&user.Info.Email,
 			&user.CreatedAt,
 			&user.UpdatedAt,
@@ -67,6 +68,7 @@ func buildSelectUserQuery(userUUID uuid.UUID) squirrel.SelectBuilder {
 	builder := squirrel.Select(
 		userFieldUserUUID,
 		userFieldLogin,
+		userFieldPassword,
 		userFieldEmail,
 		userFieldCreatedAt,
 		userFieldUpdatedAt,
