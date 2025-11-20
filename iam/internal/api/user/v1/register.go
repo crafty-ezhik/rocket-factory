@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/converter"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	userV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/user/v1"
 )
@@ -14,12 +15,10 @@ func (a *api) Register(ctx context.Context, req *userV1.RegisterRequest) (*userV
 		return &userV1.RegisterResponse{}, model.ErrPasswordIsRequired
 	}
 
-	userUUID, err := a.service.Register(ctx, model.UserRegistrationInfo{}) // TODO: Добавить конвертер
+	userUUID, err := a.service.Register(ctx, converter.UserRegInfoToModel(req.Info))
 	if err != nil {
 		return &userV1.RegisterResponse{}, err
 	}
-	_ = userUUID
 
-	// TODO: Добавить конвертер
-	return nil, nil
+	return &userV1.RegisterResponse{UserUuid: userUUID.String()}, nil
 }
