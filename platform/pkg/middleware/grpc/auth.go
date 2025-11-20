@@ -3,14 +3,13 @@ package grpc
 import (
 	"context"
 	"fmt"
+	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
+	commonV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/common/v1"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
-
-	authV1 "github.com/olezhek28/microservices-course-olezhek-solution/shared/pkg/proto/auth/v1"
-	commonV1 "github.com/olezhek28/microservices-course-olezhek-solution/shared/pkg/proto/common/v1"
 )
 
 const (

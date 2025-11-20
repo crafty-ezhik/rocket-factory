@@ -3,6 +3,7 @@ create table users (
     user_uuid uuid primary key default gen_random_uuid(),
     login varchar(100) not null ,
     email varchar(100) not null ,
+    password text not null ,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
     updated_at TIMESTAMP WITH TIME ZONE
 );

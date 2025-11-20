@@ -2,11 +2,10 @@ package http
 
 import (
 	"context"
+	grpcAuth "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
+	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
+	commonV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/common/v1"
 	"net/http"
-
-	grpcAuth "github.com/olezhek28/microservices-course-olezhek-solution/platform/pkg/middleware/grpc"
-	authV1 "github.com/olezhek28/microservices-course-olezhek-solution/shared/pkg/proto/auth/v1"
-	commonV1 "github.com/olezhek28/microservices-course-olezhek-solution/shared/pkg/proto/common/v1"
 )
 
 const SessionUUIDHeader = "X-Session-Uuid"
