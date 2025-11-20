@@ -13,8 +13,8 @@ services: # Раздел, в котором описываются все кон
       # Это позволяет не потерять данные при перезапуске контейнера
 
     ports:
-      - "${EXTERNAL_POSTGRES_PORT}:5432"
-      # Пробрасываем внутренний порт PostgreSQL (5432) на порт хоста, указанный в переменной EXTERNAL_POSTGRES_PORT
+      - "${EXTERNAL_POSTGRES_PORT}:${POSTGRES_PORT}"
+      # Пробрасываем внутренний порт PostgreSQL (5433) на порт хоста, указанный в переменной EXTERNAL_POSTGRES_PORT
       # Это нужно, чтобы можно было подключиться к базе извне, например, из DBeaver или другого сервиса
 
     healthcheck:
@@ -66,12 +66,12 @@ services: # Раздел, в котором описываются все кон
       - .env
 
     depends_on:
-      postgres-order:
+      postgres-iam:
         condition: service_healthy
 
     command: [
       "-path", "/migrations",
-      "-database", "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-order:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=${POSTGRES_SSL_MODE}",
+      "-database", "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-iam:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=${POSTGRES_SSL_MODE}",
       "up"
     ]
 
