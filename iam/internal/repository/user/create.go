@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Masterminds/squirrel"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
@@ -9,6 +10,7 @@ import (
 	repoModel "github.com/crafty-ezhik/rocket-factory/iam/internal/repository/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 func (r *repository) Create(ctx context.Context, info model.UserRegistrationInfo, hashedPassword string) (uuid.UUID, error) {
@@ -23,6 +25,12 @@ func (r *repository) Create(ctx context.Context, info model.UserRegistrationInfo
 
 		err = tx.QueryRow(ctx, usersStmt, args...).Scan(&userUUID)
 		if err != nil {
+			var existsErr *pgconn.PgError
+			if errors.As(err, &existsErr) {
+				if existsErr.Code == "23505" {
+					return model.ErrUserAlreadyExist
+				}
+			}
 			return fmt.Errorf("insert user: %w", err)
 		}
 
