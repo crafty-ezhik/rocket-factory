@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/converter"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
 	"github.com/google/uuid"
@@ -21,8 +22,6 @@ func (a *api) Whoami(ctx context.Context, req *authV1.WhoamiRequest) (*authV1.Wh
 	if err != nil {
 		return &authV1.WhoamiResponse{}, err
 	}
-	_ = response
 
-	// TODO: Сделать конвертер и использовать в return
-	return nil, nil
+	return converter.WhoamiResponseToProto(response, sessionUUID.String()), nil
 }
