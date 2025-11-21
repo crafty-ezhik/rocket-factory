@@ -6,7 +6,7 @@ import (
 )
 
 type Session struct {
-	UUID      uuid.UUID
+	UserUUID  uuid.UUID
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
 	ExpiresAt *time.Time
