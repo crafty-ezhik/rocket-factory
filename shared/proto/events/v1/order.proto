@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package events.v1;
+
+option go_package = "github.com/crafty-ezhik/rocket-factory/pkg/proto/events/v1;events_v1";
+
+
+// Заказ оплачен
+message OrderPaid {
+  string event_uuid = 1; // Уникальный идентификатор события (для идемпотентности)
+  string order_uuid = 2; // Идентификатор оплаченного заказа
+  string user_uuid = 3; // Идентификатор пользователя
+  string payment_method = 4; // Способ оплаты (строкой, значение из PaymentMethod)
+  string transaction_uuid = 5; // Идентификатор транзакции, сгенерированный в результате оплаты
+}
+
+// Корабль собран
+message ShipAssembled {
+  string event_uuid = 1; // Уникальный идентификатор события (для идемпотентности)
+  string order_uuid = 2; // Идентификатор оплаченного заказа
+  string user_uuid = 3; // Идентификатор пользователя
+  int64 build_time_sec = 4; // Время (в секундах), потраченное на сборку корабля
+}

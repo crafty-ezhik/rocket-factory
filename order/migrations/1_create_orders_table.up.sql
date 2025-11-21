@@ -17,11 +17,3 @@ CREATE TABLE orders (
 CREATE INDEX IF NOT EXISTS idx_orders_user_uuid ON orders (user_uuid);
 
 
--- +goose Down
-DROP TABLE orders;
-
--- удаляем таблицу заказов
-DROP TABLE IF EXISTS orders;
-
--- удаляем индекс по user_uuid
-DROP INDEX IF EXISTS idx_orders_user_uuid;

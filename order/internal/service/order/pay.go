@@ -34,6 +34,18 @@ func (s *service) Pay(ctx context.Context, orderID uuid.UUID, paymentMethod mode
 		return uuid.Nil, err
 	}
 
+	// Отправляем сообщение в Kafka для сборки заказа в Assembly Service
+	err = s.orderPaidProducer.ProduceOrderPaid(ctx, model.OrderPaidEvent{
+		EventUUID:       uuid.New(),
+		OrderUUID:       order.UUID,
+		UserUUID:        order.UserUUID,
+		PaymentMethod:   paymentMethod.String(),
+		TransactionUUID: transactionUUID,
+	})
+	if err != nil {
+		return uuid.Nil, err
+	}
+
 	// Обновляем данные по заказу
 	order.Status = model.OrderStatusPAID
 	order.PaymentMethod = paymentMethod

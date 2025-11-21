@@ -46,6 +46,10 @@ func (s *ServiceSuite) TestPayOrderSuccess() {
 					Return(transactionUUID.String(), nil).
 					Once()
 
+				s.orderPaidProducer.On("ProduceOrderPaid", s.ctx, mock.Anything).
+					Return(nil).
+					Once()
+
 				s.repo.On("Update", s.ctx, order).
 					Return(nil).
 					Once()
@@ -171,6 +175,10 @@ func (s *ServiceSuite) TestPayOrderFail() {
 
 				s.paymentClient.On("PayOrder", mock.Anything, orderId, userId, paymentMethod).
 					Return(transactionUUID.String(), nil).
+					Once()
+
+				s.orderPaidProducer.On("ProduceOrderPaid", s.ctx, mock.Anything).
+					Return(nil).
 					Once()
 
 				s.repo.On("Update", s.ctx, order).
