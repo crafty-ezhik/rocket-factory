@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	Get(ctx context.Context, userUUID uuid.UUID) (model.User, error)
 	Create(ctx context.Context, info model.UserRegistrationInfo, hashedPassword string) (uuid.UUID, error)
+	Exist(ctx context.Context, login string) (model.User, error)
 }
 
 type SessionRepository interface {
