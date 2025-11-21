@@ -7,9 +7,9 @@ import (
 
 type Session struct {
 	UserUUID  uuid.UUID
-	CreatedAt *time.Time
+	CreatedAt time.Time
 	UpdatedAt *time.Time
-	ExpiresAt *time.Time
+	ExpiresAt time.Time
 }
 
 type WhoamiResponse struct {
