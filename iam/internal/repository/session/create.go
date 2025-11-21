@@ -3,8 +3,9 @@ package session
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const ttl = time.Hour * 24
@@ -31,7 +32,7 @@ func (r *repository) Create(ctx context.Context, userUUID uuid.UUID) (uuid.UUID,
 
 	err := r.redis.HashSet(ctx, sessionUUID.String(), fields)
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("failed to set hash set: %v", err)
+		return uuid.Nil, fmt.Errorf("failed to set hash set: %w", err)
 	}
 
 	err = r.AddToUserSet(ctx, userUUID, sessionUUID)

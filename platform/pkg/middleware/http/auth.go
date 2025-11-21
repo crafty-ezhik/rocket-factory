@@ -2,10 +2,11 @@ package http
 
 import (
 	"context"
+	"net/http"
+
 	grpcAuth "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
 	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
 	commonV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/common/v1"
-	"net/http"
 )
 
 const SessionUUIDHeader = "X-Session-Uuid"

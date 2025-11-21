@@ -1,10 +1,12 @@
 package converter
 
 import (
+	"time"
+
+	"github.com/google/uuid"
+
 	serviceModel "github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	repoModel "github.com/crafty-ezhik/rocket-factory/iam/internal/repository/model"
-	"github.com/google/uuid"
-	"time"
 )
 
 func SessionToServiceModel(data repoModel.Session) serviceModel.Session {

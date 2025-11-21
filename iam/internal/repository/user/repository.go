@@ -1,8 +1,9 @@
 package user
 
 import (
-	def "github.com/crafty-ezhik/rocket-factory/iam/internal/repository"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	def "github.com/crafty-ezhik/rocket-factory/iam/internal/repository"
 )
 
 var _ def.UserRepository = (*repository)(nil)

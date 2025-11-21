@@ -1,10 +1,11 @@
 package converter
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	serviceModel "github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	commonV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/common/v1"
 	userV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/user/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // UserRegInfoToModel - конвертирует регистрационные данные в сервисную модель

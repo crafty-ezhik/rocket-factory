@@ -4,13 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/Masterminds/squirrel"
-	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
-	"github.com/crafty-ezhik/rocket-factory/iam/internal/repository/converter"
-	repoModel "github.com/crafty-ezhik/rocket-factory/iam/internal/repository/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/repository/converter"
+	repoModel "github.com/crafty-ezhik/rocket-factory/iam/internal/repository/model"
 )
 
 func (r *repository) Create(ctx context.Context, info model.UserRegistrationInfo, hashedPassword string) (uuid.UUID, error) {
@@ -35,6 +37,10 @@ func (r *repository) Create(ctx context.Context, info model.UserRegistrationInfo
 		}
 
 		methodsStmt, args, err := notificationInsertBuilder(userUUID, repoUser.Info.NotificationMethods).ToSql()
+		if err != nil {
+			return fmt.Errorf("build notification insert: %w", err)
+		}
+
 		_, err = tx.Exec(ctx, methodsStmt, args...)
 		if err != nil {
 			return fmt.Errorf("insert notification method: %w", err)

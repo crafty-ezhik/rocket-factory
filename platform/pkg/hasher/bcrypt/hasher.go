@@ -2,8 +2,10 @@ package bcrypt
 
 import (
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/hasher"
+
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/hasher"
 )
 
 type BcryptPasswordHasher struct {

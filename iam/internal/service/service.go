@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
-	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
+
 	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 )
 
 type AuthService interface {

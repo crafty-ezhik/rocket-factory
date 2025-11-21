@@ -1,10 +1,11 @@
 package converter
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
 	commonV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/common/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func WhoamiResponseToProto(data model.WhoamiResponse, sessionUUID string) *authV1.WhoamiResponse {

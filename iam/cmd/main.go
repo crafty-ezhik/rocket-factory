@@ -3,8 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"net"
+	"time"
+
+	redigo "github.com/gomodule/redigo/redis"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
+
 	authAPIV1 "github.com/crafty-ezhik/rocket-factory/iam/internal/api/auth/v1"
 	userAPIV1 "github.com/crafty-ezhik/rocket-factory/iam/internal/api/user/v1"
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/interceptor"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/repository/session"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/repository/user"
@@ -16,16 +27,6 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
 	userV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/user/v1"
-	redigo "github.com/gomodule/redigo/redis"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
-	"log"
-	"net"
-	"time"
-
-	"github.com/crafty-ezhik/rocket-factory/iam/internal/config"
 )
 
 const configPath = "../deploy/compose/iam/.env"
@@ -90,11 +91,13 @@ func main() {
 
 	listener, err := net.Listen("tcp", config.AppConfig().IamGRPC.Address())
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Printf("failed to listen: %v", err)
+		return
 	}
 
 	log.Printf("🚀 grpc server listening at %v\n", listener.Addr())
 	if err := server.Serve(listener); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.Printf("failed to serve: %v", err)
+		return
 	}
 }

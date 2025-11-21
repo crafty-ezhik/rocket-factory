@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/converter"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	userV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/user/v1"

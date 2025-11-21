@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v5"
+
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/repository/converter"
 	repoModel "github.com/crafty-ezhik/rocket-factory/iam/internal/repository/model"
-	"github.com/jackc/pgx/v5"
 )
 
 func (r *repository) Exist(ctx context.Context, login string) (model.User, error) {

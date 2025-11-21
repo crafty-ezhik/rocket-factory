@@ -3,10 +3,12 @@ package user
 import (
 	"context"
 	"errors"
+	"net/mail"
+
+	"github.com/google/uuid"
+
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/hasher"
-	"github.com/google/uuid"
-	"net/mail"
 )
 
 func (s *service) Register(ctx context.Context, userInfo model.UserRegistrationInfo) (uuid.UUID, error) {

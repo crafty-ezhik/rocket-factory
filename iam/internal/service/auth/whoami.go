@@ -2,8 +2,10 @@ package auth
 
 import (
 	"context"
-	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
+
 	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
 )
 
 func (s *service) Whoami(ctx context.Context, sessionUUID uuid.UUID) (model.WhoamiResponse, error) {
