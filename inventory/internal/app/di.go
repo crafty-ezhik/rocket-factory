@@ -3,17 +3,14 @@ package app
 import (
 	"context"
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
-	middlewareGRPC "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
-	auth_v1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	inventoryV1API "github.com/crafty-ezhik/rocket-factory/inventory/internal/api/inventory/v1"
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/config"
@@ -22,6 +19,9 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/inventory/internal/service"
 	inventoryService "github.com/crafty-ezhik/rocket-factory/inventory/internal/service/part"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/closer"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
+	middlewareGRPC "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
+	auth_v1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 
@@ -111,7 +111,6 @@ func (d *diContainer) IAMConn(_ context.Context) *grpc.ClientConn {
 		config.AppConfig().IamGRPC.Address(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
-
 	if err != nil {
 		panic(fmt.Sprintf("❌ Ошибка подключения к IAM Service: %v", err))
 	}

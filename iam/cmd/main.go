@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/crafty-ezhik/rocket-factory/iam/internal/app"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/closer"
-	"go.uber.org/zap"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"go.uber.org/zap"
+
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/app"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/config"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/closer"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 )
 

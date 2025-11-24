@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	HTTPMiddleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/http"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -14,6 +13,7 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/order/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/closer"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
+	HTTPMiddleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/http"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
 )
 

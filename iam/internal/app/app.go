@@ -4,6 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/reflection"
+
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/config"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/interceptor"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/closer"
@@ -11,10 +17,6 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
 	userV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/user/v1"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/reflection"
-	"net"
 )
 
 type App struct {
@@ -53,7 +55,6 @@ func (a *App) initDeps(ctx context.Context) error {
 		}
 	}
 	return nil
-
 }
 
 func (a *App) initDI(_ context.Context) error {

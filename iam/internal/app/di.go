@@ -3,6 +3,12 @@ package app
 import (
 	"context"
 	"fmt"
+	"time"
+
+	"github.com/gomodule/redigo/redis"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"go.uber.org/zap"
+
 	authAPIV1 "github.com/crafty-ezhik/rocket-factory/iam/internal/api/auth/v1"
 	userAPIV1 "github.com/crafty-ezhik/rocket-factory/iam/internal/api/user/v1"
 	"github.com/crafty-ezhik/rocket-factory/iam/internal/config"
@@ -20,10 +26,6 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
 	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
 	userV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/user/v1"
-	"github.com/gomodule/redigo/redis"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"go.uber.org/zap"
-	"time"
 )
 
 type diContainer struct {

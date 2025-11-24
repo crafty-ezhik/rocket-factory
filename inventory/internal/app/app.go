@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	grpcMidlleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
 	"net"
 	"net/http"
 	"time"
@@ -21,6 +20,7 @@ import (
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/grpc/health"
 	sharedIns "github.com/crafty-ezhik/rocket-factory/platform/pkg/grpc/interceptors"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
+	grpcMidlleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 

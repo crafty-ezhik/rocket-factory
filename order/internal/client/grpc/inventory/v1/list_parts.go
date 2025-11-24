@@ -2,10 +2,10 @@ package v1
 
 import (
 	"context"
-	"github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
 
 	clientConverter "github.com/crafty-ezhik/rocket-factory/order/internal/client/converter"
 	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
 	generatedInventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 )
 

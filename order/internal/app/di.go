@@ -3,10 +3,6 @@ package app
 import (
 	"context"
 	"fmt"
-	middlewareGRPC "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
-	HTTPMiddleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/http"
-	auth_v1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
-
 	"time"
 
 	"github.com/IBM/sarama"
@@ -33,8 +29,11 @@ import (
 	wrapperKafkaConsumer "github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka/consumer"
 	wrapperKafkaProducer "github.com/crafty-ezhik/rocket-factory/platform/pkg/kafka/producer"
 	"github.com/crafty-ezhik/rocket-factory/platform/pkg/logger"
+	middlewareGRPC "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
+	HTTPMiddleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/http"
 	kafkaMiddleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/kafka"
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
+	auth_v1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
 	inventoryV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/inventory/v1"
 	paymentV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/payment/v1"
 )
@@ -200,7 +199,6 @@ func (d *diContainer) IAMConn(_ context.Context) *googleGRPC.ClientConn {
 		config.AppConfig().IamGRPC.Address(),
 		googleGRPC.WithTransportCredentials(insecure.NewCredentials()),
 	)
-
 	if err != nil {
 		panic(fmt.Sprintf("❌ Ошибка подключения к IAM Service: %v", err))
 	}
