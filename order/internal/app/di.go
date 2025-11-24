@@ -3,6 +3,10 @@ package app
 import (
 	"context"
 	"fmt"
+	middlewareGRPC "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
+	HTTPMiddleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/http"
+	auth_v1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
+
 	"time"
 
 	"github.com/IBM/sarama"
@@ -46,6 +50,7 @@ type diContainer struct {
 
 	inventoryClient grpc.InventoryClient
 	paymentClient   grpc.PaymentClient
+	iamClient       HTTPMiddleware.IAMClient
 
 	consumerGroup          sarama.ConsumerGroup
 	orderAssembledConsumer wrapperKafka.Consumer
@@ -140,6 +145,14 @@ func (d *diContainer) InventoryClient(ctx context.Context) grpc.InventoryClient 
 	return d.inventoryClient
 }
 
+func (d *diContainer) IAMClient(ctx context.Context) middlewareGRPC.IAMClient {
+	if d.iamClient == nil {
+		grpcIAM := auth_v1.NewAuthServiceClient(d.IAMConn(ctx))
+		d.iamClient = grpcIAM
+	}
+	return d.iamClient
+}
+
 func (d *diContainer) PaymentConn(_ context.Context) *googleGRPC.ClientConn {
 	conn, err := googleGRPC.NewClient(
 		config.AppConfig().PaymentGRPC.Address(),
@@ -174,6 +187,27 @@ func (d *diContainer) InventoryConn(_ context.Context) *googleGRPC.ClientConn {
 	closer.AddNamed("InventoryService connection", func(ctx context.Context) error {
 		if err := conn.Close(); err != nil {
 			logger.Error(ctx, "❌ Ошибка при закрытии подключения с InventoryService", zap.Error(err))
+			return err
+		}
+		return nil
+	})
+
+	return conn
+}
+
+func (d *diContainer) IAMConn(_ context.Context) *googleGRPC.ClientConn {
+	conn, err := googleGRPC.NewClient(
+		config.AppConfig().IamGRPC.Address(),
+		googleGRPC.WithTransportCredentials(insecure.NewCredentials()),
+	)
+
+	if err != nil {
+		panic(fmt.Sprintf("❌ Ошибка подключения к IAM Service: %v", err))
+	}
+
+	closer.AddNamed("IAM client", func(ctx context.Context) error {
+		if err := conn.Close(); err != nil {
+			logger.Error(ctx, "❌ Ошибка при закрытии подключения с IAM Service", zap.Error(err))
 			return err
 		}
 		return nil

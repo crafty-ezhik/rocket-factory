@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	HTTPMiddleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/http"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -109,11 +110,14 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 	// Инициализируем роутер Chi
 	r := chi.NewRouter()
 
+	authMiddleware := HTTPMiddleware.NewAuthMiddleware(a.diContainer.IAMClient(ctx))
+
 	// Добавляем middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Heartbeat("/api/v1/orders/ping"))
 	r.Use(middleware.Timeout(config.AppConfig().OrderHTTP.ReadTimeout()))
+	r.Use(authMiddleware.Handle)
 
 	// Монтируем обработчик OpenAPI к нашему серверу
 	r.Mount("/", orderServer)

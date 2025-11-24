@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
 
 	clientConverter "github.com/crafty-ezhik/rocket-factory/order/internal/client/converter"
 	serviceModel "github.com/crafty-ezhik/rocket-factory/order/internal/model"
@@ -9,7 +10,7 @@ import (
 )
 
 func (c *client) ListParts(ctx context.Context, filter serviceModel.PartsFilter) ([]serviceModel.Part, error) {
-	parts, err := c.generatedClient.ListParts(ctx, &generatedInventoryV1.ListPartsRequest{
+	parts, err := c.generatedClient.ListParts(grpc.ForwardSessionUUIDToGRPC(ctx), &generatedInventoryV1.ListPartsRequest{
 		Filter: clientConverter.PartsFilterToProto(filter),
 	})
 	if err != nil {
