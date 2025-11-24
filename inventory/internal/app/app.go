@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	grpcMidlleware "github.com/crafty-ezhik/rocket-factory/platform/pkg/middleware/grpc"
 	"net"
 	"net/http"
 	"time"
@@ -116,10 +117,13 @@ func (a *App) initListener(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
+	authInterceptor := grpcMidlleware.NewAuthInterceptor(a.diContainer.IAMClient(ctx))
+
 	a.grpcServer = grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
 		grpc.ChainUnaryInterceptor(
 			interceptor.LoggerInterceptor(),
+			authInterceptor.Unary(),
 			sharedIns.UnaryErrorInterceptor(),
 			interceptor.ValidatorInterceptor(),
 		))
