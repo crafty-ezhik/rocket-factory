@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package user.v1;
+
+import "common/v1/common.proto";
+
+
+// Описываем, куда будет положены сгенерированные файла и как будет называться пакет в Go
+option go_package = "github.com/crafty-ezhik/rocket-factory/pkg/proto/user/v1;user_v1";
+
+service UserService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc GetUser(GetUserRequest) returns (GetUserResponse);
+}
+
+// Запрос на регистрацию пользователя
+message RegisterRequest {
+  UserRegistrationInfo info = 1; // Данные для регистрации
+}
+
+// Ответ на операцию регистрации
+message RegisterResponse {
+  string user_uuid = 1; // UUID созданного пользователя
+}
+
+// Запрос на получение информации о пользователе по его UUID
+message GetUserRequest {
+  string user_uuid = 1; // UUID пользователя
+}
+
+// Ответ на запрос получения информации пользователя по его UUID
+message GetUserResponse {
+  common.v1.User user = 1; // Пользователь
+}
+
+// Основная информация пользователя
+message UserRegistrationInfo {
+  common.v1.UserInfo info = 1; // Основная информация пользователя
+  string password = 2;
+}

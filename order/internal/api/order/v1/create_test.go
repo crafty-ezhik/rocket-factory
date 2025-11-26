@@ -23,6 +23,7 @@ func (s *ApiSuite) TestCreateOrderSuccess() {
 	tests := []struct {
 		name        string
 		req         *orderV1.CreateOrderRequest
+		params      orderV1.OrderCreateParams
 		expectedRes orderV1.OrderCreateRes
 		setupMock   func()
 	}{
@@ -31,6 +32,9 @@ func (s *ApiSuite) TestCreateOrderSuccess() {
 			req: &orderV1.CreateOrderRequest{
 				UserUUID:  userUUID,
 				PartUuids: partUUIDs,
+			},
+			params: orderV1.OrderCreateParams{
+				XSessionUUID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 			},
 			expectedRes: &orderV1.CreateOrderResponse{
 				OrderUUID:  orderUUID,
@@ -48,7 +52,7 @@ func (s *ApiSuite) TestCreateOrderSuccess() {
 		s.Run(tt.name, func() {
 			tt.setupMock()
 
-			res, err := s.api.OrderCreate(s.ctx, tt.req)
+			res, err := s.api.OrderCreate(s.ctx, tt.req, tt.params)
 
 			s.Require().NoError(err)
 			s.Require().Equal(tt.expectedRes, res)
@@ -67,6 +71,7 @@ func (s *ApiSuite) TestCreateOrderFailure() {
 	tests := []struct {
 		name        string
 		req         *orderV1.CreateOrderRequest
+		params      orderV1.OrderCreateParams
 		expectedRes orderV1.OrderCreateRes
 		setupMock   func()
 	}{
@@ -75,6 +80,9 @@ func (s *ApiSuite) TestCreateOrderFailure() {
 			req: &orderV1.CreateOrderRequest{
 				UserUUID:  userUUID,
 				PartUuids: nil,
+			},
+			params: orderV1.OrderCreateParams{
+				XSessionUUID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 			},
 			expectedRes: &orderV1.BadRequestError{
 				Code:    http.StatusBadRequest,
@@ -87,6 +95,9 @@ func (s *ApiSuite) TestCreateOrderFailure() {
 			req: &orderV1.CreateOrderRequest{
 				UserUUID:  userUUID,
 				PartUuids: partUUIDs,
+			},
+			params: orderV1.OrderCreateParams{
+				XSessionUUID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 			},
 			expectedRes: &orderV1.RequestTimeoutError{
 				Code:    http.StatusRequestTimeout,
@@ -104,6 +115,9 @@ func (s *ApiSuite) TestCreateOrderFailure() {
 				UserUUID:  userUUID,
 				PartUuids: partUUIDs,
 			},
+			params: orderV1.OrderCreateParams{
+				XSessionUUID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+			},
 			expectedRes: &orderV1.BadRequestError{
 				Code:    http.StatusBadRequest,
 				Message: "request cancelled",
@@ -120,6 +134,9 @@ func (s *ApiSuite) TestCreateOrderFailure() {
 				UserUUID:  userUUID,
 				PartUuids: partUUIDs,
 			},
+			params: orderV1.OrderCreateParams{
+				XSessionUUID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+			},
 			expectedRes: &orderV1.InternalServerError{
 				Code:    http.StatusInternalServerError,
 				Message: "something went wrong",
@@ -135,7 +152,7 @@ func (s *ApiSuite) TestCreateOrderFailure() {
 	for _, tt := range tests {
 		s.Run(tt.name, func() {
 			tt.setupMock()
-			res, err := s.api.OrderCreate(s.ctx, tt.req)
+			res, err := s.api.OrderCreate(s.ctx, tt.req, tt.params)
 
 			s.Require().NoError(err)
 			s.Require().Equal(tt.expectedRes, res)

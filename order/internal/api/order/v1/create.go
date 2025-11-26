@@ -9,7 +9,7 @@ import (
 	orderV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/openapi/order/v1"
 )
 
-func (a *api) OrderCreate(ctx context.Context, req *orderV1.CreateOrderRequest) (orderV1.OrderCreateRes, error) {
+func (a *api) OrderCreate(ctx context.Context, req *orderV1.CreateOrderRequest, params orderV1.OrderCreateParams) (orderV1.OrderCreateRes, error) {
 	if err := req.Validate(); err != nil {
 		return &orderV1.BadRequestError{
 			Code:    http.StatusBadRequest,

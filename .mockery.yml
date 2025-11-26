@@ -61,3 +61,16 @@ packages:
   github.com/crafty-ezhik/rocket-factory/notification/internal/client/grpc:
     config:
       include-interface-regex: .*Client
+
+  # === IAM SERVICE ===
+  github.com/crafty-ezhik/rocket-factory/iam/internal/service:
+    config:
+      include-interface-regex: .*Service
+
+  github.com/crafty-ezhik/rocket-factory/iam/internal/config:
+    config:
+      include-interface-regex: .*Config
+
+  github.com/crafty-ezhik/rocket-factory/iam/internal/repository:
+    config:
+      include-interface-regex: .*Repository
