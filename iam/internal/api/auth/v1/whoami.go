@@ -1,0 +1,29 @@
+package v1
+
+import (
+	"context"
+
+	"github.com/google/uuid"
+
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/converter"
+	"github.com/crafty-ezhik/rocket-factory/iam/internal/model"
+	authV1 "github.com/crafty-ezhik/rocket-factory/shared/pkg/proto/auth/v1"
+)
+
+func (a *api) Whoami(ctx context.Context, req *authV1.WhoamiRequest) (*authV1.WhoamiResponse, error) {
+	if req.SessionUuid == "" {
+		return &authV1.WhoamiResponse{}, model.ErrSessionUUIDIsMissing
+	}
+
+	sessionUUID, err := uuid.Parse(req.SessionUuid)
+	if err != nil {
+		return &authV1.WhoamiResponse{}, model.ErrInvalidSessionUUID
+	}
+
+	response, err := a.service.Whoami(ctx, sessionUUID)
+	if err != nil {
+		return &authV1.WhoamiResponse{}, err
+	}
+
+	return converter.WhoamiResponseToProto(response, sessionUUID.String()), nil
+}
